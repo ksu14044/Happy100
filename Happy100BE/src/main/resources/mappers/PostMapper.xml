@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Happy100BE.Happy100.mapper.PostMapper">
+
+    <!--
+      resultMap: DB 컬럼 → Post 필드 매핑
+      - ENUM(BoardType/QnaStatus)은 기본 EnumTypeHandler가 name()을 문자열로 매핑합니다.
+    -->
+    <resultMap id="PostMap" type="com.Happy100BE.Happy100.entity.Post">
+        <id     property="postId"        column="post_id"/>
+        <result property="boardType"     column="board_type"/>
+        <result property="title"         column="title"/>
+        <result property="contentJson"   column="content_json"/>
+        <result property="authorUserId"  column="author_user_id"/>
+        <result property="qnaStatus"     column="qna_status"/>
+        <result property="createdAt"     column="created_at"/>
+        <result property="updatedAt"     column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT: JSON 문자열을 DB JSON으로 캐스팅 저장 -->
+    <insert id="insertPost"
+            parameterType="com.Happy100BE.Happy100.entity.Post"
+            useGeneratedKeys="true"
+            keyProperty="postId">
+        INSERT INTO post_tb
+        (board_type, title, content_json, author_user_id, qna_status)
+        VALUES
+        (
+        #{boardType},
+        #{title},
+        CAST(#{contentJson} AS JSON),
+        #{authorUserId},
+        #{qnaStatus}
+        )
+    </insert>
+
+    <!-- 단건 조회 -->
+    <select id="findById" parameterType="int" resultMap="PostMap">
+        SELECT
+        post_id, board_type, title, content_json,
+        author_user_id, qna_status,
+        created_at, updated_at
+        FROM post_tb
+        WHERE post_id = #{postId}
+    </select>
+
+    <select id="findPageByBoard" resultMap="PostMap">
+        SELECT
+        post_id, board_type, title, content_json,
+        author_user_id, qna_status, created_at, updated_at
+        FROM post_tb
+        WHERE board_type = #{boardType}
+        <if test="keyword != null and keyword != ''">
+            AND (
+            title LIKE CONCAT('%', #{keyword}, '%')
+            OR content_json LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <!-- QNA는 관리자만 전체 열람, 일반 사용자는 자신의 글만 -->
+        <if test="isQna and !isAdmin">
+            AND author_user_id = #{currentUserId}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 총 건수(페이지네이션 계산용) -->
+    <select id="countByBoard" resultType="int">
+        SELECT COUNT(*)
+        FROM post_tb
+        WHERE board_type = #{boardType}
+        <if test="keyword != null and keyword != ''">
+            AND (
+            title LIKE CONCAT('%', #{keyword}, '%')
+            OR content_json LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        <if test="isQna and !isAdmin">
+            AND author_user_id = #{currentUserId}
+        </if>
+    </select>
+
+    <!-- ====== 수정 ====== -->
+    <update id="updatePost" parameterType="com.Happy100BE.Happy100.entity.Post">
+        UPDATE post_tb
+        SET
+        title = #{title},
+        content_json = CAST(#{contentJson} AS JSON),
+        qna_status = #{qnaStatus},
+        updated_at = CURRENT_TIMESTAMP
+        WHERE post_id = #{postId}
+    </update>
+
+    <!-- ====== 삭제 ====== -->
+    <delete id="deletePost" parameterType="int">
+        DELETE FROM post_tb
+        WHERE post_id = #{postId}
+    </delete>
+
+</mapper>
