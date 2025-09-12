@@ -54,7 +54,7 @@ public class UserService {
                 .username(user.getUsername())
                 .name(user.getName())
                 .email(user.getEmail())
-                .accountEnabled(user.getAccountEnabled() == 1)
+                .accountEnabled(user.getAccountEnabled() == 0)
                 .build();
     }
 
