@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@MapperScan("com.Happy100BE.Happy100.mapper")
 public class Happy100Application {
 
 	public static void main(String[] args) {
