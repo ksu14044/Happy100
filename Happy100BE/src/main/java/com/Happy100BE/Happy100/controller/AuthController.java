@@ -75,13 +75,6 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600));
     }
 
-    @Operation(summary = "내 정보", description = "JWT로 인증된 사용자의 정보를 반환합니다.")
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/me")
-    public ResponseEntity<UserInfoResponse> me(Authentication authentication) {
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
-        UserInfoResponse response = userService.getMyInfo(principal.getUsername());
-        return ResponseEntity.ok(response);
-    }
+    
 
 }

@@ -13,4 +13,13 @@ public interface UserMapper {
     boolean existsByEmail(@Param("email") String email);
 
     User findByUsername(@Param("username") String username);
+
+    int updatePasswordByUsername(@Param("username") String username,
+                                @Param("passwordHash") String passwordHash);
+
+    int updateEmailByUsername(@Param("username") String username,
+                                @Param("email") String email);
+
+    int updateNameByUsername(@Param("username") String username,
+                                @Param("name") String name);
 }

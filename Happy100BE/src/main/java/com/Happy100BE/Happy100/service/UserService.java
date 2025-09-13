@@ -7,6 +7,7 @@ import com.Happy100BE.Happy100.entity.User;
 import com.Happy100BE.Happy100.mapper.UserMapper;
 import com.Happy100BE.Happy100.repository.UserRepository;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -78,5 +80,48 @@ public class UserService {
                 .email(user.getEmail())
                 .role(user.getRoleName())
                 .build();
+    }
+
+    @Transactional
+    public void putPasswordByUsername(String username, String rawPassword) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("인증 정보가 없습니다.");
+        }
+        if (!StringUtils.hasText(rawPassword)) {
+            throw new IllegalArgumentException("비밀번호가 비어 있습니다.");
+        }
+        String encoded = passwordEncoder.encode(rawPassword);
+        int rows = userMapper.updatePasswordByUsername(username, encoded);
+        if (rows == 0) {
+            throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
+        }
+    }
+
+    @Transactional
+    public void putEmailByUsername(String username, String email) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("인증 정보가 없습니다.");
+        }
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("이메일이 비어 있습니다.");
+        }
+        int rows = userMapper.updateEmailByUsername(username, email);
+        if (rows == 0) {
+            throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
+        }
+    }
+
+    @Transactional
+    public void putNameByUsername(String username, String name) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("인증 정보가 없습니다.");
+        }
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("이름이 비어 있습니다.");
+        }
+        int rows = userMapper.updateNameByUsername(username, name);
+        if (rows == 0) {
+            throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
+        }
     }
 }

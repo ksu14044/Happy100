@@ -38,4 +38,26 @@
         LIMIT 1
     </select>
 
+    <!-- username 기준 + 활성 계정(account_enabled = 0)만 수정 허용 -->
+    <update id="updatePasswordByUsername">
+        UPDATE user_tb
+        SET password = #{passwordHash}
+        WHERE username = #{username}
+        AND account_enabled = 0
+    </update>
+
+    <update id="updateEmailByUsername">
+        UPDATE user_tb
+        SET email = #{email}
+        WHERE username = #{username}
+        AND account_enabled = 0
+    </update>
+
+    <update id="updateNameByUsername">
+        UPDATE user_tb
+        SET name = #{name}
+        WHERE username = #{username}
+        AND account_enabled = 0
+    </update>
+
 </mapper>

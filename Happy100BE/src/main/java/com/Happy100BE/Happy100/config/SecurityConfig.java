@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // ✅ JWT 필터 등록
 
         return http.build();
-    }
+        }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
