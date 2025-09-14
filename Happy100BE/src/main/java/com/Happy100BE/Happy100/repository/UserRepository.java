@@ -61,4 +61,12 @@ public class UserRepository {
     public Optional<String> findUsernameByEmail(String email) {
         return Optional.ofNullable(userMapper.findUsernameByEmail(email));
     }
+    
+    public boolean existsByUsernameAndEmail(String username, String email){
+        return userMapper.countByUsernameAndEmail(username, email) > 0;
+    }
+
+    public int updatePasswordByUsernameAndEmail(String username, String email, String encodedPassword){
+        return userMapper.updatePasswordByUsernameAndEmail(username, email, encodedPassword);
+    }
 }

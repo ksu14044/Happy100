@@ -3,6 +3,8 @@ package com.Happy100BE.Happy100.security.filter;
 
 import com.Happy100BE.Happy100.security.jwt.JwtService;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
+
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

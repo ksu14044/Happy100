@@ -29,4 +29,7 @@ public interface UserMapper {
     int disableAccountByTargetUsername(@Param("targetUsername") String targetUsername);
 
     String findUsernameByEmail(@Param("email") String email);
+
+    int countByUsernameAndEmail(@Param("username") String username, @Param("email") String email);
+    int updatePasswordByUsernameAndEmail(@Param("username") String username, @Param("email") String email, @Param("encodedPassword") String encodedPassword);
 }

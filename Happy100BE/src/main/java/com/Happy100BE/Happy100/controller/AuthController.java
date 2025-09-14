@@ -1,13 +1,19 @@
 package com.Happy100BE.Happy100.controller;
 
 import com.Happy100BE.Happy100.dto.request.LoginRequest;
+import com.Happy100BE.Happy100.dto.request.PasswordFindConfirmRequest;
+import com.Happy100BE.Happy100.dto.request.PasswordFindRequest;
+import com.Happy100BE.Happy100.dto.request.PasswordFindVerifyRequest;
 import com.Happy100BE.Happy100.dto.request.SignUpRequestDto;
 import com.Happy100BE.Happy100.dto.response.DuplicateCheckResponseDto;
 import com.Happy100BE.Happy100.dto.response.LoginResponse;
+import com.Happy100BE.Happy100.dto.response.PasswordResetVerifyResponse;
+import com.Happy100BE.Happy100.dto.response.SimpleOkResponse;
 import com.Happy100BE.Happy100.dto.response.UserInfoResponse;
 import com.Happy100BE.Happy100.dto.response.UserResponseDto;
 import com.Happy100BE.Happy100.security.jwt.JwtService;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
+import com.Happy100BE.Happy100.service.PasswordFindService;
 import com.Happy100BE.Happy100.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,6 +38,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final PasswordFindService passwordFindService;
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
@@ -88,6 +95,27 @@ public class AuthController {
         return userService.findUsername(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/request")
+    public ResponseEntity<SimpleOkResponse> requestCode(@RequestBody @Valid PasswordFindRequest req) {
+        System.out.println(req.getUsername());
+        System.out.println(req.getEmail());
+        passwordFindService.requestVerificationCode(req);
+        return ResponseEntity.ok(new SimpleOkResponse("OK"));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<PasswordResetVerifyResponse> verify(@RequestBody @Valid PasswordFindVerifyRequest req) {
+        String resetToken = passwordFindService.verifyCodeAndIssueToken(req);
+        return ResponseEntity.ok(new PasswordResetVerifyResponse(resetToken));
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<Void> confirm(@RequestBody @Valid PasswordFindConfirmRequest req) {
+        passwordFindService.resetPassword(req);
+        return ResponseEntity.noContent().build();
     }
     
 

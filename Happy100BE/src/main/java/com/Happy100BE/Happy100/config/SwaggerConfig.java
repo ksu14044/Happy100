@@ -12,27 +12,27 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    @Bean
-    public OpenAPI happy100OpenAPI() {
-        String schemeName = "bearerAuth";
+        @Bean
+        public OpenAPI happy100OpenAPI() {
+                String schemeName = "bearerAuth";
 
-        return new OpenAPI()
-                .components(new Components()
-                        .addSecuritySchemes(schemeName, new SecurityScheme()
-                                .name(schemeName)
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")))
-                .addSecurityItem(new SecurityRequirement().addList(schemeName))
-                .info(new Info()
-                        .title("Happy100 API")
-                        .description("행복백세 프로젝트 API 문서")
-                        .version("v1.0.0")
-                        .contact(new Contact()
-                                .name("김시욱")
-                                .email("mhm1404@naver.com"))
-                        .license(new License()
-                                .name("Apache 2.0")
-                                .url("http://springdoc.org")));
-    }
+                return new OpenAPI()
+                        .components(new Components()
+                                .addSecuritySchemes(schemeName, new SecurityScheme()
+                                        .name(schemeName)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+                        .addSecurityItem(new SecurityRequirement().addList(schemeName))
+                        .info(new Info()
+                                .title("Happy100 API")
+                                .description("행복백세 프로젝트 API 문서")
+                                .version("v1.0.0")
+                                .contact(new Contact()
+                                        .name("김시욱")
+                                        .email("mhm1404@naver.com"))
+                                .license(new License()
+                                        .name("Apache 2.0")
+                                        .url("http://springdoc.org")));
+        }
 }

@@ -82,4 +82,19 @@
         AND account_enabled = 0
     </update>
 
+    <select id="countByUsernameAndEmail" resultType="int">
+    SELECT COUNT(*) FROM user_tb
+    WHERE username = #{username}
+    AND email = #{email}
+    AND account_enabled = 0
+</select>
+
+<update id="updatePasswordByUsernameAndEmail">
+    UPDATE user_tb
+    SET password = #{encodedPassword}
+    WHERE username = #{username}
+    AND email = #{email}
+    AND account_enabled = 0
+</update>
+
 </mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Happy100BE.Happy100.mapper.RecoveryMapper">
+
+<resultMap id="VerificationCodeMap" type="com.Happy100BE.Happy100.entity.VerificationCode">
+    <id property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="email" column="email"/>
+    <result property="codeHash" column="code_hash"/>
+    <result property="expiresAt" column="expires_at"/>
+    <result property="attempts" column="attempts"/>
+    <result property="maxAttempts" column="max_attempts"/>
+    <result property="cooldownUntil" column="cooldown_until"/>
+    <result property="consumed" column="consumed"/>
+</resultMap>
+
+<!-- 결과 매핑: ResetToken -->
+<resultMap id="ResetTokenMap" type="com.Happy100BE.Happy100.entity.ResetToken">
+    <id property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="email" column="email"/>
+    <result property="tokenHash" column="token_hash"/>
+    <result property="expiresAt" column="expires_at"/>
+    <result property="consumed" column="consumed"/>
+</resultMap>
+
+<!-- 인증코드 저장 -->
+<insert id="insertVerificationCode">
+    INSERT INTO password_reset_code
+        (username, email, code_hash, expires_at, attempts, max_attempts, cooldown_until, consumed)
+    VALUES
+        (#{username}, #{email}, #{codeHash}, #{expiresAt}, #{attempts}, #{maxAttempts}, #{cooldownUntil}, #{consumed})
+</insert>
+
+<!-- 활성 인증코드 조회(미소비 + 미만료) -->
+<select id="findActiveCodeByUser" parameterType="map" resultMap="VerificationCodeMap">
+    SELECT id, username, email, code_hash, expires_at, attempts, max_attempts, cooldown_until, consumed
+    FROM password_reset_code
+    WHERE username = #{username}
+    AND email = #{email}
+    AND consumed = 0
+    AND expires_at > #{now}
+    ORDER BY id DESC
+    LIMIT 1
+</select>
+
+<!-- 코드 소비 처리 -->
+<update id="markCodeConsumed">
+    UPDATE password_reset_code
+    SET consumed = #{consumed}
+    WHERE id = #{id}
+</update>
+
+<!-- 시도 횟수 증가 -->
+<update id="increaseAttempts">
+    UPDATE password_reset_code
+    SET attempts = attempts + 1
+    WHERE id = #{id}
+</update>
+
+<!-- 재전송 쿨다운 갱신(선택) -->
+<update id="updateCooldown">
+    UPDATE password_reset_code
+    SET cooldown_until = #{cooldownUntil}
+    WHERE id = #{id}
+</update>
+
+<!-- 리셋 토큰 저장 -->
+<insert id="insertResetToken">
+    INSERT INTO password_reset_token
+        (username, email, token_hash, expires_at, consumed)
+    VALUES
+        (#{username}, #{email}, #{tokenHash}, #{expiresAt}, #{consumed})
+</insert>
+
+<!-- 활성 리셋 토큰 조회(해시로 조회) -->
+<select id="findActiveTokenByHash" parameterType="map" resultMap="ResetTokenMap">
+    SELECT id, username, email, token_hash, expires_at, consumed
+    FROM password_reset_token
+    WHERE token_hash = #{tokenHash}
+    AND consumed = 0
+    AND expires_at > #{now}
+    LIMIT 1
+</select>
+
+<!-- 토큰 소비 처리 -->
+<update id="markTokenConsumed">
+    UPDATE password_reset_token
+    SET consumed = #{consumed}
+    WHERE id = #{id}
+</update>
+</mapper>
