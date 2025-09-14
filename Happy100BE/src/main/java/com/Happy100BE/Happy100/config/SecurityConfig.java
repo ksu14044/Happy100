@@ -36,7 +36,7 @@ public class SecurityConfig {
                                 "/api/auth/**"       // ✅ 로그인/회원가입/중복체크는 허용
                         ).permitAll()
                         .requestMatchers(
-                                "/api/test/**"
+                                "/api/admin/**"
                         ).hasRole("ADMIN")
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.GET, "/api/posts/**"

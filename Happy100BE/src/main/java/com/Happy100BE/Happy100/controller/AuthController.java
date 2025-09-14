@@ -12,12 +12,18 @@ import com.Happy100BE.Happy100.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -75,6 +81,14 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600));
     }
 
+    @GetMapping("/find-username")
+    public ResponseEntity<String> findUsernameByEmail(
+            @RequestParam @NotBlank @Email String email) {
+
+        return userService.findUsername(email)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
     
 
 }

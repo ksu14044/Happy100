@@ -9,6 +9,10 @@ import com.Happy100BE.Happy100.repository.UserRepository;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
+
+import java.lang.StackWalker.Option;
+import java.util.Optional;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -91,7 +95,7 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 비어 있습니다.");
         }
         String encoded = passwordEncoder.encode(rawPassword);
-        int rows = userMapper.updatePasswordByUsername(username, encoded);
+        int rows = userRepository.updatePasswordByUsername(username, encoded);
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
@@ -105,7 +109,7 @@ public class UserService {
         if (!StringUtils.hasText(email)) {
             throw new IllegalArgumentException("이메일이 비어 있습니다.");
         }
-        int rows = userMapper.updateEmailByUsername(username, email);
+        int rows = userRepository.updateEmailByUsername(username, email);
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
@@ -119,9 +123,37 @@ public class UserService {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("이름이 비어 있습니다.");
         }
-        int rows = userMapper.updateNameByUsername(username, name);
+        int rows = userRepository.updateNameByUsername(username, name);
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
+    }
+
+    public void disableMyAccount(String myUsername) {
+        if (!StringUtils.hasText(myUsername)) {
+            throw new IllegalArgumentException("인증 정보가 없습니다.");
+        }
+        int rows = userRepository.disableAccountByUsername(myUsername);
+        if (rows == 0) {
+            throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 이미 비활성화되었습니다.");
+        }
+    }
+
+    @Transactional
+    public void adminDisableAccount(String targetUsername) {
+        if (!StringUtils.hasText(targetUsername)) {
+            throw new IllegalArgumentException("대상 사용자 이름이 비어 있습니다.");
+        }
+        int rows = userRepository.disableAccountByTargetUsername(targetUsername);
+        if (rows == 0) {
+            throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 이미 비활성화되었습니다.");
+        }
+    }
+
+    public Optional<String> findUsername(String email) {
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("이메일이 비어 있습니다.");
+        }
+        return userRepository.findUsernameByEmail(email);
     }
 }

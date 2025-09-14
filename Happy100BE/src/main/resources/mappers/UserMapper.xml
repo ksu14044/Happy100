@@ -26,6 +26,14 @@
         SELECT EXISTS(SELECT 1 FROM user_tb WHERE username = #{username})
     </select>
 
+    <select id="findUsernameByEmail" parameterType="string" resultType="string">
+        SELECT username
+        FROM user_tb
+        WHERE
+            email = #{email} and account_enabled = 0
+        LIMIT 1
+    </select>
+
     <select id="existsByEmail" parameterType="string" resultType="boolean">
         SELECT EXISTS(SELECT 1 FROM user_tb WHERE email = #{email})
     </select>
@@ -57,6 +65,20 @@
         UPDATE user_tb
         SET name = #{name}
         WHERE username = #{username}
+        AND account_enabled = 0
+    </update>
+
+    <update id="disableAccountByUsername">
+        UPDATE user_tb
+        SET account_enabled = 1
+        WHERE username = #{username}
+        AND account_enabled = 0
+    </update>
+
+    <update id="disableAccountByTargetUsername">
+        UPDATE user_tb
+        SET account_enabled = 1
+        WHERE username = #{targetUsername}
         AND account_enabled = 0
     </update>
 

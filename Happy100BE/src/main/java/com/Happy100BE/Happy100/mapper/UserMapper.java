@@ -22,4 +22,11 @@ public interface UserMapper {
 
     int updateNameByUsername(@Param("username") String username,
                                 @Param("name") String name);
+
+    int disableAccountByUsername(@Param("username") String username);
+
+    // 관리자가 특정 사용자를 비활성화할 때(식별 기준: username)
+    int disableAccountByTargetUsername(@Param("targetUsername") String targetUsername);
+
+    String findUsernameByEmail(@Param("email") String email);
 }

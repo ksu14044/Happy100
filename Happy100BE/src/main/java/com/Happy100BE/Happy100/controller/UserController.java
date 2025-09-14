@@ -64,4 +64,11 @@ public class UserController {
         UserInfoResponse response = userService.getMyInfo(principal.getUsername());
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/me/delete")
+    public ResponseEntity<Void> disableAccount(Authentication auth) {
+        CustomUserPrincipal principal = (CustomUserPrincipal) auth.getPrincipal();
+        userService.disableMyAccount(principal.getUsername());
+        return ResponseEntity.noContent().build();
+    }
 }
