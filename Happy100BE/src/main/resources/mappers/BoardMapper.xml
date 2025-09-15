@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Happy100BE.Happy100.mapper.BoardMapper">
+
+  <resultMap id="BoardPostMap" type="com.Happy100BE.Happy100.entity.BoardPost">
+    <id property="postId" column="post_id"/>
+    <result property="boardType" column="board_type"/>
+    <result property="title" column="title"/>
+    <result property="contentJson" column="content_json"/>
+    <result property="authorId" column="author_id"/>
+    <result property="viewCount" column="view_count"/>
+    <result property="deletedYn" column="deleted_yn"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <insert id="insertPost" parameterType="com.Happy100BE.Happy100.entity.BoardPost" useGeneratedKeys="true" keyProperty="postId">
+    INSERT INTO board_post
+      (board_type, title, content_json, author_id)
+    VALUES
+      (#{boardType}, #{title}, #{contentJson}, #{authorId})
+  </insert>
+
+  <select id="selectPostById" resultMap="BoardPostMap">
+    SELECT
+      post_id, board_type, title, content_json, author_id, view_count,
+      deleted_yn, created_at, updated_at
+    FROM board_post
+    WHERE post_id = #{postId}
+  </select>
+
+  <select id="selectPostList" resultMap="BoardPostMap">
+    SELECT
+      post_id, board_type, title, content_json, author_id, view_count,
+      deleted_yn, created_at, updated_at
+    FROM board_post
+    WHERE deleted_yn = 0
+      <if test="boardType != null and boardType != ''">
+        AND board_type = #{boardType}
+      </if>
+    ORDER BY created_at DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <update id="updatePost" parameterType="com.Happy100BE.Happy100.entity.BoardPost">
+    UPDATE board_post
+    SET
+      title = #{title},
+      content_json = #{contentJson}
+    WHERE post_id = #{postId}
+  </update>
+
+  <update id="softDeletePost">
+    UPDATE board_post
+    SET deleted_yn = 1
+    WHERE post_id = #{postId}
+  </update>
+
+  <update id="increaseViewCount">
+    UPDATE board_post
+    SET view_count = view_count + 1
+    WHERE post_id = #{postId}
+  </update>
+
+  <!-- Attachments -->
+  <resultMap id="BoardAttachmentMap" type="com.Happy100BE.Happy100.entity.BoardAttachment">
+    <id property="attachmentId" column="attachment_id"/>
+    <result property="postId" column="post_id"/>
+    <result property="attachmentType" column="attachment_type"/>
+    <result property="fileName" column="file_name"/>
+    <result property="filePath" column="file_path"/>
+    <result property="fileSize" column="file_size"/>
+    <result property="mimeType" column="mime_type"/>
+    <result property="sortOrder" column="sort_order"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <insert id="insertAttachments">
+    INSERT INTO board_attachment
+      (post_id, attachment_type, file_name, file_path, file_size, mime_type, sort_order)
+    VALUES
+    <foreach collection="list" item="a" separator=",">
+      (#{postId}, #{a.attachmentType}, #{a.fileName}, #{a.filePath},
+       #{a.fileSize}, #{a.mimeType}, #{a.sortOrder})
+    </foreach>
+  </insert>
+
+  <select id="selectAttachments" resultMap="BoardAttachmentMap">
+    SELECT
+      attachment_id, post_id, attachment_type, file_name, file_path,
+      file_size, mime_type, sort_order, created_at
+    FROM board_attachment
+    WHERE post_id = #{postId}
+    ORDER BY sort_order ASC, attachment_id ASC
+  </select>
+
+  <delete id="deleteAttachmentsByPost">
+    DELETE FROM board_attachment
+    WHERE post_id = #{postId}
+  </delete>
+  <select id="existsEnabledBoardType" resultType="int">
+    SELECT COUNT(1)
+    FROM board_type_catalog
+    WHERE type_key = #{typeKey}
+        AND enabled_yn = 1
+    </select>
+
+</mapper>

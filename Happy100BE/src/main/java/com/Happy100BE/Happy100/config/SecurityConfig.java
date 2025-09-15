@@ -39,7 +39,7 @@ public class SecurityConfig {
                 http
                 // CSRF: JWT 기반 API 서버이면 비활성화하거나, 필요한 경로만 무시 처리
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.disable())
                 .formLogin(f -> f.disable())
                 .httpBasic(b -> b.disable())
 
@@ -54,6 +54,7 @@ public class SecurityConfig {
                         ).permitAll()
                         // 게시글 GET 공개
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
                         // 관리자 영역
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 나머지는 인증 필요
