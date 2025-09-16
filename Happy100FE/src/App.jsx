@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React from 'react';
+import { Global, css } from '@emotion/react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import Header from './components/header/Header.jsx';
+import Footer from './components/footer/Footer.jsx';
+import NewsPage from './pages/NewsPage/NewsPage.jsx';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Global
+        styles={css`
+          html, body, #root { height: 100%; margin: 0; padding: 0; }
+          #root { width: 100% !important; }
+          body { background: #fff; color: #111827; }
+          a { color: inherit; }
+        `}
+      />
+      <Header
+        currentPath={location.pathname}
+        onNavigate={(href) => navigate(href)}
+        sticky
+        showTagline
+      />
+      <Routes>
+        <Route path="/overview/news" element={<NewsPage/>} />
+      </Routes>
+      <Footer />
     </>
-  )
+  );
 }
-
-export default App
