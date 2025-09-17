@@ -9,20 +9,16 @@ import com.Happy100BE.Happy100.dto.response.DuplicateCheckResponseDto;
 import com.Happy100BE.Happy100.dto.response.LoginResponse;
 import com.Happy100BE.Happy100.dto.response.PasswordResetVerifyResponse;
 import com.Happy100BE.Happy100.dto.response.SimpleOkResponse;
-import com.Happy100BE.Happy100.dto.response.UserInfoResponse;
 import com.Happy100BE.Happy100.dto.response.UserResponseDto;
 import com.Happy100BE.Happy100.security.jwt.JwtService;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 import com.Happy100BE.Happy100.service.PasswordFindService;
 import com.Happy100BE.Happy100.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
