@@ -4,7 +4,9 @@ import { Global, css } from '@emotion/react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/header/Header.jsx';
 import Footer from './components/footer/Footer.jsx';
-import NewsPage from './pages/NewsPage/NewsPage.jsx';
+import BoardListPage from './pages/BoardListPage/BoardListPage.jsx';
+import LoginPage from './pages/auth/login/LogInPage.jsx';
+import SignUpPage from './pages/auth/signup/SignUpPage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -27,7 +29,9 @@ export default function App() {
         showTagline
       />
       <Routes>
-        <Route path="/overview/news" element={<NewsPage/>} />
+        <Route path="/:section/:key" element={<BoardListPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
       <Footer />
     </>

@@ -8,7 +8,7 @@ export const FooterWrap = styled.footer`
   width: 100%;
   background: ${bg};
   color: #fff;
-  margin-top: 80px;
+  margin-top: 40px;
 `;
 
 export const Container = styled.div`
