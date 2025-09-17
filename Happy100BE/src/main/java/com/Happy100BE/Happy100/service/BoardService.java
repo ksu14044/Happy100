@@ -131,4 +131,8 @@ public class BoardService {
         r.setAttachments(ars);
         return r;
     }
+
+    public int countPostsByBoardType(String boardType) {
+        return boardRepository.countPostsByBoardType(boardType);
+    }
 }

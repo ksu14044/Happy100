@@ -11,4 +11,5 @@ public class LoginResponse {
     private String accessToken;
     private String tokenType; // "Bearer"
     private long expiresInSeconds;
+    private String username;
 }

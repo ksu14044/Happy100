@@ -26,4 +26,5 @@ public interface BoardMapper {
     List<BoardAttachment> selectAttachments(@Param("postId") Long postId);
     int deleteAttachmentsByPost(@Param("postId") Long postId);
     int existsEnabledBoardType(@org.apache.ibatis.annotations.Param("typeKey") String typeKey);
+    int countPostsByBoardType(@Param("boardType") String boardType);
 }

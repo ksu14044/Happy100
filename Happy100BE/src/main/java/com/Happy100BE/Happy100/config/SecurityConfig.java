@@ -3,9 +3,14 @@ package com.Happy100BE.Happy100.config;
 import com.Happy100BE.Happy100.security.filter.JwtAuthenticationFilter;
 import com.Happy100BE.Happy100.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+
+import java.time.Duration;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus; // ✅ 추가
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,70 +25,78 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint; // ✅ 추가
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // ✅ 추가
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
         private final CustomUserDetailsService userDetailsService;
-        private final PasswordEncoder passwordEncoder;                    // BCrypt 등
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;    // JWT 필터
-        // 아래 두 빈(성공/실패 핸들러, 사용자서비스)은 없으면 생성해 드릴 수 있습니다.
+        private final PasswordEncoder passwordEncoder; // BCrypt 등
+        private final JwtAuthenticationFilter jwtAuthenticationFilter; // JWT 필터
         private final AuthenticationSuccessHandler oAuth2SuccessHandler;
         private final AuthenticationFailureHandler oAuth2FailureHandler;
-        // 선택: 제공자별 속성 매핑이 필요하면 커스텀 서비스 주입
-        private final OAuth2UserService<OAuth2UserRequest,OAuth2User> customOAuth2UserService;
+        private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                // CSRF: JWT 기반 API 서버이면 비활성화하거나, 필요한 경로만 무시 처리
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
-                .formLogin(f -> f.disable())
-                .httpBasic(b -> b.disable())
+                                // JWT 기반이면 CSRF 대부분 비활성
+                                .csrf(csrf -> csrf.disable())
+                                .cors(Customizer.withDefaults())
+                                .formLogin(f -> f.disable())
+                                .httpBasic(b -> b.disable())
 
-                .authorizeHttpRequests(auth -> auth
-                        // 공개 문서
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        // 인증/회원가입, 소셜 로그인 진입점 및 콜백 허용
-                        .requestMatchers(
-                        "/api/auth/**",
-                        "/oauth2/**",
-                        "/login/**"
-                        ).permitAll()
-                        // 게시글 GET 공개
-                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
-                        // 관리자 영역
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // 나머지는 인증 필요
-                        .anyRequest().authenticated()
-                )
+                                .authorizeHttpRequests(auth -> auth
+                                                // 공개 문서
+                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll()
+                                                // 인증/회원가입, 소셜 로그인 진입점 및 콜백 허용
+                                                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**").permitAll()
 
-                // OAuth2 로그인 설정
-                .oauth2Login(oauth -> oauth
-                        // 커스텀 로그인 시작 경로가 있다면 지정 가능(예: /login/google -> /oauth2/authorization/google로 리다이렉트)
+                                                // ✅ 읽기 전용 공개 API (필요 시 조정)
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/notices/**",
+                                                                "/api/recruits/**",
+                                                                "/api/products/**",
+                                                                "/api/posts/**",
+                                                                "/api/boards/**")
+                                                .permitAll()
 
-                        .userInfoEndpoint(userInfo -> userInfo
-                        .userService(customOAuth2UserService)
-                        )
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
-                )
+                                                // 관리자
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // 로그아웃(쿠키 삭제 등은 핸들러에서 추가 가능)
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .deleteCookies("access_token", "refresh_token")
-                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(204))
-                )
+                                                // 그 외 보호
+                                                .anyRequest().authenticated())
 
-                // DAO 인증 프로바이더
-                .authenticationProvider(authenticationProvider())
+                                // OAuth2 로그인
+                                .oauth2Login(oauth -> oauth
+                                                .userInfoEndpoint(userInfo -> userInfo
+                                                                .userService(customOAuth2UserService))
+                                                .successHandler(oAuth2SuccessHandler)
+                                                .failureHandler(oAuth2FailureHandler))
 
-                // JWT 필터 등록: UsernamePasswordAuthenticationFilter 앞
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                // 로그아웃
+                                .logout(logout -> logout
+                                                .logoutUrl("/api/auth/logout")
+                                                .deleteCookies("access_token", "refresh_token")
+                                                .logoutSuccessHandler((req, res, auth) -> res.setStatus(204)))
+
+                                .authenticationProvider(authenticationProvider())
+
+                                // ✅ 핵심: /api/** 에서는 302 리다이렉트 대신 401을 응답 (CORS 회피)
+                                .exceptionHandling(ex -> ex
+                                                .defaultAuthenticationEntryPointFor(
+                                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                                                new AntPathRequestMatcher("/api/**")))
+
+                                // JWT 필터
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
@@ -97,9 +110,24 @@ public class SecurityConfig {
                 return provider;
         }
 
-        // 컨트롤러 주입용 AuthenticationManager
         @Bean
         public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
                 return configuration.getAuthenticationManager();
+        }
+
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration cfg = new CorsConfiguration();
+                // withCredentials=true 이므로 반드시 정확한 오리진 명시('*' 금지)
+                cfg.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+                cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+                cfg.setExposedHeaders(List.of("Location", "Content-Disposition"));
+                cfg.setAllowCredentials(true);
+                cfg.setMaxAge(Duration.ofHours(1));
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", cfg);
+                return source;
         }
 }

@@ -107,5 +107,13 @@
     WHERE type_key = #{typeKey}
         AND enabled_yn = 1
     </select>
+  <select id="countPostsByBoardType" resultType="int">
+    SELECT count(*)
+    FROM board_post
+    WHERE
+      board_type = #{boardType}
+      AND
+      deleted_yn = 0
+  </select>
 
 </mapper>

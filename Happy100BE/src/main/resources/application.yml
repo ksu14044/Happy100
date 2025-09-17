@@ -37,6 +37,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       read-only:  false
+react:
+  server:
+    protocol: http
+    host: localhost
+    port: 5173
 
 ---
 spring:

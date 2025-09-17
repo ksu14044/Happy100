@@ -55,4 +55,8 @@ public class BoardRepository {
     public boolean existsEnabledBoardType(String typeKey) {
         return boardMapper.existsEnabledBoardType(typeKey) > 0;
     }
+
+    public int countPostsByBoardType(String boardType) {
+        return boardMapper.countPostsByBoardType(boardType);
+    }
 }

@@ -83,9 +83,11 @@ public class AuthController {
         // JwtService 시그니처: generateToken(String username, String role)
         String accessToken = jwtService.generateToken(principal.getUsername(), principal.getAuthorities()
                 .iterator().next().getAuthority());
+        
+        String name = userService.getMyInfo(principal.getUsername()).getName();
 
         // 만료시간은 application-secret.yml의 access-token-validity-seconds(=3600)와 일치하도록 반환
-        return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600));
+        return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600, name));
     }
 
     @GetMapping("/find-username")

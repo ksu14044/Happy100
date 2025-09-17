@@ -2,6 +2,7 @@ package com.Happy100BE.Happy100.controller;
 
 import com.Happy100BE.Happy100.dto.request.PostCreateRequest;
 import com.Happy100BE.Happy100.dto.request.PostUpdateRequest;
+import com.Happy100BE.Happy100.dto.response.PostListResponse;
 import com.Happy100BE.Happy100.dto.response.PostResponse;
 import com.Happy100BE.Happy100.service.BoardService;
 
@@ -39,10 +40,25 @@ public class BoardController {
 
     @GetMapping
     @Operation(summary = "게시글 다건 조회")
-    public ResponseEntity<List<PostResponse>> list(@RequestParam String boardType,
+    public ResponseEntity<PostListResponse> list(@RequestParam String boardType,
                                                     @RequestParam(defaultValue = "1") int page,
                                                     @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(boardService.list(boardType, page, size));
+            int totalPostListCount = boardService.countPostsByBoardType(boardType);
+            int totalPages = totalPostListCount % size == 0
+            ? totalPostListCount / size
+            : (totalPostListCount / size) + 1;
+            PostListResponse res = PostListResponse.builder()
+            .page(page)
+            .limitCount(size)
+            .totalPages(totalPages)
+            .totalElements(totalPostListCount)
+            .isFirstPage(page == 1)
+            .isLastPage(page == totalPages)
+            .nextPage(page < totalPages ? page + 1 : 0)
+            .postList(boardService.list(boardType, page, size))
+            .build();
+            return ResponseEntity.ok().body(res);
+        // return ResponseEntity.ok(boardService.list(boardType, page, size));
     }
 
     @PutMapping("/{postId}")
