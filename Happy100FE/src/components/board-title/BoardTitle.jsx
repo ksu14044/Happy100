@@ -9,6 +9,7 @@ import {
     Description,
     RightSlot,
 } from "./style";
+import WritePostButton from "../write-post-botton/WritePostButton";
 
 /**
  * BoardTitle
@@ -24,6 +25,14 @@ export default function BoardTitle({
     className,
     "aria-label": ariaLabel,
 }) {
+    var section = "";
+    if (title === "공지사항") {
+        section = "news";
+    } else if (title === "자격증반") {
+        section = "cert";
+    } else if (title === "쇼핑몰") {
+        section = "shop";
+    }
     return (
         <TitleSection aria-label={ariaLabel} className={className}>
             <Container>
@@ -32,7 +41,12 @@ export default function BoardTitle({
                         {icon ? <TitleIconSlot aria-hidden>{icon}</TitleIconSlot> : null}
                         <TitleText as={as}>{title}</TitleText>
                     </div>
-                    {right ? <RightSlot>{right}</RightSlot> : null}
+                    <RightSlot>
+                        {/* 우선 BoardTitle 내부에 기본 제공: 관리자에게만 보임 */}
+                        <WritePostButton section={section} />
+                        {/* 외부에서 전달된 우측 액션이 있으면 함께 표시 */}
+                        {right ?? null}
+                    </RightSlot>
                 </TitleRow>
                 {description ? <Description>{description}</Description> : null}
             </Container>

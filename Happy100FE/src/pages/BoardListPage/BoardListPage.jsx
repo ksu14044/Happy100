@@ -6,6 +6,7 @@ import TableRow from "../../components/board-table-row/TableRow";
 import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useGetPostListQuery } from "../../queries/postQuery";
+import { tokenStorage } from "../../libs/authStorage";
 
 // section/key 조합별 설정(보드타입/타이틀/설명)
 const PAGE_CONFIG = {
@@ -31,6 +32,8 @@ export default function BoardListPage() {
     // 페이지 상태
     const [page, setPage] = useState(1);
     const size = 10;
+    const [auth, setAuth] = useState(() => tokenStorage.load());
+    console.log(auth);
 
     // 반응형: 모바일 여부
     const [isMobile, setIsMobile] = useState(false);
@@ -48,6 +51,7 @@ export default function BoardListPage() {
         page,
         size,
     });
+
 
     // 응답 구조
     const {

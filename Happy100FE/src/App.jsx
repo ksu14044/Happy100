@@ -7,6 +7,7 @@ import Footer from './components/footer/Footer.jsx';
 import BoardListPage from './pages/BoardListPage/BoardListPage.jsx';
 import LoginPage from './pages/auth/login/LogInPage.jsx';
 import SignUpPage from './pages/auth/signup/SignUpPage.jsx';
+import WritePage from './pages/WritePage/WritePage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/:section/:key" element={<BoardListPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/:section/write" element={<WritePage />} />
       </Routes>
       <Footer />
     </>

@@ -29,6 +29,7 @@ export const TitleRow = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 `;
 
 export const TitleIconSlot = styled.span`
@@ -68,8 +69,19 @@ export const RightSlot = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* 데스크톱: 살짝 왼쪽·아래로 내린 듯한 인상 */
+  transform: translate(-50px, 20px);
 
-  & > * {
-    white-space: nowrap;
+  & > * { white-space: nowrap; }
+
+  /* 모바일: 제목 아래 줄에 배치 + 우측 정렬 + 살짝 아래 */
+  @media (max-width: 768px) {
+    width: 100%;
+    order: 2;               /* 제목 오른쪽이 아니라 다음 줄로 */
+    justify-content: flex-end;
+    transform: translate(0, 6px);
+    margin-top: 4px;        /* Description과 간섭 줄이기 위한 여백 */
   }
 `;
+
+
