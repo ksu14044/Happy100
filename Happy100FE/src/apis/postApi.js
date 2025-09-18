@@ -68,3 +68,12 @@ export const createPostApi = async ({
 	const res = await api.post("/api/boards", payload);
 	return res.data; // 서버가 ResponseEntity<Long>을 반환한다고 가정 → postId
 };
+
+export const getPostByIdApi = async ({ postId, increaseView = true, signal }) => {
+  if (!postId) throw new Error("postId is required");
+  const res = await api.get(`/api/boards/${postId}`, {
+    params: { increaseView }, // 컨트롤러 시그니처와 동일
+    signal,
+  });
+  return res.data; // ← PostResponse
+};

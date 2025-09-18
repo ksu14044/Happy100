@@ -13,9 +13,11 @@ import {
     Small,
 } from "./style";
 import { Link, useNavigate } from "react-router-dom";
+import { useSignUpMutation } from "../../../mutations/authMutation";
 
 export default function SignUpPage() {
     const navigate = useNavigate();
+    const { mutateAsync, isPending } = useSignUpMutation();
     const [form, setForm] = useState({
         username: "",
         password: "",
@@ -27,14 +29,40 @@ export default function SignUpPage() {
     const onChange = (e) =>
         setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
+
+        // 클라이언트 검증
         if (form.password !== form.passwordConfirm) {
             alert("비밀번호가 일치하지 않습니다.");
             return;
         }
-        console.log("SIGNUP", form); // TODO: 회원가입 API 연동
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+        if (!emailOk) {
+            alert("이메일 형식이 올바르지 않습니다.");
+            return;
+        }
+
+        try {
+            await mutateAsync({
+                username: form.username.trim(),
+                password: form.password, // 서버에서 해시 처리
+                name: form.name.trim(),
+                email: form.email.trim(),
+            });
+
+            alert("회원가입이 완료되었습니다. 로그인 해주세요!");
+            navigate("/login", { replace: true });
+        } catch (err) {
+            // 서버에서 온 메시지 노출
+            const msg =
+                err?.response?.data?.message ||
+                err?.message ||
+                "회원가입 중 오류가 발생했습니다.";
+            alert(msg);
+        }
     };
+
 
     return (
         <PageWrap>

@@ -23,6 +23,7 @@ import {
     DangerBtn,
 } from "./style";
 import { useCreatePostMutation } from "../../mutations/postMutation";
+import { toAttachmentRequests } from "../../apis/postApi";
 
 // 섹션 → 보드 타입 매핑 (백엔드 ENUM과 맞추세요)
 const BOARD_TYPE = { news: "NEWS", cert: "CERT", shop: "SHOP" };
@@ -76,7 +77,7 @@ export default function WritePage() {
     const navigate = useNavigate();
     const { section } = useParams();
 
-    const isValidSection = ["news", "cert", "shop"].includes(section || "");
+    const isValidSection = ["news", "recruit", "shop"].includes(section || "");
     if (!isValidSection) return <Navigate to="/404" replace />;
 
     const boardType = BOARD_TYPE[section];

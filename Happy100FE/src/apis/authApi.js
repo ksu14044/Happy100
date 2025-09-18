@@ -17,7 +17,6 @@ export async function loginApi({ username, password }) {
     });
 
     const data = res.data; // LoginResponse.java 응답 본문
-    console.log("loginApi response:", data.username);
 
     // 다양한 이름을 허용해 토큰 추출(백엔드 구현과 일치하면 첫 키에서 잡힙니다)
     const accessToken = data.accessToken ?? data.token ?? data.jwt ?? data.access_token;
@@ -36,4 +35,16 @@ export async function loginApi({ username, password }) {
 /** 로그아웃(클라이언트 측) */
 export function logout() {
     tokenStorage.clear();
+}
+
+export async function signUpApi({ username, password, name, email }) {
+    if (!username || !password || !name || !email) {
+        throw new Error("필수값이 누락되었습니다.");
+    }
+    const res = await api.post(
+        "/api/auth/signup",
+        { username, password, name, email },
+        { headers: { "Content-Type": "application/json" } }
+    );
+    return res.data; // 보통 { success: true } 또는 생성된 user 정보
 }

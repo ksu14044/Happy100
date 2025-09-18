@@ -8,6 +8,7 @@ import BoardListPage from './pages/BoardListPage/BoardListPage.jsx';
 import LoginPage from './pages/auth/login/LogInPage.jsx';
 import SignUpPage from './pages/auth/signup/SignUpPage.jsx';
 import WritePage from './pages/WritePage/WritePage.jsx';
+import PostDetail from './pages/PostDetail/PostDetail.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -30,10 +31,11 @@ export default function App() {
         showTagline
       />
       <Routes>
-        <Route path="/:section/:key" element={<BoardListPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/:section/write" element={<WritePage />} />
+        <Route path="/:section/:key/:postId" element={<PostDetail />} />
+        <Route path="/:section/:key" element={<BoardListPage />} />
       </Routes>
       <Footer />
     </>

@@ -20,12 +20,13 @@ const PAGE_CONFIG = {
         title: "자격증반 모집",
         description: "자격증반 모집 페이지입니다.",
     },
+
 };
 
 export default function BoardListPage() {
     const { section, key } = useParams();
-    const config = PAGE_CONFIG[`${section}/${key}`];
-
+    const config = PAGE_CONFIG[`${section}/${key}`]; 
+    
     // 매핑되지 않으면 404로 넘김(원한다면 커스텀 UI로 대체)
     if (!config) return <Navigate to="/404" replace />;
 
@@ -33,7 +34,6 @@ export default function BoardListPage() {
     const [page, setPage] = useState(1);
     const size = 10;
     const [auth, setAuth] = useState(() => tokenStorage.load());
-    console.log(auth);
 
     // 반응형: 모바일 여부
     const [isMobile, setIsMobile] = useState(false);
@@ -116,7 +116,7 @@ export default function BoardListPage() {
                     views={p.viewCount}
                     author={p.authorName ?? "관리자"}
                     date={fmtDate(p.createdAt)}
-                    href={`/boards/${(p.boardType || config.boardType).toLowerCase()}/${p.postId}`}
+                    href={`/${section}/${key}/${p.postId}`}
                 />
             ))}
 

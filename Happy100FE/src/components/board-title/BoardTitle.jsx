@@ -10,6 +10,7 @@ import {
     RightSlot,
 } from "./style";
 import WritePostButton from "../write-post-botton/WritePostButton";
+import { useParams } from "react-router-dom";
 
 /**
  * BoardTitle
@@ -25,14 +26,7 @@ export default function BoardTitle({
     className,
     "aria-label": ariaLabel,
 }) {
-    var section = "";
-    if (title === "공지사항") {
-        section = "news";
-    } else if (title === "자격증반") {
-        section = "cert";
-    } else if (title === "쇼핑몰") {
-        section = "shop";
-    }
+    const {section, key} = useParams();
     return (
         <TitleSection aria-label={ariaLabel} className={className}>
             <Container>
@@ -43,7 +37,7 @@ export default function BoardTitle({
                     </div>
                     <RightSlot>
                         {/* 우선 BoardTitle 내부에 기본 제공: 관리자에게만 보임 */}
-                        <WritePostButton section={section} />
+                        <WritePostButton section={key} />
                         {/* 외부에서 전달된 우측 액션이 있으면 함께 표시 */}
                         {right ?? null}
                     </RightSlot>

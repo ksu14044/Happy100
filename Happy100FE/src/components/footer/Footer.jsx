@@ -14,6 +14,7 @@ import {
     Info,
     SrOnly,
 } from './style';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export default function Footer({
     links = {
@@ -21,10 +22,11 @@ export default function Footer({
         youtube: '#',
         naver: '#', // 네이버 메인 or 네이버 포스트
         blog: '#',
-        band: '#',
+        band: 'https://naver.com',
     },
     className,
 }) {
+    const nav = useNavigate();
     return (
         <FooterWrap className={className}>
             <Container>
@@ -45,7 +47,7 @@ export default function Footer({
                 <SocialRow aria-label="소셜 미디어">
                     <IconLink href={links.band} target="_blank" rel="noopener noreferrer">
                         <SrOnly>Naver Band</SrOnly>
-                        <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" >
                             <rect x="4" y="4" width="40" height="40" rx="10" fill="#21c531" />
                             <circle cx="24" cy="24" r="11" fill="#fff" />
                             <path d="M24 16a8 8 0 100 16 8 8 0 000-16zm0 4a4 4 0 110 8 4 4 0 010-8z" fill="#21c531" />
