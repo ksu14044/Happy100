@@ -1,5 +1,6 @@
 package com.Happy100BE.Happy100.service;
 
+import com.Happy100BE.Happy100.dto.request.AttachmentRequest;
 import com.Happy100BE.Happy100.dto.request.PostCreateRequest;
 import com.Happy100BE.Happy100.dto.request.PostUpdateRequest;
 import com.Happy100BE.Happy100.dto.response.PostResponse;
@@ -11,12 +12,10 @@ import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.catalina.authenticator.SpnegoAuthenticator.AuthenticateAction;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +86,8 @@ public class BoardService {
         if (list == null) return List.of();
         List<BoardAttachment> result = new ArrayList<>();
         for (Object o : list) {
-            com.Happy100BE.Happy100.dto.request.AttachmentRequest a =
-                    (com.Happy100BE.Happy100.dto.request.AttachmentRequest) o;
+            AttachmentRequest a =
+                    (AttachmentRequest) o;
             BoardAttachment e = new BoardAttachment();
             e.setPostId(postId);
             e.setAttachmentType(a.getAttachmentType());

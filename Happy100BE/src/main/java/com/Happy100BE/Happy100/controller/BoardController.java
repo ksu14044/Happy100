@@ -4,6 +4,7 @@ import com.Happy100BE.Happy100.dto.request.PostCreateRequest;
 import com.Happy100BE.Happy100.dto.request.PostUpdateRequest;
 import com.Happy100BE.Happy100.dto.response.PostListResponse;
 import com.Happy100BE.Happy100.dto.response.PostResponse;
+import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 import com.Happy100BE.Happy100.service.BoardService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +27,7 @@ public class BoardController {
     public ResponseEntity<Long> create(@RequestBody PostCreateRequest req,
                                         Authentication auth) {
         Long postId = boardService.create(req, auth);
+        
         return ResponseEntity.ok(postId);
     }
 
