@@ -6,7 +6,7 @@ export default function TableHeader({ className }) {
         <HeaderWrap className={className}>
             <Container>
                 {/* 헤더/로우 모두 같은 gridColumns 사용 */}
-                <RowGrid style={{ gridTemplateColumns: gridColumns }}>
+                <RowGrid columns={gridColumns}>
                     <Cell $align="center">제목</Cell>
                     <Cell $align="center">조회수</Cell>
                     <Cell $align="center">작성자</Cell>

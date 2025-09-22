@@ -11,10 +11,8 @@ export default function TableRow({
     onClick,
     className,
 }) {
-    const gridStyle = { gridTemplateColumns: gridColumns };
-
     const content = (
-        <RowGrid style={gridStyle}>
+        <RowGrid columns={gridColumns}>
             {/* 제목만 왼쪽 정렬 */}
             <Cell $align="left" title={typeof title === "string" ? title : undefined}>
                 {title}

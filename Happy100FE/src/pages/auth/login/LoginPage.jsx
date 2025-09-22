@@ -20,6 +20,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { loginApi } from "../../../apis/authApi";
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+
 export default function LoginPage() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ username: "", password: "" });
@@ -42,6 +44,15 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleOAuthLogin = (provider) => {
+        if (!API_BASE_URL) {
+            setErr("API 서버 주소가 설정되지 않았습니다. .env 값을 확인하세요.");
+            return;
+        }
+        const providerPath = provider.toLowerCase();
+        window.location.href = `${API_BASE_URL}/oauth2/authorization/${providerPath}`;
     };
 
     return (
@@ -92,7 +103,7 @@ export default function LoginPage() {
                 <Divider />
 
                 <OAuthRow>
-                    <OAuthBtn data-provider="google" type="button" onClick={() => console.log("GOOGLE_LOGIN")}>
+                    <OAuthBtn data-provider="google" type="button" onClick={() => handleOAuthLogin("google")}>
                         Google로 계속하기
                     </OAuthBtn>
                     <OAuthBtn data-provider="naver" type="button" onClick={() => console.log("NAVER_LOGIN")}>

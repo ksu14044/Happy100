@@ -24,25 +24,29 @@ export default function BoardTitle({
     right,
     as = "h1",
     className,
+    writeSection,
     "aria-label": ariaLabel,
 }) {
-    const {section, key} = useParams();
+    const { section, key } = useParams();
+    const resolvedSection = writeSection ?? key ?? section;
     return (
         <TitleSection aria-label={ariaLabel} className={className}>
             <Container>
+                <div>
                 <TitleRow>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         {icon ? <TitleIconSlot aria-hidden>{icon}</TitleIconSlot> : null}
                         <TitleText as={as}>{title}</TitleText>
                     </div>
-                    <RightSlot>
-                        {/* 우선 BoardTitle 내부에 기본 제공: 관리자에게만 보임 */}
-                        <WritePostButton section={key} />
-                        {/* 외부에서 전달된 우측 액션이 있으면 함께 표시 */}
-                        {right ?? null}
-                    </RightSlot>
                 </TitleRow>
                 {description ? <Description>{description}</Description> : null}
+                </div>
+                
+                        {/* 우선 BoardTitle 내부에 기본 제공: 관리자에게만 보임 */}
+                        <WritePostButton section={resolvedSection} />
+                        {/* 외부에서 전달된 우측 액션이 있으면 함께 표시 */}
+                        {right ?? null}
+                
             </Container>
         </TitleSection>
     );
@@ -59,6 +63,8 @@ BoardTitle.propTypes = {
     right: PropTypes.node,
     /** heading 태그 (기본 h1) */
     as: PropTypes.oneOf(["h1", "h2", "h3"]),
+    /** 글쓰기 버튼 경로 계산에 사용할 섹션 오버라이드 */
+    writeSection: PropTypes.string,
     className: PropTypes.string,
     "aria-label": PropTypes.string,
 };

@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { responsiveFont } from "../../styles/responsive";
 
 export const WriteButton = styled.a`
   display: flex;
@@ -7,7 +8,7 @@ export const WriteButton = styled.a`
   height: 36px;
   padding: 0 14px;  border: 1px solid #111827;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: ${responsiveFont("13px", "14px")};
   font-weight: 600;
   background: #111827;
   color: #fff;

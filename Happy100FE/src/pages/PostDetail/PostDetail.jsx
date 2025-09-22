@@ -2,6 +2,7 @@
 import React, { useMemo } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { useGetPostByIdQuery } from "../../queries/postQuery";
+import { useDownloadAttachmentMutation } from "../../mutations/attachmentMutation";
 import {
     PageWrap,
     Container,
@@ -34,7 +35,7 @@ function humanFileSize(bytes) {
 
 export default function PostDetail() {
     const navigate = useNavigate();
-    const { section, key, postId } = useParams();
+    const { section, postId } = useParams();
 
     // 라우트 패턴 지원:
     // - /news/:postId, /cert/:postId, /shop/:postId
@@ -46,13 +47,16 @@ export default function PostDetail() {
                 secRaw; // news | cert | shop
 
     const isValidSection = ["news", "cert", "shop"].includes(effectiveSection);
-    if (!isValidSection || !postId) return <Navigate to="/404" replace />;
+    const invalidRoute = !isValidSection || !postId;
 
     // 단건 조회 (백엔드 시그니처: GET /api/boards/{postId}?increaseView=true)
     const { data: post, isLoading, error } = useGetPostByIdQuery({
         postId,
         increaseView: true,
+        enabled: !invalidRoute,
     });
+
+    const downloadAttachment = useDownloadAttachmentMutation();
 
     const token = localStorage.getItem("auth_token");
     const payload = token ? decodeJwtPayload(token) : null;
@@ -74,25 +78,14 @@ export default function PostDetail() {
         }
     }, [post]);
 
-    // 첨부파일: DTO 규격(AttachmentResponse) 기준 filePath 사용
+    // 첨부파일: AttachmentResponse 규격 기반
     const attachments = useMemo(() => {
         const list = Array.isArray(post?.attachments) ? post.attachments : [];
-        return list.map((a) => {
-            const raw = a?.filePath || ""; // 현재 응답은 빈 문자열 가능
-            // 필요 시 아래 fallback 규칙만 수정하세요.
-            // 예) 백엔드가 /api/attachments/{id}/download 제공 시:
-            const fallbackHref = a?.attachmentId
-                ? `/api/attachments/${a.attachmentId}/download`
-                : "";
-
-            return {
-                id: a?.attachmentId,
-                name: a?.fileName || "첨부파일",
-                href: raw || fallbackHref, // 우선순위: filePath > fallback
-                size: typeof a?.fileSize === "number" ? a.fileSize : undefined,
-                mimeType: a?.mimeType || "",
-            };
-        });
+        return list.map((item) => ({
+            id: item?.attachmentId,
+            name: item?.fileName || "첨부파일",
+            size: typeof item?.fileSize === "number" ? item.fileSize : undefined,
+        }));
     }, [post]);
 
     const createdAt =
@@ -110,6 +103,25 @@ export default function PostDetail() {
         "";
 
     const views = post?.viewCount ?? post?.views ?? undefined;
+    const downloadingAttachmentId = downloadAttachment.isPending
+        ? downloadAttachment.variables?.attachmentId
+        : null;
+
+    const handleDownload = (attachment) => {
+        if (!attachment?.id) return;
+        downloadAttachment.mutate(
+            { postId, attachmentId: attachment.id, fileName: attachment.name },
+            {
+                onError: () => {
+                    window.alert("파일 다운로드에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+                },
+            },
+        );
+    };
+
+    if (invalidRoute) {
+        return <Navigate to="/404" replace />;
+    }
 
     return (
         <PageWrap>
@@ -143,33 +155,35 @@ export default function PostDetail() {
                             <Help>첨부된 파일이 없습니다.</Help>
                         ) : (
                             <AttachList>
-                                {attachments.map((f) => (
-                                    <AttachItem key={f.id ?? f.name}>
-                                        <span title={f.name}>{f.name}</span>
+                                {attachments.map((f) => {
+                                    const isDownloading =
+                                        downloadingAttachmentId != null && downloadingAttachmentId === f.id;
+                                    return (
+                                        <AttachItem key={f.id ?? f.name}>
+                                            <span title={f.name}>{f.name}</span>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                            {typeof f.size === "number" && (
-                                                <small style={{ color: "#6b7280" }}>{humanFileSize(f.size)}</small>
-                                            )}
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                {typeof f.size === "number" && (
+                                                    <small style={{ color: "#6b7280" }}>{humanFileSize(f.size)}</small>
+                                                )}
 
-                                            {f.href ? (
-                                                <PrimaryBtn
-                                                    as="button"
-                                                    href={f.href}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    download
-                                                >
-                                                    다운로드
-                                                </PrimaryBtn>
-                                            ) : (
-                                                <small style={{ color: "#9ca3af" }}>
-                                                    다운로드 경로가 없습니다
-                                                </small>
-                                            )}
-                                        </div>
-                                    </AttachItem>
-                                ))}
+                                                {f.id ? (
+                                                    <PrimaryBtn
+                                                        type="button"
+                                                        onClick={() => handleDownload(f)}
+                                                        disabled={isDownloading}
+                                                    >
+                                                        {isDownloading ? "다운로드 중…" : "다운로드"}
+                                                    </PrimaryBtn>
+                                                ) : (
+                                                    <small style={{ color: "#9ca3af" }}>
+                                                        다운로드 정보를 찾을 수 없습니다
+                                                    </small>
+                                                )}
+                                            </div>
+                                        </AttachItem>
+                                    );
+                                })}
                             </AttachList>
                         )}
                     </AttachArea>

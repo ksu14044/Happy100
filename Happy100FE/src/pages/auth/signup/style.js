@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { responsiveFont } from "../../../styles/responsive";
 
 const maxW = "420px";
 
@@ -22,7 +23,7 @@ export const Card = styled.div`
 
 export const Title = styled.h1`
   margin: 0 0 12px;
-  font-size: clamp(18px, 4vw, 20px);
+  font-size: ${responsiveFont("20px", "22px")};
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #111827;
@@ -39,7 +40,7 @@ export const Row = styled.div`
 `;
 
 export const Label = styled.label`
-  font-size: 13px;
+  font-size: ${responsiveFont("12px", "13px")};
   font-weight: 600;
   color: #374151;
 `;
@@ -47,7 +48,7 @@ export const Label = styled.label`
 export const Input = styled.input`
   height: 40px;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: ${responsiveFont("13px", "14px")};
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   outline: none;
@@ -69,7 +70,7 @@ export const PrimaryButton = styled.button`
   background: #111827;
   color: #fff;
   font-weight: 700;
-  font-size: 14px;
+  font-size: ${responsiveFont("14px", "15px")};
   cursor: pointer;
 
   &:hover { opacity: 0.96; }
@@ -85,13 +86,13 @@ export const MutedLinkRow = styled.div`
 `;
 
 export const MutedLink = styled.a`
-  font-size: 13px;
+  font-size: ${responsiveFont("12px", "13px")};
   color: #111827;
   font-weight: 700;
   text-decoration: none;
 `;
 
 export const Small = styled.span`
-  font-size: 12px;
+  font-size: ${responsiveFont("11px", "12px")};
   color: #6b7280;
 `;

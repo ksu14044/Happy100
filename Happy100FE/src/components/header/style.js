@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import { css, keyframes } from "@emotion/react";
+import { mediaQuery, mediaQueryUp } from "../../styles/responsive";
 
-export const bp = { md: "768px", lg: "1024px" };
-export const containerWidth = "1280px";
+export const containerWidth = "1100px";
 
 // DOM 경고 방지용 shouldForwardProp
 const forwardSticky = { shouldForwardProp: (prop) => prop !== "sticky" };
@@ -22,12 +22,14 @@ export const HeaderWrap = styled("header", forwardSticky)`
 export const Inner = styled.div`
   max-width: ${containerWidth};
   margin: 0 auto;
-  padding: 0 16px 12px;
-  @media (min-width: ${bp.md}) {
-    padding: 16px 24px 16px;
+  padding: 12px 16px;
+
+  ${mediaQuery.mobile} {
+    padding: 16px 20px;
   }
-  @media (min-width: ${bp.lg}) {
-    padding: 18px 40px 18px;
+
+  ${mediaQueryUp.desktop} {
+    padding: 18px 32px;
   }
 `;
 
@@ -43,7 +45,8 @@ export const RightArea = styled.div`
   display: none;
   align-items: center;
   gap: 10px;
-  @media (min-width: ${bp.md}) {
+
+  ${mediaQueryUp.tablet} {
     display: flex;
   }
 `;
@@ -53,7 +56,8 @@ export const UserArea = styled.div`
   display: none;
   align-items: center;
   gap: 10px;
-  @media (min-width: ${bp.md}) {
+
+  ${mediaQueryUp.tablet} {
     display: flex;
   }
 `;
@@ -124,8 +128,9 @@ export const Brand = styled.span`
   line-height: 1;
   letter-spacing: -0.02em;
   color: #ec4899;
-  font-size: 20px;
-  @media (min-width: ${bp.md}) {
+  font-size: 18px;
+
+  ${mediaQueryUp.tablet} {
     font-size: 22px;
   }
 `;
@@ -151,16 +156,18 @@ export const LogoSvg = styled.svg`
 
 export const DesktopNav = styled.nav`
   display: none;
-  @media (min-width: ${bp.md}) {
+
+  ${mediaQueryUp.tablet} {
     display: block;
   }
 `;
 
 export const NavList = styled.ul`
   display: flex;
-  gap: 40px;
-  @media (min-width: ${bp.lg}) {
-    gap: 64px;
+  gap: 28px;
+
+  ${mediaQueryUp.desktop} {
+    gap: 48px;
   }
 `;
 
@@ -217,7 +224,7 @@ export const MobileBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  @media (min-width: ${bp.md}) {
+  ${mediaQueryUp.tablet} {
     display: none;
   }
 `;
@@ -225,7 +232,7 @@ export const MobileBtn = styled.button`
 export const MobilePanel = styled.div`
   display: block;
   padding: 0 0 16px 0;
-  @media (min-width: ${bp.md}) {
+  ${mediaQueryUp.tablet} {
     display: none;
   }
   nav {
@@ -277,7 +284,7 @@ export const Dropdown = styled("ul", forwardOpen)`
     height: 14px;
   }
 
-  @media (max-width: 767px) {
+  ${mediaQuery.tablet} {
     display: none;
   }
 `;

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
+import { mediaQuery, mediaQueryUp, responsiveFont } from "../../styles/responsive";
 
-export const containerWidth = "1280px"; // 공통값(fallback)
+export const containerWidth = "900px";
 
 export const RowWrap = styled.div`
   background: #fff;
@@ -16,31 +17,32 @@ export const RowWrap = styled.div`
 export const Container = styled.div`
   max-width: ${containerWidth};
   margin: 0 auto;
-  padding: 0 16px;
-
-  @media (min-width: 768px) {
-    padding: 0 24px;
-  }
+  padding: 0;
 `;
 
 export const RowGrid = styled.div`
   display: grid;
   align-items: center;
-  min-height: 56px; /* 행 높이 */
-  /* grid-template-columns는 JSX에서 주입 */
+  min-height: 56px;
+  grid-template-columns: ${(p) => p.columns || "1fr"};
+  gap: 0;
+
+  ${mediaQuery.mobile} {
+    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(0, 1fr);
+    min-height: 52px;
+  }
 `;
 
 export const Cell = styled.div`
   position: relative;
-  padding: 16px 12px;               /* ⬅ 헤더와 동일 패딩 */
-  font-size: 14px;
+  padding: 16px 12px;
+  font-size: ${responsiveFont("13px", "15px")};
   color: #222;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: ${({ $align }) => $align || "left"};
 
-  /* 컬럼 세로 구분선 (첫 컬럼 제외) */
   &:not(:first-of-type)::before {
     content: "";
     position: absolute;
@@ -51,7 +53,7 @@ export const Cell = styled.div`
     background: rgba(0, 0, 0, 0.06);
   }
 
-  @media (min-width: 768px) {
-    font-size: 15px;
+  ${mediaQuery.mobile} {
+    padding: 14px 10px;
   }
 `;

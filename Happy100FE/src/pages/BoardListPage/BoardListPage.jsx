@@ -1,5 +1,5 @@
 
-import { layout, text, pagerRow, btnStyle } from "./style";
+import { PageContainer, StatusMessage, ErrorMessage } from "./style";
 import BoardTitle from "../../components/board-title/BoardTitle";
 import TableHeader from "../../components/board-table-header/TableHeader";
 import TableRow from "../../components/board-table-row/TableRow";
@@ -7,6 +7,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useGetPostListQuery } from "../../queries/postQuery";
 import { tokenStorage } from "../../libs/authStorage";
+import { Pagination } from "../../components/Pagination";
 
 // section/key 조합별 설정(보드타입/타이틀/설명)
 const PAGE_CONFIG = {
@@ -58,8 +59,6 @@ export default function BoardListPage() {
         postList = [],
         totalPages = 1,
         totalElements = 0,
-        firstPage = page === 1,
-        lastPage = page === totalPages,
     } = data ?? {};
 
     // 페이지 버튼(모바일 단순화)
@@ -96,17 +95,17 @@ export default function BoardListPage() {
             <TableHeader />
 
             {/* 상태 메시지 */}
-            <div style={layout.container}>
-                {isLoading && <div style={text.msg}>불러오는 중…</div>}
+            <PageContainer>
+                {isLoading && <StatusMessage>불러오는 중…</StatusMessage>}
                 {!isLoading && error && (
-                    <div style={{ ...text.msg, color: "#b91c1c" }}>
+                    <ErrorMessage>
                         오류가 발생했습니다: {String(error.message || error)}
-                    </div>
+                    </ErrorMessage>
                 )}
                 {!isLoading && !error && postList.length === 0 && (
-                    <div style={text.msg}>게시글이 없습니다.</div>
+                    <StatusMessage>게시글이 없습니다.</StatusMessage>
                 )}
-            </div>
+            </PageContainer>
 
             {/* 목록 */}
             {postList.map((p) => (
@@ -122,50 +121,14 @@ export default function BoardListPage() {
 
             {/* 페이지네이션 */}
             {totalElements > 0 && (
-                <nav aria-label={`${config.title} 페이지네이션`} style={layout.pagerWrap}>
-                    <div style={pagerRow(isMobile)}>
-                        <button
-                            type="button"
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            disabled={firstPage || page <= 1}
-                            style={btnStyle(false, firstPage || page <= 1)}
-                        >
-                            이전
-                        </button>
-
-                        {pageItems.map((it, idx) =>
-                            it === "…" ? (
-                                <span key={`e-${idx}`} style={text.ellipsis}>…</span>
-                            ) : (
-                                <button
-                                    key={it}
-                                    type="button"
-                                    onClick={() => setPage(it)}
-                                    aria-current={page === it ? "page" : undefined}
-                                    disabled={page === it}
-                                    style={btnStyle(page === it, page === it)}
-                                >
-                                    {isMobile ? `${page}/${totalPages}` : it}
-                                </button>
-                            )
-                        )}
-
-                        <button
-                            type="button"
-                            onClick={() => setPage((p) => Math.min(totalPages || 1, p + 1))}
-                            disabled={lastPage || page >= (totalPages || 1)}
-                            style={btnStyle(false, lastPage || page >= (totalPages || 1))}
-                        >
-                            다음
-                        </button>
-                    </div>
-
-                    {!isMobile && (
-                        <div style={text.summary}>
-                            총 {totalElements}건 · {page}/{totalPages}페이지
-                        </div>
-                    )}
-                </nav>
+                <Pagination
+                    total={totalElements}
+                    page={page}
+                    totalPages={totalPages}
+                    pageItems={pageItems}
+                    onChange={setPage}
+                    isMobile={isMobile}
+                />
             )}
         </>
     );

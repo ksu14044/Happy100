@@ -1,5 +1,6 @@
 // FILE: /src/pages/WritePage/style.js
 import styled from "@emotion/styled";
+import { mediaQuery, responsiveFont } from "../../styles/responsive";
 
 export const PageWrap = styled.main`
   width: 100%;
@@ -9,14 +10,17 @@ export const PageWrap = styled.main`
 export const Container = styled.div`
   max-width: 1024px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px 24px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 18px;
 
-  @media (min-width: 768px) {
-    padding: 24px;
-    gap: 22px;
+  ${mediaQuery.tablet} {
+    padding: 20px;
+  }
+
+  ${mediaQuery.mobile} {
+    padding: 16px;
   }
 `;
 
@@ -27,7 +31,7 @@ export const TitleBar = styled.div`
 export const TitleInput = styled.input`
   width: 100%;
   /* ⬇️ 높이 축소: 폰트/패딩 조정 */
-  font-size: clamp(16px, 2.2vw, 22px);
+  font-size: ${responsiveFont("18px", "22px")};
   font-weight: 700;
   line-height: 1.25;
   padding: 10px 12px; /* 이전보다 줄임 */
@@ -46,13 +50,13 @@ export const Field = styled.section`
 `;
 
 export const Label = styled.h3`
-  font-size: 14px;
+  font-size: ${responsiveFont("13px", "14px")};
   font-weight: 700;
   color: #111827;
 `;
 
 export const Help = styled.p`
-  font-size: 12px;
+  font-size: ${responsiveFont("11px", "12px")};
   color: #6b7280;
   margin: 6px 0 0;
 `;
@@ -61,12 +65,12 @@ export const Help = styled.p`
 export const AttachArea = styled.div`
   border: 1px dashed #cbd5e1;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
   display: grid;
   gap: 12px;
 
-  @media (min-width: 768px) {
-    padding: 14px;
+  ${mediaQuery.mobile} {
+    padding: 12px;
   }
 `;
 
@@ -106,7 +110,7 @@ export const AttachItem = styled.li`
 
   & > span {
     flex: 1;
-    font-size: 13px;
+    font-size: ${responsiveFont("12px", "13px")};
     color: #374151;
     white-space: nowrap;
     overflow: hidden;
@@ -131,7 +135,7 @@ export const EditorWrap = styled.div`
 
   .ck.ck-editor__editable {
     min-height: 300px;
-    @media (min-width: 768px) {
+    ${mediaQuery.tablet} {
       min-height: 380px;
     }
   }
@@ -151,7 +155,7 @@ export const ButtonBase = styled.button`
   height: 36px;
   padding: 0 14px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: ${responsiveFont("13px", "14px")};
   font-weight: 700;
   cursor: pointer;
   border: 1px solid transparent;

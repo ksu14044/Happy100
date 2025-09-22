@@ -1,5 +1,6 @@
 // FILE: src/pages/PostDetail/style.js
 import styled from "@emotion/styled";
+import { mediaQuery, responsiveFont } from "../../styles/responsive";
 // 핵심 스타일은 WritePage와 일관되게 재사용
 import {
     EditorWrap as BaseEditorWrap,
@@ -8,7 +9,7 @@ import {
 
 /** 상세 제목: WritePage의 TitleInput 타이포와 스케일을 맞춤 */
 export const TitleText = styled.h1`
-  font-size: clamp(16px, 2.2vw, 22px);
+  font-size: ${responsiveFont("18px", "22px")};
   font-weight: 700;
   line-height: 1.25;
   padding: 10px 12px;
@@ -26,7 +27,7 @@ export const MetaBar = styled.div`
   gap: 8px 14px;
   padding: 6px 2px 0;
   color: #6b7280;
-  font-size: 12px;
+  font-size: ${responsiveFont("12px", "13px")};
 
   & > span {
     position: relative;
@@ -50,7 +51,7 @@ export const ContentWrap = styled(BaseEditorWrap)`
     line-height: 1.7;
   }
 
-  @media (min-width: 768px) {
+  ${mediaQuery.tablet} {
     article.ck-content-like {
       padding: 18px;
     }
@@ -63,9 +64,9 @@ export const ContentWrap = styled(BaseEditorWrap)`
       line-height: 1.25;
       font-weight: 700;
     }
-    h1 { font-size: clamp(20px, 2.6vw, 28px); }
-    h2 { font-size: clamp(18px, 2.4vw, 24px); }
-    h3 { font-size: clamp(16px, 2.2vw, 20px); }
+    h1 { font-size: ${responsiveFont("22px", "28px")}; }
+    h2 { font-size: ${responsiveFont("20px", "24px")}; }
+    h3 { font-size: ${responsiveFont("18px", "20px")}; }
 
     p { margin: 0.9em 0; }
     ul, ol { padding-left: 1.2em; margin: 0.9em 0; }
@@ -90,7 +91,7 @@ export const ContentWrap = styled(BaseEditorWrap)`
       width: 100%;
       border-collapse: collapse;
       margin: 1em 0;
-      font-size: 14px;
+      font-size: ${responsiveFont("13px", "14px")};
     }
     table th, table td {
       border: 1px solid #e5e7eb;
@@ -130,7 +131,7 @@ export const BackBar = styled.div`
   background: #fff;
   padding-top: 8px;
 
-  @media (min-width: 768px) {
+  ${mediaQuery.tablet} {
     gap: 12px;
   }
 `;
@@ -141,4 +142,3 @@ export const SecondaryBtn = styled(ButtonBase)`
   color: #111827;
   border: 1px solid #e5e7eb;
 `;
-

@@ -5,10 +5,13 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/header/Header.jsx';
 import Footer from './components/footer/Footer.jsx';
 import BoardListPage from './pages/BoardListPage/BoardListPage.jsx';
-import LoginPage from './pages/auth/login/LogInPage.jsx';
 import SignUpPage from './pages/auth/signup/SignUpPage.jsx';
 import WritePage from './pages/WritePage/WritePage.jsx';
 import PostDetail from './pages/PostDetail/PostDetail.jsx';
+import LoginPage from './pages/auth/login/LoginPage.jsx';
+import OAuthCallbackPage from './pages/auth/oauth/OAuthCallbackPage.jsx';
+import CounselPage from './pages/CounselPage/CounselPage.jsx';
+import ShopListPage from './pages/ShopListPage/ShopListPage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -31,6 +34,9 @@ export default function App() {
         showTagline
       />
       <Routes>
+        <Route path="/oauth2/callback" element={<OAuthCallbackPage />} />
+        <Route path="/counsel" element={<CounselPage />} />
+        <Route path="/shop/list" element={<ShopListPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/:section/write" element={<WritePage />} />

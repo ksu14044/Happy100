@@ -32,6 +32,13 @@ const BOARD_TYPE = { news: "NEWS", cert: "CERT", shop: "SHOP" };
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/files` : "/api/files";
 
+function resolveFileUrl(urlOrPath) {
+    if (!urlOrPath) return "";
+    if (/^https?:\/\//i.test(urlOrPath)) return urlOrPath;
+    const base = API_BASE_URL || window.location.origin;
+    return `${base}${urlOrPath.startsWith("/") ? "" : "/"}${urlOrPath}`;
+}
+
 function buildAuthHeaders() {
     const headers = {};
     const stored = typeof tokenStorage !== "undefined" ? tokenStorage.load?.() : null;
@@ -60,7 +67,7 @@ async function uploadAttachment(file) {
         filePath,
         fileSize: data?.fileSize ?? (typeof file.size === "number" ? file.size : null),
         mimeType: data?.mimeType ?? file.type ?? "",
-        url: data?.url ?? undefined,
+        url: resolveFileUrl(data?.url ?? filePath),
     };
 }
 
@@ -87,8 +94,12 @@ class MyUploadAdapter {
             throw new Error(msg || "파일 업로드 실패");
         }
         const data = await res.json();
+        const fileUrl = resolveFileUrl(data?.url ?? data?.filePath);
+        if (!fileUrl) {
+            throw new Error("업로드 응답에 표시할 URL이 없습니다.");
+        }
         // CKEditor는 { default: 'https://...' } 형태로 URL을 기대합니다.
-        return { default: data.url };
+        return { default: fileUrl };
     }
     abort() {
         // 필요시 업로드 취소 로직 추가 가능

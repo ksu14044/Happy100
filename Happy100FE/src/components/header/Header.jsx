@@ -49,13 +49,10 @@ export default function Header({
                 {
                     label: "자격증반",
                     href: "/cert/recruit",
-                    children: [
-                        { label: "자격증반 모집", href: "/cert/recruit" },
-                        { label: "자격증반 신청", href: "/cert/apply" },
-                    ],
                 },
                 { label: "지사모집", href: "/franchise" },
-                { label: "쇼핑몰", href: "/shop" },
+                { label: "쇼핑몰", href: "/shop/list" },
+                { label: "상담신청", href: "/counsel" },
                 { label: "Q&A", href: "/qna" },
             ],
         [navItems]
