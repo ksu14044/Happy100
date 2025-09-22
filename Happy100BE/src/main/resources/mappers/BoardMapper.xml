@@ -97,6 +97,14 @@
     ORDER BY sort_order ASC, attachment_id ASC
   </select>
 
+  <select id="selectAttachmentById" resultMap="BoardAttachmentMap">
+    SELECT
+      attachment_id, post_id, attachment_type, file_name, file_path,
+      file_size, mime_type, sort_order, created_at
+    FROM board_attachment
+    WHERE attachment_id = #{attachmentId}
+  </select>
+
   <delete id="deleteAttachmentsByPost">
     DELETE FROM board_attachment
     WHERE post_id = #{postId}

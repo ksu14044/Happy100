@@ -4,15 +4,22 @@ import com.Happy100BE.Happy100.dto.request.PostCreateRequest;
 import com.Happy100BE.Happy100.dto.request.PostUpdateRequest;
 import com.Happy100BE.Happy100.dto.response.PostListResponse;
 import com.Happy100BE.Happy100.dto.response.PostResponse;
-import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
+import com.Happy100BE.Happy100.entity.BoardAttachment;
 import com.Happy100BE.Happy100.service.BoardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -38,6 +45,29 @@ public class BoardController {
         PostResponse res = boardService.get(postId, increaseView);
         if (res == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/{postId}/attachments/{attachmentId}/download")
+    @Operation(summary = "첨부파일 다운로드")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long postId,
+                                                       @PathVariable Long attachmentId) {
+        BoardService.AttachmentFile attachmentFile = boardService.downloadAttachment(postId, attachmentId);
+        BoardAttachment attachment = attachmentFile.getAttachment();
+
+        ContentDisposition contentDisposition = ContentDisposition.attachment()
+                .filename(attachment.getFileName(), StandardCharsets.UTF_8)
+                .build();
+
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .contentType(resolveMediaType(attachment.getMimeType()));
+
+        Long fileSize = attachment.getFileSize();
+        if (fileSize != null && fileSize > 0) {
+            builder = builder.contentLength(fileSize);
+        }
+
+        return builder.body(attachmentFile.getResource());
     }
 
     @GetMapping
@@ -78,5 +108,19 @@ public class BoardController {
         boolean ok = boardService.delete(postId);
         if (!ok) return ResponseEntity.notFound().build();
         return ResponseEntity.noContent().build();
+    }
+
+    private MediaType resolveMediaType(String mimeType) {
+        if (mimeType != null) {
+            String trimmed = mimeType.trim();
+            if (!trimmed.isEmpty()) {
+                try {
+                    return MediaType.parseMediaType(trimmed);
+                } catch (InvalidMediaTypeException ignored) {
+                    return MediaType.APPLICATION_OCTET_STREAM;
+                }
+            }
+        }
+        return MediaType.APPLICATION_OCTET_STREAM;
     }
 }

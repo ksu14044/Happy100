@@ -17,6 +17,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+app:
+  attachments:
+    base-path: ${ATTACHMENT_BASE_PATH:./uploads}
+
 server:
   port: 8080
 

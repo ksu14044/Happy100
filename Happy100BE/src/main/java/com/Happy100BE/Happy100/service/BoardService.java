@@ -12,11 +12,21 @@ import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
 
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +37,10 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardCounterService boardCounterService;
+
+    @Value("${app.attachments.base-path:}")
+    private String attachmentsBasePath;
+
     @Transactional(readOnly = false)
     public Long create(PostCreateRequest req, Authentication auth) {
         BoardPost post = new BoardPost();
@@ -82,6 +96,75 @@ public class BoardService {
         return boardRepository.softDelete(postId) > 0;
     }
 
+    @Transactional(readOnly = true)
+    public AttachmentFile downloadAttachment(Long postId, Long attachmentId) {
+        BoardAttachment attachment = boardRepository.findAttachment(attachmentId);
+        if (attachment == null || attachment.getPostId() == null || !attachment.getPostId().equals(postId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found");
+        }
+
+        Path path = resolveAttachmentPath(attachment.getFilePath());
+        if (!Files.exists(path) || !Files.isRegularFile(path)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment file not found");
+        }
+
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment file not readable");
+            }
+            return new AttachmentFile(attachment, resource);
+        } catch (MalformedURLException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid attachment path", e);
+        }
+    }
+
+    private Path resolveAttachmentPath(String filePath) {
+        if (!StringUtils.hasText(filePath)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Attachment path missing");
+        }
+
+        Path candidate;
+        try {
+            candidate = Paths.get(filePath).normalize();
+        } catch (InvalidPathException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid attachment path", ex);
+        }
+
+        if (candidate.isAbsolute()) {
+            return candidate;
+        }
+
+        Path base = resolveBasePath();
+        Path sanitized = stripLeadingBase(candidate, base);
+
+        Path resolved = base.resolve(sanitized).normalize();
+        if (!resolved.startsWith(base)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid attachment path");
+        }
+        return resolved;
+    }
+
+    private Path resolveBasePath() {
+        Path configuredBase = StringUtils.hasText(attachmentsBasePath)
+                ? Paths.get(attachmentsBasePath)
+                : Paths.get("");
+        return configuredBase.toAbsolutePath().normalize();
+    }
+
+    private Path stripLeadingBase(Path candidate, Path base) {
+        if (candidate.getNameCount() == 0) {
+            return candidate;
+        }
+        Path baseName = base.getFileName();
+        if (baseName != null && candidate.getName(0).toString().equals(baseName.toString())) {
+            return candidate.getNameCount() == 1
+                    ? Paths.get("")
+                    : candidate.subpath(1, candidate.getNameCount());
+        }
+        return candidate;
+    }
+
     private List<BoardAttachment> toAttachmentEntities(Long postId, List<?> list) {
         if (list == null) return List.of();
         List<BoardAttachment> result = new ArrayList<>();
@@ -134,4 +217,22 @@ public class BoardService {
     public int countPostsByBoardType(String boardType) {
         return boardRepository.countPostsByBoardType(boardType);
     }
+    public static class AttachmentFile {
+        private final BoardAttachment attachment;
+        private final Resource resource;
+
+        public AttachmentFile(BoardAttachment attachment, Resource resource) {
+            this.attachment = attachment;
+            this.resource = resource;
+        }
+
+        public BoardAttachment getAttachment() {
+            return attachment;
+        }
+
+        public Resource getResource() {
+            return resource;
+        }
+    }
+
 }

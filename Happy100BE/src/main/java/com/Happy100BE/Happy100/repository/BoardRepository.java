@@ -35,6 +35,10 @@ public class BoardRepository {
         return boardMapper.selectAttachments(postId);
     }
 
+    public BoardAttachment findAttachment(Long attachmentId) {
+        return boardMapper.selectAttachmentById(attachmentId);
+    }
+
     public int updatePost(BoardPost post, List<BoardAttachment> newAttachments) {
         int updated = boardMapper.updatePost(post);
         boardMapper.deleteAttachmentsByPost(post.getPostId());

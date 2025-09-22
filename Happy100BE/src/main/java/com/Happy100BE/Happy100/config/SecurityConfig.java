@@ -65,7 +65,8 @@ public class SecurityConfig {
                                                                 "/api/recruits/**",
                                                                 "/api/products/**",
                                                                 "/api/posts/**",
-                                                                "/api/boards/**")
+                                                                "/api/boards/**",
+                                                                "/uploads/**")
                                                 .permitAll()
 
                                                 // 관리자
