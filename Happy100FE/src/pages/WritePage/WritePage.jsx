@@ -24,22 +24,46 @@ import {
 } from "./style";
 import { useCreatePostMutation } from "../../mutations/postMutation";
 import { toAttachmentRequests } from "../../apis/postApi";
+import { tokenStorage } from "../../libs/authStorage";
 
 // 섹션 → 보드 타입 매핑 (백엔드 ENUM과 맞추세요)
 const BOARD_TYPE = { news: "NEWS", cert: "CERT", shop: "SHOP" };
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/files` : "/api/files";
+
+function buildAuthHeaders() {
+    const headers = {};
+    const stored = typeof tokenStorage !== "undefined" ? tokenStorage.load?.() : null;
+    const token = stored?.accessToken || localStorage.getItem("accessToken");
+    if (token) {
+        const scheme = stored?.tokenType || "Bearer";
+        headers["Authorization"] = `${scheme} ${token}`;
+    }
+    return headers;
+}
+
 async function uploadAttachment(file) {
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch("/api/files", {
+    const res = await fetch(FILE_UPLOAD_ENDPOINT, {
         method: "POST",
         headers: buildAuthHeaders(),
         body: form,
     });
-    if (!res.ok) throw new Error((await res.text()) || "파일 업로드 실패");
-    const data = await res.json(); // { url: "..." } 가정
-    return { fileName: file.name, url: data.url };
+    if (!res.ok) throw new Error((await res.text()) || "첨부파일 업로드에 실패했습니다.");
+    const data = await res.json();
+    const filePath = data?.filePath ?? data?.url ?? data?.path ?? "";
+    if (!filePath) throw new Error("업로드 응답에 파일 경로가 없습니다.");
+    return {
+        fileName: data?.fileName ?? file.name,
+        filePath,
+        fileSize: data?.fileSize ?? (typeof file.size === "number" ? file.size : null),
+        mimeType: data?.mimeType ?? file.type ?? "",
+        url: data?.url ?? undefined,
+    };
 }
+
 
 /** CKEditor5 커스텀 업로드 어댑터: /api/files 로 업로드 후 {url} 사용 */
 class MyUploadAdapter {
@@ -51,11 +75,9 @@ class MyUploadAdapter {
         const form = new FormData();
         form.append("file", file);
 
-        const headers = {};
-        const token = localStorage.getItem("accessToken");
-        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const headers = buildAuthHeaders();
 
-        const res = await fetch("/api/files", {
+        const res = await fetch(FILE_UPLOAD_ENDPOINT, {
             method: "POST",
             body: form,
             headers,
@@ -86,6 +108,7 @@ export default function WritePage() {
     const [title, setTitle] = useState("");
     const [attachments, setAttachments] = useState([]); // 본문 외 첨부
     const [editorHtml, setEditorHtml] = useState("");
+    const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
 
 
 
@@ -141,11 +164,10 @@ export default function WritePage() {
     };
 
     /** 제출 */
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        if (!canSubmit || isPending) return;
+        if (!canSubmit || isPending || isUploadingAttachments) return;
 
-        // contentJson은 "문자열"로 직렬화
         const contentJsonStr = JSON.stringify({
             type: "ckeditor5",
             html: editorHtml,
@@ -153,8 +175,71 @@ export default function WritePage() {
             version: "1.0",
         });
 
-        // 첨부 메타데이터(AttachmentRequest[])로 변환
-        const attachmentsReq = toAttachmentRequests(attachments);
+        let attachmentsReq = [];
+        const hasNewFiles =
+            attachments.some((item) => typeof File !== "undefined" && item instanceof File);
+
+        try {
+            if (hasNewFiles) {
+                setIsUploadingAttachments(true);
+            }
+
+            const prepared = await Promise.all(
+                attachments.map(async (item, idx) => {
+                    if (item && typeof item === "object" && "attachmentType" in item) {
+                        const path = item.filePath ?? "";
+                        if (!path) {
+                            throw new Error("첨부파일에 저장 경로가 없습니다.");
+                        }
+
+                        return {
+                            attachmentType: item.attachmentType,
+                            fileName: item.fileName ?? "",
+                            filePath: path,
+                            fileSize: item.fileSize ?? null,
+                            mimeType: item.mimeType ?? null,
+                            sortOrder: item.sortOrder ?? idx,
+                        };
+                    }
+
+                    const isFileObject = typeof File !== "undefined" && item instanceof File;
+                    if (!isFileObject) {
+                        throw new Error("지원하지 않는 첨부 파일 형식입니다.");
+                    }
+
+                    const uploaded = await uploadAttachment(item);
+                    const filePath = uploaded.filePath || uploaded.url || "";
+                    if (!filePath) {
+                        const fallbackName = item.name || `attachment ${idx + 1}`;
+                        throw new Error(`${fallbackName} 파일의 저장 경로를 찾을 수 없습니다.`);
+                    }
+
+                    const mime = item.type || "";
+                    const attachmentType =
+                        mime.startsWith("image/") ? "IMAGE" :
+                        mime.startsWith("video/") ? "VIDEO" : "FILE";
+
+                    return {
+                        attachmentType,
+                        fileName: uploaded.fileName || item.name,
+                        filePath,
+                        fileSize: typeof item.size === "number" ? item.size : null,
+                        mimeType: mime || null,
+                        sortOrder: idx,
+                    };
+                })
+            );
+
+            attachmentsReq = toAttachmentRequests(prepared);
+        } catch (error) {
+            console.error(error);
+            alert(error?.message || "첨부파일 업로드에 실패했습니다.");
+            return;
+        } finally {
+            if (hasNewFiles) {
+                setIsUploadingAttachments(false);
+            }
+        }
 
         createPost(
             {
@@ -175,6 +260,7 @@ export default function WritePage() {
             }
         );
     };
+
 
     return (
         <PageWrap>
@@ -252,7 +338,7 @@ export default function WritePage() {
                 {/* 제출 */}
                 <SubmitBar>
                     <GhostBtn type="button" onClick={() => navigate(-1)}>취소</GhostBtn>
-                    <PrimaryBtn type="submit" disabled={!canSubmit}>작성 완료</PrimaryBtn>
+                    <PrimaryBtn type="submit" disabled={!canSubmit || isPending || isUploadingAttachments}>작성 완료</PrimaryBtn>
                 </SubmitBar>
             </Container>
         </PageWrap>
