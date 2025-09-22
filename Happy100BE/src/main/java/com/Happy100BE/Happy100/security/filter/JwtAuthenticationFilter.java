@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 이미 인증된 요청은 패스
         Authentication existing = SecurityContextHolder.getContext().getAuthentication();
-        if (existing != null) {
+        if (existing != null && existing.isAuthenticated()
+                && !(existing instanceof AnonymousAuthenticationToken)) {
             chain.doFilter(request, response);
             return;
         }

@@ -3,6 +3,8 @@ spring:
     active: local
     group:
       local: local_server, common, secret
+  config:
+    import: optional:file:.env[.properties],optional:file:Happy100BE/.env[.properties]
 
 ---
 spring:
@@ -20,6 +22,8 @@ spring:
 app:
   attachments:
     base-path: ${ATTACHMENT_BASE_PATH:./uploads}
+  contact:
+    recipient-email: ${MAIL_USERNAME}
 
 server:
   port: 8080
@@ -46,6 +50,8 @@ react:
     protocol: http
     host: localhost
     port: 5173
+    callback-path: /oauth2/callback
+    failure-path: /oauth2/callback
 
 ---
 spring:
@@ -92,7 +98,7 @@ spring:
             client-id: ${OAUTH_GOOGLE_CLIENT_ID}
             client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET}
             scope: openid, profile, email
-            redirect-uri: "{baseUrl}/oauth2/callback/google"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-authentication-method: client_secret_basic
             authorization-grant-type: authorization_code
         provider:

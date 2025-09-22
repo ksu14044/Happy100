@@ -57,7 +57,7 @@ public class SecurityConfig {
                                                                 "/swagger-ui.html")
                                                 .permitAll()
                                                 // 인증/회원가입, 소셜 로그인 진입점 및 콜백 허용
-                                                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**").permitAll()
+                                                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/counsel/**").permitAll()
 
                                                 // ✅ 읽기 전용 공개 API (필요 시 조정)
                                                 .requestMatchers(HttpMethod.GET,

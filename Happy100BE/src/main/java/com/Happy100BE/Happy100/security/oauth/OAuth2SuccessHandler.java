@@ -1,18 +1,21 @@
 package com.Happy100BE.Happy100.security.oauth;
 
+import com.Happy100BE.Happy100.security.jwt.JwtProperties;
 import com.Happy100BE.Happy100.security.jwt.JwtService;
 import com.Happy100BE.Happy100.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +23,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserService userService;
     private final JwtService jwtService;
+    private final JwtProperties jwtProperties;
+
+    @Value("${react.server.protocol:http}")
+    private String reactProtocol;
+
+    @Value("${react.server.host:localhost}")
+    private String reactHost;
+
+    @Value("${react.server.port:5173}")
+    private int reactPort;
+
+    @Value("${react.server.callback-path:/oauth2/callback}")
+    private String reactCallbackPath;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -44,18 +60,36 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String username = userService.upsertSocialUser(provider, providerUserId, email, name);
         String role = userService.findRoleByUsername(username);
         String accessToken = jwtService.generateToken(username, role);
+        long expiresIn = jwtProperties.accessTokenValiditySeconds();
 
-        // 보안상 쿼리 파라미터 대신 HttpOnly 쿠키로 전달
-        ResponseCookie cookie = ResponseCookie.from("access_token", accessToken)
-                .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true 권장(HTTPS)
-                .path("/")
-                .sameSite("Lax")
-                .maxAge(3600)
-                .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        String redirectUri = UriComponentsBuilder.fromHttpUrl(buildFrontendBaseUrl())
+                .path(normalizePath(reactCallbackPath))
+                .queryParam("accessToken", accessToken)
+                .queryParam("tokenType", "Bearer")
+                .queryParam("expiresIn", expiresIn)
+                .queryParam("username", username)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUriString();
 
-        // 존재하는 경로로 리다이렉트 (스웨거 UI)
-        response.sendRedirect("/swagger-ui/index.html");
+        response.sendRedirect(redirectUri);
+    }
+
+    private String buildFrontendBaseUrl() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(reactProtocol).append("://").append(reactHost);
+        boolean isDefaultPort = ("http".equalsIgnoreCase(reactProtocol) && reactPort == 80)
+                || ("https".equalsIgnoreCase(reactProtocol) && reactPort == 443);
+        if (!isDefaultPort && reactPort > 0) {
+            sb.append(":").append(reactPort);
+        }
+        return sb.toString();
+    }
+
+    private String normalizePath(String path) {
+        if (path == null || path.isBlank()) {
+            return "/oauth2/callback";
+        }
+        return path.startsWith("/") ? path : "/" + path;
     }
 }
