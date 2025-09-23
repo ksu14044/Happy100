@@ -175,7 +175,7 @@ export default function CounselPage() {
                 )}
 
                 <SubmitButton type="submit" disabled={loading}>
-                    {loading ? "접수 중..." : `${activeLabel} 신청하기`}
+                    {loading ? "접수 중..." : `${activeLabel}하기`}
                 </SubmitButton>
             </Form>
         </PageWrap>

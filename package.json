@@ -1,0 +1,12 @@
+{
+  "name": "happy100",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix Happy100FE",
+    "dev:fe": "npm run dev --prefix Happy100FE",
+    "build:fe": "npm run build --prefix Happy100FE",
+    "lint:fe": "npm run lint --prefix Happy100FE",
+    "dev:be": "cd Happy100BE && ./mvnw spring-boot:run",
+    "test:be": "cd Happy100BE && ./mvnw test"
+  }
+}

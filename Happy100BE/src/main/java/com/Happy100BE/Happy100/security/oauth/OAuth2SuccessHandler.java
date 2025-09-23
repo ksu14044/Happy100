@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -16,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -43,11 +45,46 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         String provider = "google";
+        if (authentication instanceof OAuth2AuthenticationToken token) {
+            provider = token.getAuthorizedClientRegistrationId();
+        }
+
         String providerUserId;
         String email;
         String name;
 
-        if (oAuth2User instanceof DefaultOidcUser oidc) {
+        if ("naver".equalsIgnoreCase(provider)) {
+            Map<String, Object> responseMap = oAuth2User.getAttribute("response");
+            if (responseMap == null) {
+                throw new IllegalStateException("네이버 사용자 정보(response)가 존재하지 않습니다.");
+            }
+            providerUserId = String.valueOf(responseMap.getOrDefault("id", ""));
+            email = String.valueOf(responseMap.getOrDefault("email", ""));
+            Object nameObj = responseMap.getOrDefault("name", email);
+            name = nameObj != null ? String.valueOf(nameObj) : email;
+        } else if ("kakao".equalsIgnoreCase(provider)) {
+            providerUserId = String.valueOf(oAuth2User.getAttributes().getOrDefault("id", ""));
+            Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
+            if (kakaoAccount != null) {
+                email = String.valueOf(kakaoAccount.getOrDefault("email", ""));
+                Object profile = kakaoAccount.get("profile");
+                if (profile instanceof Map<?, ?> profileMap) {
+                    Object nickname = profileMap.get("nickname");
+                    name = nickname != null ? String.valueOf(nickname) : "";
+                } else {
+                    name = "";
+                }
+            } else {
+                email = "";
+                name = "";
+            }
+            if (name == null || name.isBlank()) {
+                name = email;
+            }
+            if (name == null || name.isBlank()) {
+                name = providerUserId;
+            }
+        } else if (oAuth2User instanceof DefaultOidcUser oidc) {
             providerUserId = oidc.getSubject();
             email = oidc.getEmail();
             name = oidc.getFullName() != null ? oidc.getFullName() : oidc.getEmail();

@@ -37,6 +37,51 @@ export function logout() {
     tokenStorage.clear();
 }
 
+/**
+ * 이메일로 아이디 찾기
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+export async function findUsernameByEmail(email) {
+    const res = await api.get("/api/auth/find-username", { params: { email } });
+    return res.data;
+}
+
+/**
+ * 비밀번호 재설정 인증 코드 요청
+ * @param {{ username: string, email: string }} payload
+ * @returns {Promise<{ result: string }>}
+ */
+export async function requestPasswordResetCode(payload) {
+    const res = await api.post("/api/auth/request", payload, {
+        headers: { "Content-Type": "application/json" },
+    });
+    return res.data;
+}
+
+/**
+ * 인증 코드 확인 및 리셋 토큰 발급
+ * @param {{ username: string, email: string, code: string }} payload
+ * @returns {Promise<string>} resetToken
+ */
+export async function verifyPasswordResetCode(payload) {
+    const res = await api.post("/api/auth/verify", payload, {
+        headers: { "Content-Type": "application/json" },
+    });
+    return res.data?.resetToken;
+}
+
+/**
+ * 발급된 토큰으로 비밀번호 재설정 완료
+ * @param {{ resetToken: string, newPassword: string }} payload
+ * @returns {Promise<void>}
+ */
+export async function confirmPasswordReset(payload) {
+    await api.post("/api/auth/confirm", payload, {
+        headers: { "Content-Type": "application/json" },
+    });
+}
+
 export async function signUpApi({ username, password, name, email }) {
     if (!username || !password || !name || !email) {
         throw new Error("필수값이 누락되었습니다.");

@@ -99,6 +99,13 @@ export const PrimaryButton = styled.button`
   &:active { opacity: 0.92; }
 `;
 
+export const ModalPrimaryButton = styled(PrimaryButton)`
+  width: auto;
+  min-width: 120px;
+  margin-top: 0;
+  padding: 0 18px;
+`;
+
 export const Divider = styled.div`
   height: 1px;
   background: #f1f5f9;
@@ -154,4 +161,84 @@ export const MutedLink = styled.a`
 export const Small = styled.span`
   font-size: ${responsiveFont("11px", "12px")};
   color: #6b7280;
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 32px);
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 1000;
+`;
+
+export const ModalCard = styled.div`
+  width: 100%;
+  max-width: ${maxW};
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+  padding: clamp(18px, 4vw, 24px);
+`;
+
+export const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+export const ModalTitle = styled.h2`
+  margin: 0;
+  font-size: ${responsiveFont("18px", "20px")};
+  font-weight: 700;
+  color: #111827;
+`;
+
+export const CloseButton = styled.button`
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+
+  &:hover { color: #4b5563; }
+`;
+
+export const ModalBody = styled.div`
+  display: grid;
+  gap: 12px;
+`;
+
+export const ModalForm = styled.form`
+  display: grid;
+  gap: 12px;
+`;
+
+export const ModalFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+`;
+
+export const HelperText = styled.p`
+  margin: 0;
+  font-size: ${responsiveFont("12px", "13px")};
+  color: #4b5563;
+`;
+
+export const ErrorText = styled.p`
+  margin: 0;
+  font-size: ${responsiveFont("12px", "13px")};
+  color: #dc2626;
+`;
+
+export const SuccessText = styled.p`
+  margin: 0;
+  font-size: ${responsiveFont("12px", "13px")};
+  color: #047857;
+  word-break: keep-all;
 `;
