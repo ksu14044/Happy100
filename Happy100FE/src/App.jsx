@@ -12,6 +12,7 @@ import LoginPage from './pages/auth/login/LoginPage.jsx';
 import OAuthCallbackPage from './pages/auth/oauth/OAuthCallbackPage.jsx';
 import CounselPage from './pages/CounselPage/CounselPage.jsx';
 import ShopListPage from './pages/ShopListPage/ShopListPage.jsx';
+import OverviewMapPage from './pages/OverviewMapPage/OverviewMapPage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/oauth2/callback" element={<OAuthCallbackPage />} />
         <Route path="/counsel" element={<CounselPage />} />
         <Route path="/shop/list" element={<ShopListPage />} />
+        <Route path="/overview/map" element={<OverviewMapPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/:section/write" element={<WritePage />} />

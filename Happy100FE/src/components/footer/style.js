@@ -39,19 +39,37 @@ export const LogoStack = styled.div`
 `;
 
 export const LogoMark = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 84px;
+  height: 84px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+
+  ${mediaQuery.tablet} {
+    width: 74px;
+    height: 74px;
+  }
 
   ${mediaQuery.mobile} {
-    width: 32px;
-    height: 32px;
+    width: 66px;
+    height: 66px;
   }
 
-  svg {
+  svg,
+  img {
     width: 100%;
     height: 100%;
+    object-fit: contain;
     display: block;
   }
+`;
+
+export const LogoImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 `;
 
 export const Brand = styled.div`

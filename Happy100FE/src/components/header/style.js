@@ -143,10 +143,15 @@ export const Tagline = styled("span", forwardShow)`
 `;
 
 export const LogoImg = styled.img`
-  width: 36px;
-  height: 36px;
+  height: 44px;
+  width: auto;
+  max-width: 160px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
+
+  ${mediaQuery.mobile} {
+    height: 38px;
+  }
 `;
 
 export const LogoSvg = styled.svg`

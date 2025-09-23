@@ -19,6 +19,7 @@ export const Container = styled.div`
   padding: 0 24px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
   ${mediaQuery.tablet} {
     padding: 0 20px;

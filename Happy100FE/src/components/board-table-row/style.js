@@ -28,7 +28,7 @@ export const RowGrid = styled.div`
   gap: 0;
 
   ${mediaQuery.mobile} {
-    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(90px, 1fr);
     min-height: 52px;
   }
 `;
@@ -54,6 +54,9 @@ export const Cell = styled.div`
   }
 
   ${mediaQuery.mobile} {
+    &:nth-of-type(4) {
+      display: none;
+    }
     padding: 14px 10px;
   }
 `;

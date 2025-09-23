@@ -2,19 +2,20 @@
 // LIB: @emotion/react + @emotion/styled
 // DESC: 행복백세 푸터 컴포넌트 (반응형, Emotion)
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     FooterWrap,
     Container,
     LogoStack,
     LogoMark,
+    LogoImage,
     Brand,
     SocialRow,
     IconLink,
     Info,
     SrOnly,
 } from './style';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Footer({
     links = {
@@ -27,19 +28,34 @@ export default function Footer({
     className,
 }) {
     const nav = useNavigate();
+    const logoUrl = import.meta.env.VITE_BRAND_LOGO_URL ?? '/assets/happy100-logo.jpg';
+    const [logoError, setLogoError] = useState(false);
+
+    useEffect(() => {
+        setLogoError(false);
+    }, [logoUrl]);
     return (
         <FooterWrap className={className}>
             <Container>
                 <LogoStack>
-                    <LogoMark aria-hidden="true">
-                        <svg viewBox="0 0 64 64" width="72" height="72">
-                            <path d="M32 58S6 42 6 24c0-6.6 5.4-12 12-12 5.1 0 9.5 3 11.4 7.3C31 15 35.4 12 40 12c6.6 0 12 5.4 12 12 0 18-20 30-20 34z" fill="#fff" opacity=".9" />
-                            <g stroke="#6b4f3b" strokeWidth="2" strokeLinecap="round" opacity=".35">
-                                <path d="M20 29l9 9" />
-                                <path d="M26 25l8 8" />
-                                <path d="M39 26l-9 9" />
-                            </g>
-                        </svg>
+                    <LogoMark>
+                        {logoUrl && !logoError ? (
+                            <LogoImage
+                                src={logoUrl}
+                                alt="행복백세 로고"
+                                loading="lazy"
+                                onError={() => setLogoError(true)}
+                            />
+                        ) : (
+                            <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
+                                <path d="M32 58S6 42 6 24c0-6.6 5.4-12 12-12 5.1 0 9.5 3 11.4 7.3C31 15 35.4 12 40 12c6.6 0 12 5.4 12 12 0 18-20 30-20 34z" fill="#fff" opacity=".9" />
+                                <g stroke="#6b4f3b" strokeWidth="2" strokeLinecap="round" opacity=".35">
+                                    <path d="M20 29l9 9" />
+                                    <path d="M26 25l8 8" />
+                                    <path d="M39 26l-9 9" />
+                                </g>
+                            </svg>
+                        )}
                     </LogoMark>
                     <Brand>행복백세</Brand>
                 </LogoStack>

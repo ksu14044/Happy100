@@ -53,7 +53,6 @@ export default function Header({
                 { label: "지사모집", href: "/franchise" },
                 { label: "쇼핑몰", href: "/shop/list" },
                 { label: "상담신청", href: "/counsel" },
-                { label: "Q&A", href: "/qna" },
             ],
         [navItems]
     );
@@ -109,12 +108,25 @@ export default function Header({
         if (onNavigate) onNavigate("/");
     }, [onNavigate]);
 
+    const [logoFailed, setLogoFailed] = useState(false);
+    const resolvedLogoSrc = logoSrc ?? import.meta.env.VITE_BRAND_LOGO_URL ?? "/assets/happy100-logo.jpg";
+    const showImageLogo = resolvedLogoSrc && !logoFailed;
+
     return (
         <HeaderWrap sticky={sticky} className={className}>
             <Inner>
                 <Bar>
                     <LogoButton as="a" href="/" onClick={(e) => go(e, "/")} aria-label="행복백세 홈">
-                        {logoSrc ? <LogoImg src={logoSrc} alt="행복백세" /> : <LogoSvg aria-hidden />}
+                        {showImageLogo ? (
+                            <LogoImg
+                                src={resolvedLogoSrc}
+                                alt="행복백세 로고"
+                                loading="lazy"
+                                onError={() => setLogoFailed(true)}
+                            />
+                        ) : (
+                            <LogoSvg aria-hidden />
+                        )}
                         <span style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
                             <Brand>행복백세</Brand>
                             <Tagline show={showTagline}>행복하게 백세까지</Tagline>

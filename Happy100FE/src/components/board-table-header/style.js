@@ -29,7 +29,7 @@ export const RowGrid = styled.div`
   grid-template-columns: ${(p) => p.columns || gridColumns};
 
   ${mediaQuery.mobile} {
-    grid-template-columns: ${(p) => (p.mobileColumns ? p.mobileColumns : `minmax(0, 5fr) minmax(90px, 1fr) minmax(100px, 1fr) minmax(0, 1fr)`)};
+    grid-template-columns: ${(p) => (p.mobileColumns ? p.mobileColumns : `minmax(0, 5fr) minmax(90px, 1fr) minmax(100px, 1fr)`) };
     min-height: 44px;
   }
 `;
@@ -45,6 +45,9 @@ export const Cell = styled.div`
   text-align: ${({ $align }) => $align || "center"};
 
   ${mediaQuery.mobile} {
+    &:nth-of-type(4) {
+      display: none;
+    }
     padding: 12px 10px;
   }
 `;
