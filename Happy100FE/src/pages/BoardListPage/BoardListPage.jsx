@@ -6,7 +6,6 @@ import TableRow from "../../components/board-table-row/TableRow";
 import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useGetPostListQuery } from "../../queries/postQuery";
-import { tokenStorage } from "../../libs/authStorage";
 import { Pagination } from "../../components/Pagination";
 
 // section/key 조합별 설정(보드타입/타이틀/설명)
@@ -26,18 +25,11 @@ const PAGE_CONFIG = {
 
 export default function BoardListPage() {
     const { section, key } = useParams();
-    const config = PAGE_CONFIG[`${section}/${key}`]; 
-    
-    // 매핑되지 않으면 404로 넘김(원한다면 커스텀 UI로 대체)
-    if (!config) return <Navigate to="/404" replace />;
+    const config = PAGE_CONFIG[`${section}/${key}`] ?? null;
 
-    // 페이지 상태
     const [page, setPage] = useState(1);
-    const size = 10;
-    const [auth, setAuth] = useState(() => tokenStorage.load());
-
-    // 반응형: 모바일 여부
     const [isMobile, setIsMobile] = useState(false);
+
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 480px)");
         const onChange = () => setIsMobile(mq.matches);
@@ -46,11 +38,12 @@ export default function BoardListPage() {
         return () => mq.removeEventListener?.("change", onChange);
     }, []);
 
-    // 데이터 요청
+    const size = 10;
     const { data, isLoading, error } = useGetPostListQuery({
-        boardType: config.boardType,
+        boardType: config?.boardType,
         page,
         size,
+        enabled: Boolean(config),
     });
 
 
@@ -88,6 +81,10 @@ export default function BoardListPage() {
         return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
     };
 
+    if (!config) {
+        return <Navigate to="/404" replace />;
+    }
+
     return (
         <>
             <BoardTitle title={config.title} description={config.description} />
@@ -95,17 +92,19 @@ export default function BoardListPage() {
             <TableHeader />
 
             {/* 상태 메시지 */}
-            <PageContainer>
-                {isLoading && <StatusMessage>불러오는 중…</StatusMessage>}
-                {!isLoading && error && (
-                    <ErrorMessage>
-                        오류가 발생했습니다: {String(error.message || error)}
-                    </ErrorMessage>
-                )}
-                {!isLoading && !error && postList.length === 0 && (
-                    <StatusMessage>게시글이 없습니다.</StatusMessage>
-                )}
-            </PageContainer>
+            {(isLoading || error || postList.length === 0) && (
+                <PageContainer>
+                    {isLoading && <StatusMessage>불러오는 중…</StatusMessage>}
+                    {!isLoading && error && (
+                        <ErrorMessage>
+                            오류가 발생했습니다: {String(error.message || error)}
+                        </ErrorMessage>
+                    )}
+                    {!isLoading && !error && postList.length === 0 && (
+                        <StatusMessage>게시글이 없습니다.</StatusMessage>
+                    )}
+                </PageContainer>
+            )}
 
             {/* 목록 */}
             {postList.map((p) => (

@@ -1,62 +1,81 @@
-import styled from "@emotion/styled";
-import { mediaQuery, mediaQueryUp, responsiveFont } from "../../styles/responsive";
-
-export const containerWidth = "900px";
+import styled from '@emotion/styled';
+import { mediaQuery, responsiveFont } from '../../styles/responsive.js';
 
 export const RowWrap = styled.div`
   background: #fff;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.18s ease;
+  border-left: 1px solid rgba(148, 163, 184, 0.18);
+  border-right: 1px solid rgba(148, 163, 184, 0.18);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  width: min(1180px, 92vw);
+  margin: 0 auto;
 
   &:hover {
-    background: #f8fafc;
+    background: rgba(248, 250, 252, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.12);
+  }
+
+  &:last-of-type {
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
   }
 `;
 
 export const Container = styled.div`
-  max-width: ${containerWidth};
+  width: 100%;
   margin: 0 auto;
-  padding: 0;
 `;
 
 export const RowGrid = styled.div`
   display: grid;
   align-items: center;
-  min-height: 56px;
-  grid-template-columns: ${(p) => p.columns || "1fr"};
-  gap: 0;
+  min-height: 68px;
+  grid-template-columns: ${(p) => p.columns || '1fr'};
 
   ${mediaQuery.mobile} {
-    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(90px, 1fr);
-    min-height: 52px;
+    grid-template-columns: minmax(0, 4fr) minmax(120px, 1fr) minmax(140px, 1fr);
+    min-height: 58px;
   }
 `;
 
 export const Cell = styled.div`
-  position: relative;
-  padding: 16px 12px;
-  font-size: ${responsiveFont("13px", "15px")};
-  color: #222;
+  padding: clamp(16px, 3vw, 22px) clamp(14px, 2.6vw, 24px);
+  font-size: ${responsiveFont('13px', '15px')};
+  color: #1f2937;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: ${({ $align }) => $align || "left"};
-
-  &:not(:first-of-type)::before {
-    content: "";
-    position: absolute;
-    top: 12px;
-    bottom: 12px;
-    left: 0;
-    width: 1px;
-    background: rgba(0, 0, 0, 0.06);
-  }
+  text-align: ${({ $align }) => $align || 'left'};
 
   ${mediaQuery.mobile} {
     &:nth-of-type(4) {
       display: none;
     }
-    padding: 14px 10px;
+    padding: 16px 14px;
   }
+`;
+
+export const TitleCell = styled(Cell)`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  span {
+    display: inline-block;
+  }
+
+  ${mediaQuery.mobile} {
+    align-items: flex-start;
+  }
+`;
+
+export const NewBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
 `;

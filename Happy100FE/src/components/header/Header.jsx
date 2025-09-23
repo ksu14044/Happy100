@@ -4,9 +4,7 @@ import {
     DesktopNav, NavList, NavItem, NavLink,
     Dropdown, DropdownLink,
     MobileBtn, MobilePanel, MobileItem, SrOnly, LogoSvg,
-    RightArea, AuthLink,
-    // [ADDED IMPORT] 로그인 사용자 영역/버튼 스타일
-    UserArea, UserName, LogoutBtn,
+    RightArea, AuthLink, UserArea, UserName, LogoutBtn, CtaLink,
 } from "./style";
 // [ADDED] 토큰 저장소에서 로그인 상태 읽기/지우기
 import { tokenStorage } from "../../libs/authStorage";
@@ -38,21 +36,34 @@ export default function Header({
         () =>
             navItems ?? [
                 {
-                    label: "개요",
+                    label: "브랜드",
                     href: "/overview",
                     children: [
                         { label: "회사소개", href: "/overview/company" },
+                        { label: "핵심 활동", href: "/overview/activity" },
                         { label: "공지사항", href: "/overview/news" },
-                        { label: "오시는길", href: "/overview/map" },
+                        { label: "오시는 길", href: "/overview/map" },
                     ],
                 },
                 {
-                    label: "자격증반",
-                    href: "/cert/recruit",
+                    label: "프로그램",
+                    href: "/program",
+                    children: [
+                        { label: "교육 절차", href: "/program/flow" },
+                        { label: "과정 안내", href: "/program/curriculum" },
+                    ],
                 },
-                { label: "지사모집", href: "/franchise" },
+                {
+                    label: "자격증반 모집",
+                    href: "/cert/recruit",
+                    children: [{ label: "상담 신청", href: "/counsel?type=certificate" }],
+                },
+                {
+                    label: "지사모집",
+                    href: "/franchise",
+                    children: [{ label: "상담 신청", href: "/counsel?type=branch" }],
+                },
                 { label: "쇼핑몰", href: "/shop/list" },
-                { label: "상담신청", href: "/counsel" },
             ],
         [navItems]
     );
@@ -125,7 +136,20 @@ export default function Header({
                                 onError={() => setLogoFailed(true)}
                             />
                         ) : (
-                            <LogoSvg aria-hidden />
+                            <LogoSvg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <linearGradient id="happy100-logo" x1="0" x2="1" y1="1" y2="0">
+                                        <stop offset="0%" stopColor="#2563eb" />
+                                        <stop offset="100%" stopColor="#38bdf8" />
+                                    </linearGradient>
+                                </defs>
+                                <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#happy100-logo)" opacity="0.9" />
+                                <path
+                                    d="M32 45.5c-7.2-3.8-17-11.9-17-20.4 0-5.2 4.2-9.4 9.4-9.4 3.3 0 6.3 1.7 8 4.3 1.7-2.6 4.7-4.3 8-4.3 5.2 0 9.4 4.2 9.4 9.4 0 8.5-9.8 16.6-17 20.4z"
+                                    fill="#fff"
+                                    opacity="0.95"
+                                />
+                            </LogoSvg>
                         )}
                         <span style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
                             <Brand>행복백세</Brand>
@@ -184,16 +208,20 @@ export default function Header({
 
                     {/* 데스크톱 우측 */}
                     {auth?.accessToken ? (
-                        // [ADDED] 로그인 상태 UI
                         <UserArea>
+                            <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
+                                상담 신청
+                            </CtaLink>
                             <UserName>{displayName}님</UserName>
                             <LogoutBtn type="button" onClick={onLogout}>
                                 로그아웃
                             </LogoutBtn>
                         </UserArea>
                     ) : (
-                        // 기존: 로그인/회원가입
                         <RightArea>
+                            <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
+                                상담 신청
+                            </CtaLink>
                             <AuthLink href="/login" onClick={(e) => go(e, "/login")}>
                                 로그인
                             </AuthLink>
@@ -242,6 +270,14 @@ export default function Header({
                                     </MobileItem>
                                 </React.Fragment>
                             )}
+
+                            <MobileItem
+                                href="/counsel"
+                                onClick={(e) => go(e, "/counsel")}
+                                style={{ fontWeight: 700, color: "var(--color-primary)", background: "rgba(37,99,235,0.1)" }}
+                            >
+                                상담 신청
+                            </MobileItem>
 
                             {items.map((item) => (
                                 <React.Fragment key={item.label}>

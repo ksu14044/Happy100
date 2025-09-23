@@ -1,32 +1,34 @@
 import styled from "@emotion/styled";
 import { responsiveFont } from "../../../styles/responsive";
 
-const maxW = "420px";
+const maxW = '420px';
 
 export const PageWrap = styled.div`
   min-height: calc(100dvh - 120px);
   display: grid;
   place-items: center;
-  padding: clamp(16px, 4vw, 32px);
-  background: #f8fafc;
+  padding: clamp(24px, 6vw, 48px);
+  background: radial-gradient(circle at 18% 20%, rgba(37, 99, 235, 0.18), transparent 55%),
+    radial-gradient(circle at 82% 12%, rgba(56, 189, 248, 0.16), transparent 52%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), #f8fafc 65%);
 `;
 
 export const Card = styled.div`
   width: 100%;
   max-width: ${maxW};
-  background: #fff;
-  border: 1px solid #eef2f7;
-  border-radius: 16px;
-  padding: clamp(16px, 4vw, 24px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 28px;
+  padding: clamp(28px, 5vw, 36px);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
 `;
 
 export const Title = styled.h1`
-  margin: 0 0 12px;
-  font-size: ${responsiveFont("20px", "22px")};
+  margin: 0 0 18px;
+  font-size: ${responsiveFont('24px', '28px')};
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #111827;
+  color: #0f172a;
 `;
 
 export const Form = styled.form`
@@ -40,41 +42,45 @@ export const Row = styled.div`
 `;
 
 export const Label = styled.label`
-  font-size: ${responsiveFont("12px", "13px")};
-  font-weight: 600;
-  color: #374151;
+  font-size: ${responsiveFont('12px', '13px')};
+  font-weight: 700;
+  color: #1f2937;
 `;
 
 export const Input = styled.input`
-  height: 40px;
-  padding: 0 12px;
-  font-size: ${responsiveFont("13px", "14px")};
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  height: 48px;
+  padding: 0 16px;
+  font-size: ${responsiveFont('13px', '14px')};
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
   outline: none;
-  background: #fff;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  background: rgba(255, 255, 255, 0.96);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 
   &:focus {
-    border-color: #111827;
-    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+    border-color: rgba(37, 99, 235, 0.7);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   }
 `;
 
 export const PrimaryButton = styled.button`
-  margin-top: 8px;
+  margin-top: 12px;
   width: 100%;
-  height: 40px;
+  height: 48px;
   border: 0;
-  border-radius: 10px;
-  background: #111827;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
   font-weight: 700;
-  font-size: ${responsiveFont("14px", "15px")};
+  font-size: ${responsiveFont('14px', '15px')};
   cursor: pointer;
+  box-shadow: 0 18px 32px rgba(37, 99, 235, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 
-  &:hover { opacity: 0.96; }
-  &:active { opacity: 0.92; }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 40px rgba(37, 99, 235, 0.32);
+  }
 `;
 
 export const MutedLinkRow = styled.div`

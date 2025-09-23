@@ -2,19 +2,27 @@ import styled from "@emotion/styled";
 import { responsiveFont } from "../../styles/responsive";
 
 export const WriteButton = styled.a`
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
-  padding: 0 14px;  border: 1px solid #111827;
-  border-radius: 8px;
-  font-size: ${responsiveFont("13px", "14px")};
-  font-weight: 600;
-  background: #111827;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: ${responsiveFont('13px', '14px')};
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
+  border: 1px solid transparent;
   text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.08s ease, opacity 0.08s ease;
-  &:hover { opacity: 0.92; }
-  &:active { transform: translateY(1px); }
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.26);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 40px rgba(37, 99, 235, 0.28);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 16px 28px rgba(37, 99, 235, 0.24);
+  }
 `;

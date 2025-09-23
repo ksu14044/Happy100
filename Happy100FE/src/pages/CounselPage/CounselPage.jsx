@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     PageWrap,
     Title,
@@ -17,6 +17,7 @@ import {
     Description,
 } from "./style";
 import { submitCounselApplication } from "../../apis/counselApi";
+import { useSearchParams } from "react-router-dom";
 
 const TABS = [
     { code: "branch", label: "지사 신청" },
@@ -33,12 +34,32 @@ const createInitialForm = () => ({
     privacyAgreement: false,
 });
 
+const getValidTab = (code) => (TABS.some((tab) => tab.code === code) ? code : TABS[0].code);
+
 export default function CounselPage() {
-    const [activeTab, setActiveTab] = useState(TABS[0].code);
+    const [searchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(() => getValidTab(searchParams.get("type")));
     const [form, setForm] = useState(() => createInitialForm());
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: null, message: "" });
     const fileInputRef = useRef(null);
+
+    const resetForm = useCallback(() => {
+        setForm(createInitialForm());
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }, []);
+
+    useEffect(() => {
+        const next = getValidTab(searchParams.get("type"));
+        setActiveTab((prev) => {
+            if (prev === next) return prev;
+            resetForm();
+            setStatus({ type: null, message: "" });
+            return next;
+        });
+    }, [searchParams, resetForm]);
 
     const activeLabel = useMemo(
         () => TABS.find((tab) => tab.code === activeTab)?.label ?? "",
@@ -56,13 +77,6 @@ export default function CounselPage() {
             }
             return { ...prev, [name]: value };
         });
-    };
-
-    const resetForm = () => {
-        setForm(createInitialForm());
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
     };
 
     const validate = () => {

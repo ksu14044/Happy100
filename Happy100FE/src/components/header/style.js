@@ -1,291 +1,185 @@
-import styled from "@emotion/styled";
-import { css, keyframes } from "@emotion/react";
-import { mediaQuery, mediaQueryUp } from "../../styles/responsive";
+import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
+import { mediaQuery, mediaQueryUp } from '../../styles/responsive';
 
-export const containerWidth = "1100px";
+const containerWidth = '1180px';
 
-// DOM 경고 방지용 shouldForwardProp
-const forwardSticky = { shouldForwardProp: (prop) => prop !== "sticky" };
-const forwardShow = { shouldForwardProp: (prop) => prop !== "show" };
-const forwardActive = { shouldForwardProp: (prop) => prop !== "active" };
-const forwardOpen = { shouldForwardProp: (prop) => prop !== "open" };
+const forwardSticky = { shouldForwardProp: (prop) => prop !== 'sticky' };
+const forwardShow = { shouldForwardProp: (prop) => prop !== 'show' };
+const forwardActive = { shouldForwardProp: (prop) => prop !== 'active' };
+const forwardOpen = { shouldForwardProp: (prop) => prop !== 'open' };
 
-export const HeaderWrap = styled("header", forwardSticky)`
-  position: ${(p) => (p.sticky ? "sticky" : "static")};
+export const HeaderWrap = styled('header', forwardSticky)`
+  position: ${(p) => (p.sticky ? 'sticky' : 'static')};
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: saturate(150%) blur(8px);
-  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+  width: 100%;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.05);
 `;
 
 export const Inner = styled.div`
-  max-width: ${containerWidth};
   margin: 0 auto;
-  padding: 12px 16px;
-
-  ${mediaQuery.mobile} {
-    padding: 16px 20px;
-  }
-
-  ${mediaQueryUp.desktop} {
-    padding: 18px 32px;
-  }
+  width: min(${containerWidth}, 92vw);
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 export const Bar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
-  gap: 16px;
-`;
+  gap: 24px;
+  min-height: 76px;
 
-export const RightArea = styled.div`
-  display: none;
-  align-items: center;
-  gap: 10px;
-
-  ${mediaQueryUp.tablet} {
-    display: flex;
-  }
-`;
-
-// [ADDED] 로그인 상태 우측 영역
-export const UserArea = styled.div`
-  display: none;
-  align-items: center;
-  gap: 10px;
-
-  ${mediaQueryUp.tablet} {
-    display: flex;
-  }
-`;
-
-// [ADDED] 로그인 사용자 이름
-export const UserName = styled.span`
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
-`;
-
-// [ADDED] 로그아웃 버튼
-export const LogoutBtn = styled.button`
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 9999px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  color: #374151;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  &:hover {
-    background: #f9fafb;
-  }
-`;
-
-export const AuthLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 9999px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  color: #374151;
-  background: #fff;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-  &:hover {
-    background: #f9fafb;
-  }
-  &[data-variant="primary"] {
-    background: #111827;
-    color: #fff;
-    border-color: #111827;
-    &:hover {
-      opacity: 0.92;
-    }
+  ${mediaQuery.mobile} {
+    gap: 16px;
+    min-height: 64px;
   }
 `;
 
 export const LogoButton = styled.button`
   display: inline-flex;
+  gap: 14px;
   align-items: center;
-  gap: 12px;
   background: transparent;
   border: 0;
+  padding: 10px 8px;
+  margin: -6px 0;
   cursor: pointer;
-  padding: 6px 4px;
   color: inherit;
-  text-decoration: none;
-`;
-
-export const Brand = styled.span`
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: #ec4899;
-  font-size: 18px;
-
-  ${mediaQueryUp.tablet} {
-    font-size: 22px;
-  }
-`;
-
-export const Tagline = styled("span", forwardShow)`
-  display: ${(p) => (p.show ? "block" : "none")};
-  margin-top: 3px;
-  font-size: 11px;
-  color: #6b7280;
 `;
 
 export const LogoImg = styled.img`
-  height: 44px;
-  width: auto;
-  max-width: 160px;
-  object-fit: contain;
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid rgba(148, 163, 184, 0.35);
 
   ${mediaQuery.mobile} {
-    height: 38px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
   }
 `;
 
 export const LogoSvg = styled.svg`
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: block;
+`;
+
+export const Brand = styled.span`
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+`;
+
+export const Tagline = styled('span', forwardShow)`
+  display: ${(p) => (p.show ? 'block' : 'none')};
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+  font-weight: 500;
 `;
 
 export const DesktopNav = styled.nav`
   display: none;
+  flex: 1 1 auto;
 
   ${mediaQueryUp.tablet} {
-    display: block;
+    display: flex;
+    justify-content: center;
   }
 `;
 
 export const NavList = styled.ul`
   display: flex;
-  gap: 28px;
-
-  ${mediaQueryUp.desktop} {
-    gap: 48px;
-  }
+  align-items: center;
+  gap: clamp(18px, 4vw, 34px);
 `;
 
 export const NavItem = styled.li`
   position: relative;
 
-  /* 키보드 접근 시(TAB) :focus-within으로 열림 허용 */
-  [data-kb-nav="true"] & {
+  [data-kb-nav='true'] & {
     &:focus-within > ul {
       opacity: 1;
-      transform: translate(-50%, 0);
+      transform: translate(-50%, 0px);
       pointer-events: auto;
     }
   }
 `;
 
-export const NavLink = styled("a", forwardActive)`
+export const NavLink = styled('a', forwardActive)`
   position: relative;
-  font-size: 16.5px;
-  color: #374151;
-  text-decoration: none;
-  transition: color 0.2s ease;
-  ${(p) =>
-    p.active &&
-    css`
-      color: #111827;
-      font-weight: 600;
-    `}
-  &:hover {
-    color: #111827;
-  }
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -10px;
-    height: 2px;
-    background: ${(p) => (p.active ? "#111827" : "transparent")};
-    transition: background 0.2s ease;
-  }
-`;
-
-const slideDown = keyframes`
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-`;
-
-export const MobileBtn = styled.button`
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
-  padding: 8px 10px;
-  background: white;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  ${mediaQueryUp.tablet} {
-    display: none;
-  }
-`;
-
-export const MobilePanel = styled.div`
-  display: block;
-  padding: 0 0 16px 0;
-  ${mediaQueryUp.tablet} {
-    display: none;
-  }
-  nav {
-    overflow: hidden;
-    border: 1px solid #f3f4f6;
-    border-radius: 16px;
-    background: #fff;
-    animation: ${slideDown} 0.18s ease-out;
-  }
-`;
-
-export const MobileItem = styled.a`
-  display: block;
-  padding: 12px 16px;
+  gap: 6px;
+  padding: 14px 0;
   font-size: 16px;
-  color: #111827;
-  text-decoration: none;
+  font-weight: 600;
+  color: ${(p) => (p.active ? 'var(--color-primary)' : '#1f2937')};
+  transition: color 0.2s ease;
+
   &:hover {
-    background: #f9fafb;
+    color: var(--color-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    transform: translateX(-50%);
+    width: ${(p) => (p.active ? '70%' : '0')};
+    height: 3px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    opacity: ${(p) => (p.active ? 1 : 0)};
+    transition: width 0.2s ease, opacity 0.2s ease;
+  }
+
+  &:hover::after {
+    width: 70%;
+    opacity: 1;
   }
 `;
 
-/* Dropdown: open prop이 DOM으로 나가지 않도록 필터 */
-export const Dropdown = styled("ul", forwardOpen)`
+const dropdownFade = keyframes`
+  from { opacity: 0; transform: translate(-50%, -6px); }
+  to { opacity: 1; transform: translate(-50%, 0px); }
+`;
+
+export const Dropdown = styled('ul', forwardOpen)`
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   left: 50%;
-  transform: translate(-50%, 6px);
-  min-width: 180px;
+  transform: translate(-50%, -6px);
+  min-width: 200px;
+  padding: 12px;
+  border-radius: 18px;
   background: #fff;
-  border: 1px solid #f3f4f6;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  padding: 8px;
-  z-index: 60;
-
-  /* 기본 숨김, open=true면 표시 */
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
   opacity: ${(p) => (p.open ? 1 : 0)};
-  pointer-events: ${(p) => (p.open ? "auto" : "none")};
-  transition: opacity 0.14s ease, transform 0.14s ease;
+  pointer-events: ${(p) => (p.open ? 'auto' : 'none')};
+  transition: opacity 0.18s ease;
+  animation: ${(p) => (p.open ? dropdownFade : 'none')} 0.22s ease;
+  z-index: 20;
 
-  /* 탭과 패널 사이의 작은 갭을 메우는 브리지 */
   &::before {
-    content: "";
+    content: '';
     position: absolute;
-    left: 0;
-    right: 0;
-    top: -14px;
+    inset: -14px 0 auto;
     height: 14px;
   }
 
@@ -296,14 +190,160 @@ export const Dropdown = styled("ul", forwardOpen)`
 
 export const DropdownLink = styled.a`
   display: block;
-  padding: 10px 12px;
+  padding: 12px;
+  border-radius: 12px;
   font-size: 15px;
-  color: #374151;
-  text-decoration: none;
-  border-radius: 8px;
+  font-weight: 500;
+  color: #1f2937;
+  transition: background 0.18s ease, color 0.18s ease;
+
   &:hover {
-    background: #f9fafb;
-    color: #111827;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--color-primary);
+  }
+`;
+
+export const RightArea = styled.div`
+  display: none;
+  align-items: center;
+  gap: 12px;
+
+  ${mediaQueryUp.tablet} {
+    display: inline-flex;
+  }
+`;
+
+export const UserArea = styled(RightArea)`
+  gap: 18px;
+`;
+
+export const UserName = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+`;
+
+export const LogoutBtn = styled.button`
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 102, 241, 0.24);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.38);
+  }
+`;
+
+export const AuthLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+
+  &:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--color-primary);
+    border-color: rgba(99, 102, 241, 0.24);
+  }
+
+  &[data-variant='primary'] {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    border: 1px solid transparent;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+
+    &:hover {
+      filter: brightness(0.98);
+    }
+  }
+`;
+
+export const CtaLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #2563eb 45%, #1d4ed8 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.28);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 32px rgba(37, 99, 235, 0.28);
+  }
+`;
+
+export const MobileBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-primary);
+
+  ${mediaQueryUp.tablet} {
+    display: none;
+  }
+`;
+
+const mobileSlide = keyframes`
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+export const MobilePanel = styled.div`
+  display: block;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+  animation: ${mobileSlide} 0.22s ease;
+
+  nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  ${mediaQueryUp.tablet} {
+    display: none;
+  }
+`;
+
+export const MobileItem = styled.a`
+  display: block;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: #fff;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--color-primary);
+  }
+
+  &:last-of-type {
+    border-bottom: 0;
   }
 `;
 
@@ -314,8 +354,7 @@ export const SrOnly = styled.span`
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
   clip-path: inset(50%);
-  white-space: nowrap;
   border: 0;
 `;

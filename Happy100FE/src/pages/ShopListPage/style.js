@@ -1,134 +1,123 @@
-import styled from "@emotion/styled";
-import { mediaQuery, responsiveFont } from "../../styles/responsive";
+import styled from '@emotion/styled';
+import { responsiveFont } from '../../styles/responsive.js';
 
 export const PageWrap = styled.div`
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-
-    ${mediaQuery.tablet} {
-        padding: 0 16px 64px;
-    }
-
-    ${mediaQuery.mobile} {
-        padding: 0 12px 48px;
-    }
+  width: min(1180px, 92vw);
+  margin: 0 auto;
+  padding: clamp(18px, 3vw, 28px) 0 clamp(80px, 12vw, 120px);
+  display: grid;
+  gap: clamp(24px, 4vw, 36px);
 `;
 
 export const ListWrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: grid;
+  gap: clamp(18px, 4vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 `;
 
-export const ItemLink = styled.div`
-    display: flex;
-    align-items: stretch;
-    gap: 16px;
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    background: #fff;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    cursor: pointer;
+export const ItemLink = styled('button')`
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 22px);
+  padding: clamp(18px, 3vw, 26px);
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #fff;
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  text-align: left;
 
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-    }
+  border-width: 1px;
 
-    ${mediaQuery.tablet} {
-        gap: 12px;
-    }
-
-    ${mediaQuery.mobile} {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 14px;
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+  }
 `;
 
 export const Thumbnail = styled.div`
-    width: 160px;
-    height: 160px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #f3f4f6;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    ${mediaQuery.tablet} {
-        width: 140px;
-        height: 140px;
-    }
-
-    ${mediaQuery.mobile} {
-        width: 100%;
-        height: auto;
-
-        img {
-            height: 220px;
-            object-fit: cover;
-        }
-    }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 export const Info = styled.div`
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: grid;
+  gap: 14px;
 `;
 
 export const Title = styled.h3`
-    font-size: ${responsiveFont("18px", "20px")};
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-    line-height: 1.4;
+  margin: 0;
+  font-size: ${responsiveFont('18px', '22px')};
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 export const Summary = styled.p`
-    margin: 0;
-    color: ${({ muted }) => (muted ? "#9ca3af" : "#4b5563")};
-    line-height: 1.6;
-    font-size: ${responsiveFont("14px", "15px")};
-    max-height: 3.4em;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+  margin: 0;
+  color: ${({ muted }) => (muted ? '#94a3b8' : '#475569')};
+  line-height: 1.65;
+  font-size: ${responsiveFont('14px', '15px')};
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 export const Meta = styled.div`
-    margin-top: auto;
-    display: flex;
-    gap: 12px;
-    font-size: ${responsiveFont("12px", "13px")};
-    color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: ${responsiveFont('12px', '13px')};
+  color: #64748b;
 `;
 
-export const EmptyState = styled.div`
-    padding: 48px 16px;
-    text-align: center;
-    color: #6b7280;
-    border: 1px dashed #d1d5db;
-    border-radius: 12px;
-    background: #f9fafb;
+const StateBase = styled.div`
+  padding: clamp(32px, 5vw, 48px);
+  border-radius: 24px;
+  text-align: center;
+  font-size: ${responsiveFont('14px', '15px')};
+  font-weight: 600;
 `;
 
-export const ErrorState = styled(EmptyState)`
-    color: #b91c1c;
-    border-color: #fecaca;
-    background: #fef2f2;
+export const EmptyState = styled(StateBase)`
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
 `;
 
-export const LoadingState = styled(EmptyState)``;
+export const ErrorState = styled(StateBase)`
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+`;
+
+export const LoadingState = styled(StateBase)`
+  background: rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+`;
+
+export const NewBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+`;

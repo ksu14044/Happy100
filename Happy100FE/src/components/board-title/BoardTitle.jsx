@@ -7,7 +7,7 @@ import {
     TitleIconSlot,
     TitleText,
     Description,
-    RightSlot,
+    ActionGroup,
 } from "./style";
 import WritePostButton from "../write-post-botton/WritePostButton";
 import { useParams } from "react-router-dom";
@@ -32,21 +32,18 @@ export default function BoardTitle({
     return (
         <TitleSection aria-label={ariaLabel} className={className}>
             <Container>
-                <div>
                 <TitleRow>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                         {icon ? <TitleIconSlot aria-hidden>{icon}</TitleIconSlot> : null}
                         <TitleText as={as}>{title}</TitleText>
                     </div>
+                    {description ? <Description>{description}</Description> : null}
                 </TitleRow>
-                {description ? <Description>{description}</Description> : null}
-                </div>
-                
-                        {/* 우선 BoardTitle 내부에 기본 제공: 관리자에게만 보임 */}
-                        <WritePostButton section={resolvedSection} />
-                        {/* 외부에서 전달된 우측 액션이 있으면 함께 표시 */}
-                        {right ?? null}
-                
+
+                <ActionGroup>
+                    <WritePostButton section={resolvedSection} />
+                    {right ?? null}
+                </ActionGroup>
             </Container>
         </TitleSection>
     );

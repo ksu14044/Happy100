@@ -1,27 +1,22 @@
-import styled from "@emotion/styled";
-import { mediaQuery, responsiveFont } from "../../styles/responsive";
+import styled from '@emotion/styled';
 
 export const PageContainer = styled.div`
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0;
+  width: min(1180px, 92vw);
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 24px) 0;
 `;
 
 export const StatusMessage = styled.div`
-    color: #6b7280;
-    font-size: ${responsiveFont("13px", "15px")};
-    text-align: center;
-    padding: 48px 0;
-
-    ${mediaQuery.tablet} {
-        padding: 32px 0;
-    }
-
-    ${mediaQuery.mobile} {
-        padding: 24px 0;
-    }
+  padding: clamp(28px, 4vw, 40px);
+  border-radius: 24px;
+  background: rgba(37, 99, 235, 0.08);
+  color: #1e3a8a;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.7;
 `;
 
 export const ErrorMessage = styled(StatusMessage)`
-    color: #b91c1c;
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
 `;

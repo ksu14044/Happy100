@@ -2,21 +2,20 @@ import styled from "@emotion/styled";
 import { responsiveFont } from "../../styles/responsive";
 
 export const PageWrap = styled.main`
-  min-height: calc(100dvh - 160px);
-  padding: clamp(24px, 5vw, 60px) clamp(16px, 6vw, 80px);
-  background: #f8fafc;
+  width: min(1180px, 92vw);
+  margin: clamp(60px, 10vw, 120px) auto clamp(90px, 12vw, 150px);
   display: grid;
-  gap: clamp(16px, 3vw, 32px);
+  gap: clamp(20px, 4vw, 32px);
 `;
 
 export const Card = styled.section`
   background: #fff;
-  border-radius: 18px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.08);
-  padding: clamp(20px, 4vw, 40px);
+  border-radius: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 28px 56px rgba(15, 23, 42, 0.12);
+  padding: clamp(28px, 4.8vw, 44px);
   display: grid;
-  gap: clamp(16px, 2.5vw, 28px);
+  gap: clamp(18px, 3vw, 30px);
 `;
 
 export const Title = styled.h1`
@@ -35,20 +34,20 @@ export const Address = styled.p`
 
 export const MapBox = styled.div`
   width: 100%;
-  height: clamp(280px, 45vw, 420px);
-  border-radius: 14px;
+  height: clamp(300px, 45vw, 440px);
+  border-radius: 24px;
   overflow: hidden;
-  border: 1px solid #cbd5f5;
+  border: 1px solid rgba(148, 163, 184, 0.28);
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 `;
 
 export const Info = styled.div`
   display: grid;
-  gap: 8px;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
 `;
 
 export const Label = styled.span`

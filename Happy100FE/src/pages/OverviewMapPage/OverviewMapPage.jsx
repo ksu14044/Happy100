@@ -50,7 +50,7 @@ export default function OverviewMapPage() {
         const script = document.createElement("script");
         script.id = KAKAO_SCRIPT_ID;
         script.async = true;
-        script.src = `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services`;
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services`;
         script.addEventListener("load", handleScriptLoad, { once: true });
         script.addEventListener("error", () => {
             setStatus({ loading: false, error: "카카오 지도 SDK 스크립트를 불러오지 못했습니다." });
@@ -60,7 +60,6 @@ export default function OverviewMapPage() {
         return () => {
             script.removeEventListener("load", handleScriptLoad);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const initMap = () => {
@@ -129,4 +128,3 @@ export default function OverviewMapPage() {
         </PageWrap>
     );
 }
-

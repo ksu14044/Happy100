@@ -285,7 +285,11 @@ export default function LoginPage() {
                         </GhostButton>
                     </Actions>
 
-                    <PrimaryButton type="submit" onClick={onSubmit}>로그인</PrimaryButton>
+                    {err && <ErrorText role="alert">{err}</ErrorText>}
+
+                    <PrimaryButton type="submit" disabled={loading}>
+                        {loading ? "로그인 중…" : "로그인"}
+                    </PrimaryButton>
                 </Form>
 
                 <Divider />

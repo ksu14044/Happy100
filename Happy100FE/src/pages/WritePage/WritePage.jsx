@@ -27,7 +27,12 @@ import { toAttachmentRequests } from "../../apis/postApi";
 import { tokenStorage } from "../../libs/authStorage";
 
 // 섹션 → 보드 타입 매핑 (백엔드 ENUM과 맞추세요)
-const BOARD_TYPE = { news: "NEWS", cert: "CERT", shop: "SHOP" };
+const BOARD_TYPE = { news: "NEWS", recruit: "CERT", shop: "SHOP" };
+const REDIRECT_PATH = {
+    news: "/overview/news",
+    recruit: "/cert/recruit",
+    shop: "/shop/list",
+};
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/files` : "/api/files";
@@ -108,12 +113,10 @@ class MyUploadAdapter {
 
 export default function WritePage() {
     const navigate = useNavigate();
-    const { section } = useParams();
-
-    const isValidSection = ["news", "recruit", "shop"].includes(section || "");
-    if (!isValidSection) return <Navigate to="/404" replace />;
-
-    const boardType = BOARD_TYPE[section];
+    const { section: rawSection } = useParams();
+    const section = rawSection ?? "";
+    const boardType = BOARD_TYPE[section] ?? null;
+    const isValidSection = Boolean(boardType);
 
     // 폼 상태
     const [title, setTitle] = useState("");
@@ -177,7 +180,7 @@ export default function WritePage() {
     /** 제출 */
     const onSubmit = async (e) => {
         e.preventDefault();
-        if (!canSubmit || isPending || isUploadingAttachments) return;
+        if (!canSubmit || isPending || isUploadingAttachments || !boardType) return;
 
         const contentJsonStr = JSON.stringify({
             type: "ckeditor5",
@@ -261,9 +264,9 @@ export default function WritePage() {
                 // authorId: 생략(서버 Authentication 사용 시)
             },
             {
-                onSuccess: (postId) => {
-                    // 필요시 상세로: navigate(`/${section}/${postId}`)
-                    navigate(`/${section}`);
+                onSuccess: () => {
+                    const nextPath = REDIRECT_PATH[section] ?? "/";
+                    navigate(nextPath, { replace: true });
                 },
                 onError: (err) => {
                     alert(err?.message || "글 등록에 실패했습니다.");
@@ -272,6 +275,10 @@ export default function WritePage() {
         );
     };
 
+
+    if (!isValidSection) {
+        return <Navigate to="/404" replace />;
+    }
 
     return (
         <PageWrap>

@@ -138,7 +138,9 @@ export default function SignUpPage() {
                         />
                     </Row>
 
-                    <PrimaryButton type="submit">회원가입</PrimaryButton>
+                    <PrimaryButton type="submit" disabled={isPending}>
+                        {isPending ? "가입 진행 중…" : "회원가입"}
+                    </PrimaryButton>
                 </Form>
 
                 <MutedLinkRow>

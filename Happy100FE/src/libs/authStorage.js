@@ -5,7 +5,11 @@ const listeners = new Set();
 const notify = () => {
     const value = tokenStorage.load();
     listeners.forEach((fn) => {
-        try { fn(value); } catch { }
+        try {
+            fn(value);
+        } catch (error) {
+            console.warn('토큰 구독 콜백 처리 중 오류가 발생했습니다.', error);
+        }
     });
 };
 
@@ -29,7 +33,7 @@ export const tokenStorage = {
         notify(); // same-tab 알림
     },
     subscribe(listener) {
-        if (typeof listener !== "function") return () => { };
+        if (typeof listener !== "function") return () => undefined;
         listeners.add(listener);
         // 구독 즉시 현재 값도 한 번 전달하고 싶다면 아래 주석 해제
         // listener(tokenStorage.load());

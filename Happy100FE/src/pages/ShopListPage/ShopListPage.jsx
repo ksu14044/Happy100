@@ -14,6 +14,7 @@ import {
     EmptyState,
     ErrorState,
     LoadingState,
+    NewBadge,
 } from "./style";
 import { Pagination } from "../../components/Pagination";
 import defaultProduct from "../../assets/images/default-product.svg";
@@ -21,6 +22,7 @@ import defaultProduct from "../../assets/images/default-product.svg";
 const BOARD_TYPE = "SHOP";
 const PAGE_SIZE = 9;
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const SEVEN_DAYS_MS =  24 * 60 * 60 * 1000;
 
 function toAbsoluteUrl(input) {
     if (!input) return "";
@@ -165,6 +167,14 @@ function formatDate(value) {
     return date.toISOString().slice(0, 10);
 }
 
+function isRecentDate(value) {
+    if (!value) return false;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return false;
+    const now = Date.now();
+    return now - date.getTime() <= SEVEN_DAYS_MS && now >= date.getTime();
+}
+
 export default function ShopListPage() {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
@@ -234,13 +244,21 @@ export default function ShopListPage() {
                         const summary = extractSummary(post);
                         const hasSummary = Boolean(summary);
                         const displaySummary = hasSummary ? summary : EMPTY_SUMMARY_TEXT;
+                        const createdIsRecent = post.createdAt && isRecentDate(post.createdAt);
                         return (
-                            <ItemLink key={post.postId} onClick={() => handleNavigate(post.postId)}>
+                            <ItemLink
+                                key={post.postId}
+                                type="button"
+                                onClick={() => handleNavigate(post.postId)}
+                            >
                                 <Thumbnail>
                                     <img src={thumbnail} alt={post.title || "상품 이미지"} loading="lazy" />
                                 </Thumbnail>
                                 <Info>
-                                    <Title>{post.title || "제목 없음"}</Title>
+                                    <Title>
+                                        {createdIsRecent && <NewBadge>[신규]</NewBadge>}
+                                        <span>{post.title || "제목 없음"}</span>
+                                    </Title>
                                     <Summary muted={!hasSummary}>{displaySummary}</Summary>
                                     <Meta>
                                         {post.createdAt && <span>{formatDate(post.createdAt)}</span>}
