@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -69,9 +70,20 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> list(String boardType, int page, int size) {
+    public List<PostResponse> list(String boardType, int page, int size,
+                                   String searchType, String keyword, String sort) {
         int offset = Math.max(0, (page - 1)) * size;
-        List<BoardPost> posts = boardRepository.findPostList(boardType, offset, size);
+
+        SearchContext ctx = buildSearchContext(searchType, keyword, sort);
+
+        List<BoardPost> posts = boardRepository.findPostList(
+                boardType,
+                offset,
+                size,
+                ctx.searchType,
+                ctx.keyword,
+                ctx.sort
+        );
         List<PostResponse> result = new ArrayList<>();
         for (BoardPost p : posts) {
             if (p.getDeletedYn() != null && p.getDeletedYn() == 1) continue;
@@ -79,6 +91,11 @@ public class BoardService {
             result.add(toPostResponse(p, atts));
         }
         return result;
+    }
+
+    public int countPosts(String boardType, String searchType, String keyword) {
+        SearchContext ctx = buildSearchContext(searchType, keyword, null);
+        return boardRepository.countPostList(boardType, ctx.searchType, ctx.keyword);
     }
 
     @Transactional
@@ -216,6 +233,88 @@ public class BoardService {
 
     public int countPostsByBoardType(String boardType) {
         return boardRepository.countPostsByBoardType(boardType);
+    }
+
+    private SearchContext buildSearchContext(String searchType, String keyword, String sort) {
+        String normalizedSort = normalizeSort(sort);
+        String trimmedKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
+        String normalizedSearchType = null;
+        if (StringUtils.hasText(trimmedKeyword)) {
+            normalizedSearchType = normalizeSearchType(searchType);
+            trimmedKeyword = trimmedKeyword.toLowerCase(Locale.ROOT);
+        } else {
+            trimmedKeyword = null;
+        }
+        return new SearchContext(normalizedSearchType, trimmedKeyword, normalizedSort);
+    }
+
+    private String normalizeSearchType(String searchType) {
+        if (!StringUtils.hasText(searchType)) {
+            return SearchType.TITLE_CONTENT.value;
+        }
+        String upper = searchType.trim().toUpperCase(Locale.ROOT);
+        return SearchType.from(upper).value;
+    }
+
+    private String normalizeSort(String sort) {
+        if (!StringUtils.hasText(sort)) {
+            return SortType.LATEST.value;
+        }
+        String upper = sort.trim().toUpperCase(Locale.ROOT);
+        return SortType.from(upper).value;
+    }
+
+    private enum SearchType {
+        TITLE("TITLE"),
+        CONTENT("CONTENT"),
+        TITLE_CONTENT("TITLE_CONTENT");
+
+        private final String value;
+
+        SearchType(String value) {
+            this.value = value;
+        }
+
+        static SearchType from(String candidate) {
+            for (SearchType type : values()) {
+                if (type.value.equals(candidate)) {
+                    return type;
+                }
+            }
+            return TITLE_CONTENT;
+        }
+    }
+
+    private enum SortType {
+        LATEST("LATEST"),
+        VIEWS("VIEWS");
+
+        private final String value;
+
+        SortType(String value) {
+            this.value = value;
+        }
+
+        static SortType from(String candidate) {
+            for (SortType type : values()) {
+                if (type.value.equals(candidate)) {
+                    return type;
+                }
+            }
+            return LATEST;
+        }
+    }
+
+    private static class SearchContext {
+        private final String searchType;
+        private final String keyword;
+        private final String sort;
+
+        private SearchContext(String searchType, String keyword, String sort) {
+            this.searchType = searchType;
+            this.keyword = keyword;
+            this.sort = sort;
+        }
     }
     public static class AttachmentFile {
         private final BoardAttachment attachment;

@@ -16,7 +16,10 @@ public interface BoardMapper {
     List<BoardPost> selectPostList(
             @Param("boardType") String boardType,
             @Param("offset") int offset,
-            @Param("limit") int limit);
+            @Param("limit") int limit,
+            @Param("searchType") String searchType,
+            @Param("keyword") String keyword,
+            @Param("sort") String sort);
     int updatePost(BoardPost post);
     int softDeletePost(@Param("postId") Long postId);
     int increaseViewCount(@Param("postId") Long postId);
@@ -28,4 +31,7 @@ public interface BoardMapper {
     int deleteAttachmentsByPost(@Param("postId") Long postId);
     int existsEnabledBoardType(@org.apache.ibatis.annotations.Param("typeKey") String typeKey);
     int countPostsByBoardType(@Param("boardType") String boardType);
+    int countPostList(@Param("boardType") String boardType,
+                      @Param("searchType") String searchType,
+                      @Param("keyword") String keyword);
 }

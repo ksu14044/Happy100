@@ -27,8 +27,13 @@ public class BoardRepository {
         return boardMapper.selectPostById(postId);
     }
 
-    public List<BoardPost> findPostList(String boardType, int offset, int limit) {
-        return boardMapper.selectPostList(boardType, offset, limit);
+    public List<BoardPost> findPostList(String boardType,
+                                        int offset,
+                                        int limit,
+                                        String searchType,
+                                        String keyword,
+                                        String sort) {
+        return boardMapper.selectPostList(boardType, offset, limit, searchType, keyword, sort);
     }
 
     public List<BoardAttachment> findAttachments(Long postId) {
@@ -41,9 +46,11 @@ public class BoardRepository {
 
     public int updatePost(BoardPost post, List<BoardAttachment> newAttachments) {
         int updated = boardMapper.updatePost(post);
-        boardMapper.deleteAttachmentsByPost(post.getPostId());
-        if (newAttachments != null && !newAttachments.isEmpty()) {
-            boardMapper.insertAttachments(post.getPostId(), newAttachments);
+        if (updated > 0) {
+            boardMapper.deleteAttachmentsByPost(post.getPostId());
+            if (newAttachments != null && !newAttachments.isEmpty()) {
+                boardMapper.insertAttachments(post.getPostId(), newAttachments);
+            }
         }
         return updated;
     }
@@ -62,5 +69,9 @@ public class BoardRepository {
 
     public int countPostsByBoardType(String boardType) {
         return boardMapper.countPostsByBoardType(boardType);
+    }
+
+    public int countPostList(String boardType, String searchType, String keyword) {
+        return boardMapper.countPostList(boardType, searchType, keyword);
     }
 }

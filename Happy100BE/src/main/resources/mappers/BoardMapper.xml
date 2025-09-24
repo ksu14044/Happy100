@@ -41,7 +41,30 @@
       <if test="boardType != null and boardType != ''">
         AND board_type = #{boardType}
       </if>
-    ORDER BY created_at DESC
+      <if test="keyword != null and keyword != ''">
+        <choose>
+          <when test="searchType == 'TITLE'">
+            AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+          </when>
+          <when test="searchType == 'CONTENT'">
+            AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+          </when>
+          <otherwise>
+            AND (
+              LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+              OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+            )
+          </otherwise>
+        </choose>
+      </if>
+    <choose>
+      <when test="sort == 'VIEWS'">
+        ORDER BY view_count DESC, created_at DESC
+      </when>
+      <otherwise>
+        ORDER BY created_at DESC
+      </otherwise>
+    </choose>
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
@@ -51,12 +74,14 @@
       title = #{title},
       content_json = #{contentJson}
     WHERE post_id = #{postId}
+      AND deleted_yn = 0
   </update>
 
   <update id="softDeletePost">
     UPDATE board_post
     SET deleted_yn = 1
     WHERE post_id = #{postId}
+      AND deleted_yn = 0
   </update>
 
   <update id="increaseViewCount">
@@ -115,6 +140,30 @@
     WHERE type_key = #{typeKey}
         AND enabled_yn = 1
     </select>
+  <select id="countPostList" resultType="int">
+    SELECT COUNT(1)
+    FROM board_post
+    WHERE deleted_yn = 0
+      <if test="boardType != null and boardType != ''">
+        AND board_type = #{boardType}
+      </if>
+      <if test="keyword != null and keyword != ''">
+        <choose>
+          <when test="searchType == 'TITLE'">
+            AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+          </when>
+          <when test="searchType == 'CONTENT'">
+            AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+          </when>
+          <otherwise>
+            AND (
+              LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+              OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+            )
+          </otherwise>
+        </choose>
+      </if>
+  </select>
   <select id="countPostsByBoardType" resultType="int">
     SELECT count(*)
     FROM board_post

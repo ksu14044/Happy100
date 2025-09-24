@@ -73,24 +73,29 @@ public class BoardController {
     @GetMapping
     @Operation(summary = "게시글 다건 조회")
     public ResponseEntity<PostListResponse> list(@RequestParam String boardType,
-                                                    @RequestParam(defaultValue = "1") int page,
-                                                    @RequestParam(defaultValue = "10") int size) {
-            int totalPostListCount = boardService.countPostsByBoardType(boardType);
-            int totalPages = totalPostListCount % size == 0
-            ? totalPostListCount / size
-            : (totalPostListCount / size) + 1;
-            PostListResponse res = PostListResponse.builder()
-            .page(page)
-            .limitCount(size)
-            .totalPages(totalPages)
-            .totalElements(totalPostListCount)
-            .isFirstPage(page == 1)
-            .isLastPage(page == totalPages)
-            .nextPage(page < totalPages ? page + 1 : 0)
-            .postList(boardService.list(boardType, page, size))
-            .build();
-            return ResponseEntity.ok().body(res);
-        // return ResponseEntity.ok(boardService.list(boardType, page, size));
+                                                 @RequestParam(defaultValue = "1") int page,
+                                                 @RequestParam(defaultValue = "10") int size,
+                                                 @RequestParam(required = false) String searchType,
+                                                 @RequestParam(required = false) String keyword,
+                                                 @RequestParam(defaultValue = "LATEST") String sort) {
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.max(size, 1);
+
+        int totalPostListCount = boardService.countPosts(boardType, searchType, keyword);
+        int totalPages = (int) Math.ceil(totalPostListCount / (double) safeSize);
+        if (totalPages == 0) totalPages = 1;
+
+        PostListResponse res = PostListResponse.builder()
+                .page(safePage)
+                .limitCount(safeSize)
+                .totalPages(totalPages)
+                .totalElements(totalPostListCount)
+                .isFirstPage(safePage == 1)
+                .isLastPage(safePage >= totalPages)
+                .nextPage(safePage < totalPages ? safePage + 1 : 0)
+                .postList(boardService.list(boardType, safePage, safeSize, searchType, keyword, sort))
+                .build();
+        return ResponseEntity.ok().body(res);
     }
 
     @PutMapping("/{postId}")
