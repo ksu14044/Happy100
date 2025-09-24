@@ -64,6 +64,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/:section/write" element={<WritePage />} />
+          <Route path="/:section/edit/:postId" element={<WritePage />} />
           <Route path="/:section/:key/:postId" element={<PostDetail />} />
           <Route path="/:section/:key" element={<BoardListPage />} />
         </Routes>

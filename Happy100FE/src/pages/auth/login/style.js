@@ -124,14 +124,19 @@ export const OAuthRow = styled.div`
 `;
 
 export const OAuthBtn = styled.button`
-  height: 46px;
-  border-radius: 16px;
+  height: 50px;
+  border-radius: 18px;
   border: 1px solid rgba(148, 163, 184, 0.24);
   background: #fff;
   font-size: ${responsiveFont('14px', '15px')};
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
 
   &:hover {
     transform: translateY(-1px);
@@ -151,6 +156,27 @@ export const OAuthBtn = styled.button`
     background: #fee500;
     border-color: #fee500;
     color: #191600;
+  }
+`;
+
+export const OAuthIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
 `;
 

@@ -1,5 +1,17 @@
 
-import { PageContainer, StatusMessage, ErrorMessage } from "./style";
+import {
+    PageWrap,
+    PageContainer,
+    ListContainer,
+    TableBlock,
+    StatusMessage,
+    ErrorMessage,
+    FilterBar,
+    SearchSelect,
+    SearchInput,
+    SearchButton,
+    SortSelect,
+} from "./style";
 import BoardTitle from "../../components/board-title/BoardTitle";
 import TableHeader from "../../components/board-table-header/TableHeader";
 import TableRow from "../../components/board-table-row/TableRow";
@@ -23,12 +35,27 @@ const PAGE_CONFIG = {
 
 };
 
+const SEARCH_OPTIONS = [
+    { value: "TITLE", label: "제목" },
+    { value: "CONTENT", label: "내용" },
+    { value: "TITLE_CONTENT", label: "제목+내용" },
+];
+
+const SORT_OPTIONS = [
+    { value: "LATEST", label: "최신순" },
+    { value: "VIEWS", label: "조회수순" },
+];
+
 export default function BoardListPage() {
     const { section, key } = useParams();
     const config = PAGE_CONFIG[`${section}/${key}`] ?? null;
 
     const [page, setPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
+    const [searchType, setSearchType] = useState("TITLE");
+    const [keywordInput, setKeywordInput] = useState("");
+    const [appliedSearch, setAppliedSearch] = useState({ searchType: undefined, keyword: "" });
+    const [sort, setSort] = useState("LATEST");
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 480px)");
@@ -38,11 +65,23 @@ export default function BoardListPage() {
         return () => mq.removeEventListener?.("change", onChange);
     }, []);
 
+    useEffect(() => {
+        setPage(1);
+        setKeywordInput("");
+        setAppliedSearch({ searchType: undefined, keyword: "" });
+        setSearchType("TITLE");
+        setSort("LATEST");
+    }, [config?.boardType]);
+
     const size = 10;
+    const effectiveSearchType = appliedSearch.keyword ? appliedSearch.searchType : undefined;
     const { data, isLoading, error } = useGetPostListQuery({
         boardType: config?.boardType,
         page,
         size,
+        searchType: effectiveSearchType,
+        keyword: appliedSearch.keyword,
+        sort,
         enabled: Boolean(config),
     });
 
@@ -85,11 +124,66 @@ export default function BoardListPage() {
         return <Navigate to="/404" replace />;
     }
 
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        const trimmed = keywordInput.trim();
+        if (!trimmed) {
+            setAppliedSearch({ searchType: undefined, keyword: "" });
+            setSearchType("TITLE");
+        } else {
+            setAppliedSearch({ searchType, keyword: trimmed });
+        }
+        setPage(1);
+    };
+
+    const handleSortChange = (event) => {
+        setSort(event.target.value);
+        setPage(1);
+    };
+
     return (
-        <>
+        <PageWrap>
             <BoardTitle title={config.title} description={config.description} />
 
-            <TableHeader />
+            <FilterBar onSubmit={handleSearchSubmit}>
+                <SortSelect value={sort} onChange={handleSortChange}>
+                    {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </SortSelect>
+                <SearchSelect value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+                    {SEARCH_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </SearchSelect>
+                <SearchInput
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    placeholder="검색어를 입력하세요"
+                />
+                <SearchButton type="submit">검색</SearchButton>
+            </FilterBar>
+
+            <TableBlock>
+                <TableHeader />
+
+                <ListContainer>
+                    {postList.map((p) => (
+                        <TableRow
+                            key={p.postId}
+                            title={p.title}
+                            views={p.viewCount}
+                            author={p.authorName ?? "관리자"}
+                            date={fmtDate(p.createdAt)}
+                            href={`/${section}/${key}/${p.postId}`}
+                        />
+                    ))}
+                </ListContainer>
+            </TableBlock>
 
             {/* 상태 메시지 */}
             {(isLoading || error || postList.length === 0) && (
@@ -106,18 +200,6 @@ export default function BoardListPage() {
                 </PageContainer>
             )}
 
-            {/* 목록 */}
-            {postList.map((p) => (
-                <TableRow
-                    key={p.postId}
-                    title={p.title}
-                    views={p.viewCount}
-                    author={p.authorName ?? "관리자"}
-                    date={fmtDate(p.createdAt)}
-                    href={`/${section}/${key}/${p.postId}`}
-                />
-            ))}
-
             {/* 페이지네이션 */}
             {totalElements > 0 && (
                 <Pagination
@@ -129,6 +211,6 @@ export default function BoardListPage() {
                     isMobile={isMobile}
                 />
             )}
-        </>
+        </PageWrap>
     );
 }

@@ -4,15 +4,24 @@ import { responsiveFont } from '../../styles/responsive.js';
 export const PageWrap = styled.div`
   width: min(1180px, 92vw);
   margin: 0 auto;
-  padding: clamp(18px, 3vw, 28px) 0 clamp(80px, 12vw, 120px);
+  padding: 0 0 clamp(40px, 6vw, 70px);
   display: grid;
-  gap: clamp(24px, 4vw, 36px);
+  gap: clamp(12px, 2vw, 20px);
 `;
 
 export const ListWrap = styled.div`
   display: grid;
   gap: clamp(18px, 4vw, 26px);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const ItemLink = styled('button')`
@@ -27,6 +36,7 @@ export const ItemLink = styled('button')`
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   text-align: left;
+  height: 100%;
 
   border-width: 1px;
 
@@ -120,4 +130,63 @@ export const NewBadge = styled.span`
   color: #2563eb;
   font-size: 12px;
   font-weight: 700;
+`;
+
+export const FilterBar = styled.form`
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
+export const SearchSelect = styled.select`
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #fff;
+  padding: 0 12px;
+  font-weight: 600;
+  color: #1f2937;
+`;
+
+export const SearchInput = styled.input`
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 0 14px;
+  width: clamp(160px, 20vw, 240px);
+
+  &:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    outline: none;
+  }
+`;
+
+export const SearchButton = styled.button`
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  padding: 0 18px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const SortSelect = styled.select`
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #fff;
+  padding: 0 12px;
+  font-weight: 600;
+  color: #1f2937;
 `;

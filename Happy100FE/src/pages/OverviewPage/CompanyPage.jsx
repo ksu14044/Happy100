@@ -79,6 +79,11 @@ const SingleLineTitle = styled(PageTitle)`
   white-space: nowrap;
   overflow-wrap: normal;
   word-break: keep-all;
+
+  @media (max-width: 720px) {
+    white-space: normal;
+    word-break: break-word;
+  }
 `;
 
 export default function CompanyPage() {

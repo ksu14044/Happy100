@@ -2,10 +2,10 @@ import styled from '@emotion/styled';
 import { mediaQuery, responsiveFont } from '../../styles/responsive.js';
 
 export const gridColumns = `
-  minmax(0, 5fr)
-  minmax(120px, 1fr)
-  minmax(140px, 1fr)
-  minmax(150px, 1fr)
+  minmax(0, 7fr)
+  minmax(90px, 1.1fr)
+  minmax(120px, 1.2fr)
+  minmax(130px, 1.2fr)
 `;
 
 export const HeaderWrap = styled.div`
@@ -14,7 +14,7 @@ export const HeaderWrap = styled.div`
   border-top-right-radius: 24px;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-bottom: 1px solid rgba(148, 163, 184, 0.16);
-  margin: clamp(18px, 3vw, 26px) auto 0;
+  margin: 0 auto;
   width: min(1180px, 92vw);
 `;
 
@@ -31,7 +31,7 @@ export const RowGrid = styled.div`
   grid-template-columns: ${(p) => p.columns || gridColumns};
 
   ${mediaQuery.mobile} {
-    grid-template-columns: minmax(0, 4fr) minmax(120px, 1fr) minmax(140px, 1fr);
+    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(110px, 1fr);
     min-height: 54px;
   }
 `;
@@ -51,5 +51,9 @@ export const Cell = styled.div`
       display: none;
     }
     padding: 14px 12px;
+  }
+
+  &:first-of-type {
+    text-align: left;
   }
 `;

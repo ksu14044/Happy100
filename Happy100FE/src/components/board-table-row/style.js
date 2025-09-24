@@ -8,8 +8,8 @@ export const RowWrap = styled.div`
   border-bottom: 1px solid rgba(148, 163, 184, 0.16);
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  width: min(1180px, 92vw);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 
   &:hover {
     background: rgba(248, 250, 252, 0.9);
@@ -34,7 +34,7 @@ export const RowGrid = styled.div`
   grid-template-columns: ${(p) => p.columns || '1fr'};
 
   ${mediaQuery.mobile} {
-    grid-template-columns: minmax(0, 4fr) minmax(120px, 1fr) minmax(140px, 1fr);
+    grid-template-columns: minmax(0, 5fr) minmax(90px, 1fr) minmax(110px, 1fr);
     min-height: 58px;
   }
 `;
@@ -60,8 +60,15 @@ export const TitleCell = styled(Cell)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+
   span {
     display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   ${mediaQuery.mobile} {

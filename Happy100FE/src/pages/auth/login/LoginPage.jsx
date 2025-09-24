@@ -15,6 +15,7 @@ import {
     Divider,
     OAuthRow,
     OAuthBtn,
+    OAuthIcon,
     Small,
     ModalOverlay,
     ModalCard,
@@ -37,6 +38,9 @@ import {
     verifyPasswordResetCode,
     confirmPasswordReset,
 } from "../../../apis/authApi";
+import googleLogo from "../../../assets/images/google-logo.png";
+import naverLogo from "../../../assets/images/naver-logo.svg";
+import kakaoLogo from "../../../assets/images/kakao-logo.svg";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
 
@@ -296,12 +300,21 @@ export default function LoginPage() {
 
                 <OAuthRow>
                     <OAuthBtn data-provider="google" type="button" onClick={() => handleOAuthLogin("google")}>
+                        <OAuthIcon aria-hidden="true">
+                            <img src={googleLogo} alt="" loading="lazy" />
+                        </OAuthIcon>
                         Google로 계속하기
                     </OAuthBtn>
                     <OAuthBtn data-provider="naver" type="button" onClick={() => handleOAuthLogin("naver")}>
+                        <OAuthIcon aria-hidden="true">
+                            <img src={naverLogo} alt="" loading="lazy" />
+                        </OAuthIcon>
                         네이버로 계속하기
                     </OAuthBtn>
                     <OAuthBtn data-provider="kakao" type="button" onClick={() => handleOAuthLogin("kakao")}>
+                        <OAuthIcon aria-hidden="true">
+                            <img src={kakaoLogo} alt="" loading="lazy" />
+                        </OAuthIcon>
                         카카오로 계속하기
                     </OAuthBtn>
                 </OAuthRow>

@@ -15,6 +15,11 @@ import {
     ErrorState,
     LoadingState,
     NewBadge,
+    FilterBar,
+    SearchSelect,
+    SearchInput,
+    SearchButton,
+    SortSelect,
 } from "./style";
 import { Pagination } from "../../components/Pagination";
 import defaultProduct from "../../assets/images/default-product.svg";
@@ -23,6 +28,17 @@ const BOARD_TYPE = "SHOP";
 const PAGE_SIZE = 9;
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const SEVEN_DAYS_MS =  24 * 60 * 60 * 1000;
+
+const SEARCH_OPTIONS = [
+    { value: "TITLE", label: "제목" },
+    { value: "CONTENT", label: "내용" },
+    { value: "TITLE_CONTENT", label: "제목+내용" },
+];
+
+const SORT_OPTIONS = [
+    { value: "LATEST", label: "최신순" },
+    { value: "VIEWS", label: "조회수순" },
+];
 
 function toAbsoluteUrl(input) {
     if (!input) return "";
@@ -179,6 +195,10 @@ export default function ShopListPage() {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
+    const [searchType, setSearchType] = useState("TITLE");
+    const [keywordInput, setKeywordInput] = useState("");
+    const [appliedSearch, setAppliedSearch] = useState({ searchType: undefined, keyword: "" });
+    const [sort, setSort] = useState("LATEST");
 
     useEffect(() => {
         const mq = window.matchMedia("(max-width: 480px)");
@@ -188,10 +208,14 @@ export default function ShopListPage() {
         return () => mq.removeEventListener?.("change", update);
     }, []);
 
+    const effectiveSearchType = appliedSearch.keyword ? appliedSearch.searchType : undefined;
     const { data, isLoading, error } = useGetPostListQuery({
         boardType: BOARD_TYPE,
         page,
         size: PAGE_SIZE,
+        searchType: effectiveSearchType,
+        keyword: appliedSearch.keyword,
+        sort,
     });
 
     const postList = data?.postList ?? [];
@@ -228,6 +252,47 @@ export default function ShopListPage() {
                 description="행복백세에서 준비한 상품을 확인해 보세요."
                 writeSection="shop"
             />
+
+            <FilterBar
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    const trimmed = keywordInput.trim();
+                    if (!trimmed) {
+                        setAppliedSearch({ searchType: undefined, keyword: "" });
+                        setSearchType("TITLE");
+                    } else {
+                        setAppliedSearch({ searchType, keyword: trimmed });
+                    }
+                    setPage(1);
+                }}
+            >
+                <SortSelect
+                    value={sort}
+                    onChange={(event) => {
+                        setSort(event.target.value);
+                        setPage(1);
+                    }}
+                >
+                    {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </SortSelect>
+                <SearchSelect value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+                    {SEARCH_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </SearchSelect>
+                <SearchInput
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    placeholder="검색어를 입력하세요"
+                />
+                <SearchButton type="submit">검색</SearchButton>
+            </FilterBar>
 
             {isLoading && <LoadingState>상품을 불러오는 중입니다…</LoadingState>}
             {!isLoading && error && (

@@ -1,12 +1,39 @@
 import { api } from "../configs/axiosConfig";
 
-export const getPostApi = async ({ boardType, page = 1, size = 10, signal }) => {
-	if (!boardType) throw new Error("boardType is required");
-	const res = await api.get("/api/boards", {
-		params: { boardType, page, size },
-		signal,
-	});
-	return res.data; // ← axios 응답 본문만 반환
+export const getPostApi = async ({
+  boardType,
+  page = 1,
+  size = 10,
+  searchType,
+  keyword,
+  sort = "LATEST",
+  signal,
+}) => {
+  if (!boardType) throw new Error("boardType is required");
+
+  const params = {
+    boardType,
+    page,
+    size,
+  };
+
+  const trimmedKeyword = typeof keyword === "string" ? keyword.trim() : "";
+  if (trimmedKeyword) {
+    params.keyword = trimmedKeyword;
+    if (searchType) {
+      params.searchType = searchType.toUpperCase();
+    }
+  }
+
+  if (sort) {
+    params.sort = sort.toUpperCase();
+  }
+
+  const res = await api.get("/api/boards", {
+    params,
+    signal,
+  });
+  return res.data; // ← axios 응답 본문만 반환
 };
 
 // AttachmentRequest 규격으로 변환 유틸
@@ -76,4 +103,25 @@ export const getPostByIdApi = async ({ postId, increaseView = true, signal }) =>
     signal,
   });
   return res.data; // ← PostResponse
+};
+
+export const updatePostApi = async ({ postId, title, contentJson, attachments = [] }) => {
+  if (!postId) throw new Error("postId is required");
+  if (!title) throw new Error("title is required");
+  if (typeof contentJson !== "string") {
+    throw new Error("contentJson must be a JSON string");
+  }
+
+  const payload = {
+    title,
+    contentJson,
+    attachments: toAttachmentRequests(attachments),
+  };
+
+  await api.put(`/api/boards/${postId}`, payload);
+};
+
+export const deletePostApi = async ({ postId }) => {
+  if (!postId) throw new Error("postId is required");
+  await api.delete(`/api/boards/${postId}`);
 };

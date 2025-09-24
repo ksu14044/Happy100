@@ -3,6 +3,8 @@ import React, { useMemo } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { useGetPostByIdQuery } from "../../queries/postQuery";
 import { useDownloadAttachmentMutation } from "../../mutations/attachmentMutation";
+import { useDeletePostMutation } from "../../mutations/postMutation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
     PageWrap,
     Container,
@@ -16,6 +18,7 @@ import {
     AttachItem,
     GhostBtn,
     PrimaryBtn,
+    DangerBtn,
 } from "../WritePage/style"; // 작성 페이지 스타일 재사용
 import { TitleText, MetaBar, ContentWrap, BackBar, SecondaryBtn } from "./style";
 import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
@@ -35,7 +38,8 @@ function humanFileSize(bytes) {
 
 export default function PostDetail() {
     const navigate = useNavigate();
-    const { section, postId } = useParams();
+    const { section, key, postId } = useParams();
+    const queryClient = useQueryClient();
 
     // 라우트 패턴 지원:
     // - /news/:postId, /cert/:postId, /shop/:postId
@@ -57,6 +61,8 @@ export default function PostDetail() {
     });
 
     const downloadAttachment = useDownloadAttachmentMutation();
+    const deletePost = useDeletePostMutation();
+    const isDeleting = deletePost.isPending;
 
     const token = localStorage.getItem("auth_token");
     const payload = token ? decodeJwtPayload(token) : null;
@@ -119,6 +125,30 @@ export default function PostDetail() {
         );
     };
 
+    const handleEdit = () => {
+        if (!postId) return;
+        navigate(`/${effectiveSection}/edit/${postId}`);
+    };
+
+    const handleDelete = () => {
+        if (!postId || isDeleting) return;
+        if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
+        deletePost.mutate(
+            { postId },
+            {
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["posts"] });
+                    queryClient.removeQueries({ queryKey: ["post", postId], exact: true });
+                    const listPath = key ? `/${section}/${key}` : "/";
+                    navigate(listPath, { replace: true });
+                },
+                onError: (err) => {
+                    window.alert(err?.message || "글 삭제에 실패했습니다.");
+                },
+            },
+        );
+    };
+
     if (invalidRoute) {
         return <Navigate to="/404" replace />;
     }
@@ -129,7 +159,16 @@ export default function PostDetail() {
                 <BackBar>
                     <GhostBtn type="button" onClick={() => navigate(-1)}>← 목록으로</GhostBtn>
                     <div />
-                    { isAdmin ? <SecondaryBtn type="button" to={`/${section}/edit/${postId}`}>수정</SecondaryBtn> : <></> }
+                    {isAdmin ? (
+                        <div style={{ display: "flex", gap: 8 }}>
+                            <SecondaryBtn type="button" onClick={handleEdit}>
+                                수정
+                            </SecondaryBtn>
+                            <DangerBtn type="button" onClick={handleDelete} disabled={isDeleting}>
+                                {isDeleting ? "삭제 중…" : "삭제"}
+                            </DangerBtn>
+                        </div>
+                    ) : null}
                 </BackBar>
 
                 <TitleBar>

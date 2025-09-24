@@ -37,6 +37,7 @@ export const globalStyles = css`
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   #root {
@@ -54,6 +55,25 @@ export const globalStyles = css`
 
   p {
     margin: 0;
+  }
+
+  p,
+  span,
+  a,
+  li,
+  label,
+  button,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  td,
+  th,
+  div {
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   a {
