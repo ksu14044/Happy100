@@ -4,13 +4,8 @@ import { Container, Header, Table, Th, Td, ActionButton, Pagination, PageButton 
 
 export default function AdminDashboard() {
   const [page, setPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState(null);
   const { data: users, isLoading, error } = useUsersQuery({ page });
-  const { mutate: deleteUser, isLoading: isDeleting } = useDeleteUserMutation();
-
-  const handleEditClick = (user) => {
-    setSelectedUser(user);
-  };
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUserMutation();
 
   const handleDeleteClick = (userId) => {
     if (window.confirm('정말 이 사용자를 삭제하시겠습니까?')) {
@@ -58,23 +53,17 @@ export default function AdminDashboard() {
           </tr>
         </thead>
         <tbody>
-          {users.content.map(user => (
-            <tr key={user.id}>
-              <Td>{user.id}</Td>
+          {(users?.content ?? []).map((user) => (
+            <tr key={user.userId}>
+              <Td>{user.userId}</Td>
               <Td>{user.username}</Td>
               <Td>{user.email}</Td>
-              <Td>{new Date(user.createdAt).toLocaleDateString()}</Td>
-              <Td>{user.role}</Td>
+              <Td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</Td>
+              <Td>{user.roleName === 'ROLE_ADMIN' ? '관리자' : '사용자'}</Td>
               <Td>
                 <ActionButton
-                  variant="edit"
-                  onClick={() => handleEditClick(user)}
-                >
-                  수정
-                </ActionButton>
-                <ActionButton
                   variant="danger"
-                  onClick={() => handleDeleteClick(user.id)}
+                  onClick={() => handleDeleteClick(user.userId)}
                   disabled={isDeleting}
                 >
                   삭제

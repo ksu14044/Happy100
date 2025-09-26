@@ -47,6 +47,12 @@ export const Label = styled.label`
   color: #1f2937;
 `;
 
+export const InputGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 export const Input = styled.input`
   height: 48px;
   padding: 0 16px;
@@ -83,6 +89,31 @@ export const PrimaryButton = styled.button`
   }
 `;
 
+export const InlineButton = styled.button`
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.5);
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+  font-weight: 600;
+  font-size: ${responsiveFont('12px', '13px')};
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+  }
+`;
+
 export const MutedLinkRow = styled.div`
   display: flex;
   gap: 6px;
@@ -101,4 +132,10 @@ export const MutedLink = styled.a`
 export const Small = styled.span`
   font-size: ${responsiveFont("11px", "12px")};
   color: #6b7280;
+`;
+
+export const StatusText = styled.span`
+  font-size: ${responsiveFont('11px', '12px')};
+  font-weight: 600;
+  color: ${(props) => (props.variant === 'error' ? '#dc2626' : props.variant === 'success' ? '#16a34a' : '#6b7280')};
 `;

@@ -9,6 +9,7 @@ import {
 // [ADDED] 토큰 저장소에서 로그인 상태 읽기/지우기
 import { tokenStorage } from "../../libs/authStorage";
 import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
+import { logout as requestLogout } from "../../apis/authApi";
 
 export default function Header({
     navItems,
@@ -130,8 +131,8 @@ export default function Header({
     );
 
     // [ADDED] 로그아웃
-    const onLogout = useCallback(() => {
-        tokenStorage.clear(); // ← 구독자 알림으로 헤더 즉시 갱신
+    const onLogout = useCallback(async () => {
+        await requestLogout();
         if (onNavigate) onNavigate("/");
     }, [onNavigate]);
 

@@ -7,18 +7,17 @@ const ADMIN_QUERY_KEYS = {
 };
 
 export const useUsersQuery = (params = {}, options = {}) => {
-  const { page = 1, size = 10, searchType, keyword } = params;
+  const { page = 1, size = 10, keyword } = params;
   const queryKey = [
     ADMIN_QUERY_KEYS.users,
     page,
     size,
-    searchType ?? null,
     keyword ?? null,
   ];
 
   return useQuery({
     queryKey,
-    queryFn: () => getUsersApi({ page, size, searchType, keyword }),
+    queryFn: () => getUsersApi({ page, size, keyword }),
     ...options,
   });
 };

@@ -33,8 +33,34 @@ export async function loginApi({ username, password }) {
 }
 
 /** 로그아웃(클라이언트 측) */
-export function logout() {
-    tokenStorage.clear();
+export async function logout() {
+    try {
+        await api.post("/api/auth/logout");
+    } catch (error) {
+        console.warn("로그아웃 요청 중 오류", error);
+    } finally {
+        tokenStorage.clear();
+    }
+}
+
+export async function checkUsernameDuplicate(username) {
+    if (!username?.trim()) {
+        throw new Error("아이디를 입력해주세요.");
+    }
+    const res = await api.get("/api/auth/check-username", {
+        params: { username: username.trim() },
+    });
+    return res.data;
+}
+
+export async function checkEmailDuplicate(email) {
+    if (!email?.trim()) {
+        throw new Error("이메일을 입력해주세요.");
+    }
+    const res = await api.get("/api/auth/check-email", {
+        params: { email: email.trim() },
+    });
+    return res.data;
 }
 
 /**

@@ -1,12 +1,9 @@
 import { api } from '../configs/axiosConfig';
 
-export const getUsersApi = async ({ page = 1, size = 10, searchType, keyword } = {}) => {
+export const getUsersApi = async ({ page = 1, size = 10, keyword } = {}) => {
   const params = { page, size };
   const trimmedKeyword = keyword?.trim();
 
-  if (searchType) {
-    params.searchType = searchType;
-  }
   if (trimmedKeyword) {
     params.keyword = trimmedKeyword;
   }

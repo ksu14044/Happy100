@@ -28,7 +28,10 @@ dist-ssr
 
 # Playwright
 e2e/
+tests/
 playwright.config.js
+playwright.config.ts
 /test-results/
 /playwright-report/
 /playwright/.cache/
+tsconfig.json
