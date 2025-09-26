@@ -74,9 +74,12 @@ export const Title = styled.h3`
   font-weight: 700;
   color: #0f172a;
   line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
 `;
 
 export const Summary = styled.p`

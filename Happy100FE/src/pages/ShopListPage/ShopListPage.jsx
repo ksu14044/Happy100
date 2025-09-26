@@ -322,7 +322,7 @@ export default function ShopListPage() {
                                 <Info>
                                     <Title>
                                         {createdIsRecent && <NewBadge>[신규]</NewBadge>}
-                                        <span>{post.title || "제목 없음"}</span>
+                                        {post.title || "제목 없음"}
                                     </Title>
                                     <Summary muted={!hasSummary}>{displaySummary}</Summary>
                                     <Meta>

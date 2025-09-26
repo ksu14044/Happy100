@@ -18,11 +18,17 @@ import { globalStyles } from './styles/globalStyles.js';
 import HomePage from './pages/HomePage/HomePage.jsx';
 import OverviewPage from './pages/OverviewPage/OverviewPage.jsx';
 import CompanyPage from './pages/OverviewPage/CompanyPage.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
+import UsersManagementPage from './pages/admin/UsersManagementPage.jsx';
+import PostsManagementPage from './pages/admin/PostsManagementPage.jsx';
 import ActivityPage from './pages/OverviewPage/ActivityPage.jsx';
 import ProgramPage from './pages/ProgramPage/ProgramPage.jsx';
 import ProgramFlowPage from './pages/ProgramPage/ProgramFlowPage.jsx';
 import ProgramCurriculumPage from './pages/ProgramPage/ProgramCurriculumPage.jsx';
 import FranchisePage from './pages/FranchisePage/FranchisePage.jsx';
+import MyPage from './pages/MyPage/MyPage.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 const Main = styled.main`
   flex: 1 1 auto;
@@ -63,6 +69,12 @@ export default function App() {
           <Route path="/oauth2/callback" element={<OAuthCallbackPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/mypage" element={<MyPage />} />
+          {/* 관리자 라우트 */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><UsersManagementPage /></AdminRoute>} />
+          <Route path="/admin/posts" element={<AdminRoute><PostsManagementPage /></AdminRoute>} />
+          {/* 게시판 라우트 */}
           <Route path="/:section/write" element={<WritePage />} />
           <Route path="/:section/edit/:postId" element={<WritePage />} />
           <Route path="/:section/:key/:postId" element={<PostDetail />} />

@@ -8,6 +8,7 @@ import {
 } from "./style";
 // [ADDED] 토큰 저장소에서 로그인 상태 읽기/지우기
 import { tokenStorage } from "../../libs/authStorage";
+import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
 
 export default function Header({
     navItems,
@@ -95,9 +96,24 @@ export default function Header({
         };
     }, []);
 
-    // [ADDED] 표시용 이름 계산
-    const displayName =
-        auth?.user || "회원";
+    // JWT 토큰에서 사용자 정보 추출
+    const userInfo = useMemo(() => {
+        if (auth?.accessToken) {
+            const decoded = decodeJwtPayload(auth.accessToken);
+            console.log('Decoded token:', decoded);
+            return {
+                name: decoded?.name || auth?.user || "회원",
+                role: decoded?.role || "ROLE_USER"
+            };
+        }
+        return { name: "회원", role: "ROLE_USER" };
+    }, [auth?.accessToken, auth?.user]);
+    
+    // 표시용 이름과 관리자 권한 계산
+    const displayName = userInfo.name;
+    const isAdmin = userInfo.role === "ROLE_ADMIN";
+
+
 
     const go = useCallback(
         (e, href) => {
@@ -212,7 +228,14 @@ export default function Header({
                             <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
                                 상담 신청
                             </CtaLink>
-                            <UserName>{displayName}님</UserName>
+                            {isAdmin && (
+                                <AuthLink href="/admin" onClick={(e) => go(e, "/admin")}>
+                                    관리자
+                                </AuthLink>
+                            )}
+                            <UserName onClick={(e) => go(e, "/mypage")} style={{ cursor: 'pointer' }}>
+                                {displayName}님
+                            </UserName>
                             <LogoutBtn type="button" onClick={onLogout}>
                                 로그아웃
                             </LogoutBtn>
@@ -256,6 +279,11 @@ export default function Header({
                                     <MobileItem as="div" style={{ fontWeight: 700, cursor: "default" }}>
                                         {displayName}님
                                     </MobileItem>
+                                    {isAdmin && (
+                                        <MobileItem href="/admin" onClick={(e) => go(e, "/admin")}>
+                                            관리자 페이지
+                                        </MobileItem>
+                                    )}
                                     <MobileItem as="button" onClick={onLogout} style={{ textAlign: "left" }}>
                                         로그아웃
                                     </MobileItem>
