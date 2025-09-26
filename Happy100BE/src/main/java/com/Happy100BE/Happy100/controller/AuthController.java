@@ -6,6 +6,7 @@ import com.Happy100BE.Happy100.dto.request.PasswordFindRequest;
 import com.Happy100BE.Happy100.dto.request.PasswordFindVerifyRequest;
 import com.Happy100BE.Happy100.dto.request.SignUpRequestDto;
 import com.Happy100BE.Happy100.dto.response.DuplicateCheckResponseDto;
+import com.Happy100BE.Happy100.dto.response.ErrorResponse;
 import com.Happy100BE.Happy100.dto.response.LoginResponse;
 import com.Happy100BE.Happy100.dto.response.PasswordResetVerifyResponse;
 import com.Happy100BE.Happy100.dto.response.SimpleOkResponse;
@@ -22,9 +23,13 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 
 @RestController
@@ -69,21 +74,29 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "로그인 성공 시 액세스 토큰을 발급합니다.")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
+            CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
 
-        // JwtService 시그니처: generateToken(String username, String role)
-        String accessToken = jwtService.generateToken(principal.getUsername(), principal.getAuthorities()
-                .iterator().next().getAuthority());
-        
-        String name = userService.getMyInfo(principal.getUsername()).getName();
+            // JwtService 시그니처: generateToken(String username, String role)
+            String accessToken = jwtService.generateToken(principal.getUsername(), principal.getAuthorities()
+                    .iterator().next().getAuthority());
+            
+            String name = userService.getMyInfo(principal.getUsername()).getName();
 
-        // 만료시간은 application-secret.yml의 access-token-validity-seconds(=3600)와 일치하도록 반환
-        return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600, name));
+            // 만료시간은 application-secret.yml의 access-token-validity-seconds(=3600)와 일치하도록 반환
+            return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600, name));
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ErrorResponse.of(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."));
+        } catch (BadCredentialsException | UsernameNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "계정 정보를 확인해 주세요."));
+        }
     }
 
     @GetMapping("/find-username")

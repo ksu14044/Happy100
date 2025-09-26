@@ -34,13 +34,11 @@ public interface UserMapper {
     int updatePasswordByUsernameAndEmail(@Param("username") String username, @Param("email") String email, @Param("encodedPassword") String encodedPassword);
 
     // 관리자 기능용 쿼리
-    long countAll(@Param("searchType") String searchType,
-                  @Param("keyword") String keyword);
+    long countAll(@Param("keyword") String keyword);
 
     java.util.List<com.Happy100BE.Happy100.entity.User> selectAll(@Param("offset") int offset,
                                                                  @Param("limit") int limit,
                                                                  @Param("orderBy") String orderBy,
-                                                                 @Param("searchType") String searchType,
                                                                  @Param("keyword") String keyword);
     com.Happy100BE.Happy100.entity.User findById(@Param("userId") Integer userId);
     int updateById(@Param("userId") Integer userId,

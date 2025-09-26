@@ -72,12 +72,12 @@ public class UserRepository {
     }
 
     // 관리자 조회/수정/삭제용
-    public long countAll(String searchType, String keyword) {
-        return userMapper.countAll(searchType, keyword);
+    public long countAll(String keyword) {
+        return userMapper.countAll(keyword);
     }
 
-    public List<User> findAll(int offset, int limit, String orderBy, String searchType, String keyword) {
-        return userMapper.selectAll(offset, limit, orderBy, searchType, keyword);
+    public List<User> findAll(int offset, int limit, String orderBy, String keyword) {
+        return userMapper.selectAll(offset, limit, orderBy, keyword);
     }
 
     public User findById(Integer userId) {

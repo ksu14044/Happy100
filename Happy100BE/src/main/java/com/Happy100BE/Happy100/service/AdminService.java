@@ -1,6 +1,5 @@
 package com.Happy100BE.Happy100.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,28 +28,14 @@ public class AdminService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
 
-    public PageResponse<UserResponse> getUsers(int page, int size, String searchType, String keyword) {
+    public PageResponse<UserResponse> getUsers(int page, int size, String keyword) {
         int safePage = Math.max(page, 1);
         int safeSize = Math.max(1, Math.min(size, DEFAULT_MAX_PAGE_SIZE));
         String normalizedKeyword = normalizeKeyword(keyword);
-        String normalizedSearchType = normalizeUserSearchType(searchType);
-
-        if ("USER_ID".equals(normalizedSearchType)) {
-            Integer targetId = parseUserId(normalizedKeyword);
-            if (targetId == null) {
-                return new PageResponse<>(Collections.emptyList(), safePage, safeSize, 0);
-            }
-            User user = userRepository.findById(targetId);
-            if (user == null) {
-                return new PageResponse<>(Collections.emptyList(), safePage, safeSize, 0);
-            }
-            return new PageResponse<>(List.of(toUserResponse(user)), safePage, safeSize, 1);
-        }
 
         int offset = (safePage - 1) * safeSize;
-        List<User> users = userRepository.findAll(offset, safeSize, "created_at DESC",
-                normalizedSearchType, normalizedKeyword);
-        long total = userRepository.countAll(normalizedSearchType, normalizedKeyword);
+        List<User> users = userRepository.findAll(offset, safeSize, "created_at DESC", normalizedKeyword);
+        long total = userRepository.countAll(normalizedKeyword);
 
         List<UserResponse> content = users.stream()
                 .map(this::toUserResponse)
@@ -111,35 +96,12 @@ public class AdminService {
         return keyword.trim();
     }
 
-    private String normalizeUserSearchType(String searchType) {
-        if (!StringUtils.hasText(searchType)) {
-            return null;
-        }
-        String upper = searchType.trim().toUpperCase(Locale.ROOT);
-        return switch (upper) {
-            case "USER_ID" -> "USER_ID";
-            case "USERNAME", "NAME", "EMAIL" -> upper;
-            default -> null;
-        };
-    }
-
     private String normalizePostSearchType(String searchType) {
         if (!StringUtils.hasText(searchType)) {
             return null;
         }
         String upper = searchType.trim().toUpperCase(Locale.ROOT);
         return "TITLE".equals(upper) ? "TITLE" : null;
-    }
-
-    private Integer parseUserId(String keyword) {
-        if (!StringUtils.hasText(keyword)) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(keyword.trim());
-        } catch (NumberFormatException ex) {
-            return null;
-        }
     }
 
     private UserResponse toUserResponse(User user) {

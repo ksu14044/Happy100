@@ -28,9 +28,8 @@ public class AdminController {
     public ResponseEntity<PageResponse<UserResponse>> getUsers(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "searchType", required = false) String searchType,
             @RequestParam(name = "keyword", required = false) String keyword) {
-        PageResponse<UserResponse> response = adminService.getUsers(page, size, searchType, keyword);
+        PageResponse<UserResponse> response = adminService.getUsers(page, size, keyword);
         return ResponseEntity.ok(response);
     }
 

@@ -101,24 +101,9 @@
   <select id="countAll" resultType="long">
     SELECT COUNT(1)
     FROM user_tb u
-    <where>
-      <if test="keyword != null and keyword != ''">
-        <choose>
-          <when test="searchType == 'USER_ID'">
-            AND CAST(u.user_id AS CHAR) = #{keyword}
-          </when>
-          <when test="searchType == 'EMAIL'">
-            AND LOWER(u.email) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </when>
-          <when test="searchType == 'NAME'">
-            AND LOWER(u.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </when>
-          <otherwise>
-            AND LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </otherwise>
-        </choose>
-      </if>
-    </where>
+    <if test="keyword != null and keyword != ''">
+      WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+    </if>
   </select>
 
   <!-- 관리자 기능: 전체 조회(페이지) -->
@@ -126,24 +111,9 @@
     SELECT u.*, r.role_name
     FROM user_tb u
     JOIN role_tb r ON r.role_id = u.role_id
-    <where>
-      <if test="keyword != null and keyword != ''">
-        <choose>
-          <when test="searchType == 'USER_ID'">
-            AND CAST(u.user_id AS CHAR) = #{keyword}
-          </when>
-          <when test="searchType == 'EMAIL'">
-            AND LOWER(u.email) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </when>
-          <when test="searchType == 'NAME'">
-            AND LOWER(u.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </when>
-          <otherwise>
-            AND LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
-          </otherwise>
-        </choose>
-      </if>
-    </where>
+    <if test="keyword != null and keyword != ''">
+      WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+    </if>
     <choose>
       <when test="orderBy != null and orderBy != ''">
         ORDER BY ${orderBy}
