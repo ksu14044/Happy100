@@ -5,6 +5,7 @@ import com.Happy100BE.Happy100.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -68,5 +69,26 @@ public class UserRepository {
 
     public int updatePasswordByUsernameAndEmail(String username, String email, String encodedPassword){
         return userMapper.updatePasswordByUsernameAndEmail(username, email, encodedPassword);
+    }
+
+    // 관리자 조회/수정/삭제용
+    public long countAll(String searchType, String keyword) {
+        return userMapper.countAll(searchType, keyword);
+    }
+
+    public List<User> findAll(int offset, int limit, String orderBy, String searchType, String keyword) {
+        return userMapper.selectAll(offset, limit, orderBy, searchType, keyword);
+    }
+
+    public User findById(Integer userId) {
+        return userMapper.findById(userId);
+    }
+
+    public int updateById(Integer userId, String name, String email, Integer roleId, Integer accountEnabled) {
+        return userMapper.updateById(userId, name, email, roleId, accountEnabled);
+    }
+
+    public int disableAccountByUserId(Integer userId) {
+        return userMapper.disableAccountByUserId(userId);
     }
 }

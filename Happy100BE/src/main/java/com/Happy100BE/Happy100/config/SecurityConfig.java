@@ -5,8 +5,10 @@ import com.Happy100BE.Happy100.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,6 +32,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // �
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.util.StringUtils;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,6 +44,9 @@ public class SecurityConfig {
         private final AuthenticationSuccessHandler oAuth2SuccessHandler;
         private final AuthenticationFailureHandler oAuth2FailureHandler;
         private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
+
+        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
+        private String corsAllowedOrigins;
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -120,7 +126,7 @@ public class SecurityConfig {
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration cfg = new CorsConfiguration();
                 // withCredentials=true 이므로 반드시 정확한 오리진 명시('*' 금지)
-                cfg.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+                cfg.setAllowedOrigins(resolveAllowedOrigins());
                 cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
                 cfg.setExposedHeaders(List.of("Location", "Content-Disposition"));
@@ -130,5 +136,15 @@ public class SecurityConfig {
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", cfg);
                 return source;
+        }
+
+        private List<String> resolveAllowedOrigins() {
+                if (!StringUtils.hasText(corsAllowedOrigins)) {
+                        return List.of("http://localhost:5173", "http://127.0.0.1:5173");
+                }
+                return Arrays.stream(corsAllowedOrigins.split(","))
+                                .map(String::trim)
+                                .filter(StringUtils::hasText)
+                                .toList();
         }
 }

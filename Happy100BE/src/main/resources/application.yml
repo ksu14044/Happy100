@@ -24,6 +24,8 @@ app:
     base-path: ${ATTACHMENT_BASE_PATH:./uploads}
   contact:
     recipient-email: ${MAIL_USERNAME}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
 
 server:
   port: 8080
@@ -47,11 +49,11 @@ spring:
       read-only:  false
 react:
   server:
-    protocol: http
-    host: localhost
-    port: 5173
-    callback-path: /oauth2/callback
-    failure-path: /oauth2/callback
+    protocol: ${REACT_SERVER_PROTOCOL:http}
+    host: ${REACT_SERVER_HOST:localhost}
+    port: ${REACT_SERVER_PORT:5173}
+    callback-path: ${REACT_SERVER_CALLBACK_PATH:/oauth2/callback}
+    failure-path: ${REACT_SERVER_FAILURE_PATH:/oauth2/callback}
 
 ---
 spring:

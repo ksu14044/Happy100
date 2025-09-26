@@ -89,12 +89,97 @@
     AND account_enabled = 0
 </select>
 
-<update id="updatePasswordByUsernameAndEmail">
+  <update id="updatePasswordByUsernameAndEmail">
     UPDATE user_tb
     SET password = #{encodedPassword}
     WHERE username = #{username}
     AND email = #{email}
     AND account_enabled = 0
-</update>
+  </update>
+
+  <!-- 관리자 기능: 전체 카운트 -->
+  <select id="countAll" resultType="long">
+    SELECT COUNT(1)
+    FROM user_tb u
+    <where>
+      <if test="keyword != null and keyword != ''">
+        <choose>
+          <when test="searchType == 'USER_ID'">
+            AND CAST(u.user_id AS CHAR) = #{keyword}
+          </when>
+          <when test="searchType == 'EMAIL'">
+            AND LOWER(u.email) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </when>
+          <when test="searchType == 'NAME'">
+            AND LOWER(u.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </when>
+          <otherwise>
+            AND LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </otherwise>
+        </choose>
+      </if>
+    </where>
+  </select>
+
+  <!-- 관리자 기능: 전체 조회(페이지) -->
+  <select id="selectAll" resultMap="userMap">
+    SELECT u.*, r.role_name
+    FROM user_tb u
+    JOIN role_tb r ON r.role_id = u.role_id
+    <where>
+      <if test="keyword != null and keyword != ''">
+        <choose>
+          <when test="searchType == 'USER_ID'">
+            AND CAST(u.user_id AS CHAR) = #{keyword}
+          </when>
+          <when test="searchType == 'EMAIL'">
+            AND LOWER(u.email) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </when>
+          <when test="searchType == 'NAME'">
+            AND LOWER(u.name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </when>
+          <otherwise>
+            AND LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+          </otherwise>
+        </choose>
+      </if>
+    </where>
+    <choose>
+      <when test="orderBy != null and orderBy != ''">
+        ORDER BY ${orderBy}
+      </when>
+      <otherwise>
+        ORDER BY created_at DESC
+      </otherwise>
+    </choose>
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <!-- 관리자 기능: 단건 조회 -->
+  <select id="findById" parameterType="int" resultMap="userMap">
+    SELECT u.*, r.role_name
+    FROM user_tb u
+    JOIN role_tb r ON r.role_id = u.role_id
+    WHERE u.user_id = #{userId}
+  </select>
+
+  <!-- 관리자 기능: 수정 -->
+  <update id="updateById">
+    UPDATE user_tb
+    SET
+      name = #{name},
+      email = #{email},
+      role_id = #{roleId},
+      account_enabled = #{accountEnabled}
+    WHERE user_id = #{userId}
+  </update>
+
+  <!-- 관리자 기능: 삭제(비활성화 처리) -->
+  <update id="disableAccountByUserId">
+    UPDATE user_tb
+    SET account_enabled = 1
+    WHERE user_id = #{userId}
+      AND account_enabled = 0
+  </update>
 
 </mapper>
