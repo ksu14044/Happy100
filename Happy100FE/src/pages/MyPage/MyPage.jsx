@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { Container, Title, Section, Label, Input, Button, ErrorMessage, AdminLink } from './style';
-import { useGetUserInfoQuery, useDeleteAccountMutation } from '../../queries/userQuery';
+import { useGetUserInfoQueryForce, useDeleteAccountMutation } from '../../queries/userQuery';
 import Modal from '../../components/Modal';
 import NameEditForm from './components/NameEditForm';
 import EmailEditForm from './components/EmailEditForm';
 import PasswordEditForm from './components/PasswordEditForm';
-import { tokenStorage } from '../../libs/authStorage';
-import { decodeJwtPayload } from '../../libs/decoddecodeJwtPayload';
 
 export default function MyPage() {
   console.log('[MyPage] 컴포넌트 렌더링');
   
   const navigate = useNavigate();
-  const { data: user, isLoading, error } = useGetUserInfoQuery();
+  const { data: user, isLoading, error } = useGetUserInfoQueryForce();
   const { mutateAsync: deleteAccount, isLoading: isDeleting } = useDeleteAccountMutation();
   
   const [editingName, setEditingName] = useState(false);
@@ -54,20 +52,9 @@ export default function MyPage() {
     );
   }
 
-  // 에러가 있으면 에러 표시
-  if (error) {
-    return (
-      <Container>
-        <Title>내 정보</Title>
-        <ErrorMessage>
-          {error.response?.status === 401 
-            ? "로그인이 필요합니다."
-            : "정보를 불러오는 중 오류가 발생했습니다."
-          }
-        </ErrorMessage>
-        <Button onClick={() => navigate('/login')}>로그인하기</Button>
-      </Container>
-    );
+  // 인증되지 않은 경우 접근 차단: 로그인 페이지로 리다이렉트
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   return (

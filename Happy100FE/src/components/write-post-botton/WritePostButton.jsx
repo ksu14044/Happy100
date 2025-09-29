@@ -1,16 +1,14 @@
 // FILE: /mnt/data/WritePostButton.jsx
 
-import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
 import { WriteButton } from "./style";
+import { useGetUserInfoQuery } from "../../queries/userQuery";
 
 
 
 
 export default function WritePostButton({ label = "글쓰기", section }) {
-  const token = localStorage.getItem("auth_token");
-  const payload = token ? decodeJwtPayload(token) : null;
-  // 요구사항: payload에는 role:"ROLE_ADMIN"으로 들어있음
-  const isAdmin = payload?.role === "ROLE_ADMIN";
+  const { data: user } = useGetUserInfoQuery();
+  const isAdmin = user?.role === "ROLE_ADMIN";
   if (!isAdmin) return null;
 
   if (!section) return null;

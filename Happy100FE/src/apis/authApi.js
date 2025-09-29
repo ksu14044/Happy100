@@ -1,5 +1,4 @@
 import { api } from "../configs/axiosConfig";
-import { tokenStorage } from "../libs/authStorage";
 
 /**
  * 로그인 요청
@@ -16,20 +15,11 @@ export async function loginApi({ username, password }) {
         headers: { "Content-Type": "application/json" },
     });
 
-    const data = res.data; // LoginResponse.java 응답 본문
-
-    // 다양한 이름을 허용해 토큰 추출(백엔드 구현과 일치하면 첫 키에서 잡힙니다)
-    const accessToken = data.accessToken ?? data.token ?? data.jwt ?? data.access_token;
-    const refreshToken = data.refreshToken ?? data.refresh_token ?? null;
-    const tokenType = data.tokenType ?? data.token_type ?? "Bearer";
-
-    if (!accessToken) {
-        throw new Error("로그인 응답에 accessToken이 없습니다. LoginResponse 필드를 확인하세요.");
-    }
-
-    // 필요하면 user 정보도 함께 저장
-    tokenStorage.save({ accessToken, refreshToken, tokenType, user: data.username ?? null });
-    return data; // 호출한 쪽에서 후속 처리 가능
+    // 쿠키 기반 인증: 서버가 Set-Cookie로 토큰을 설정함
+    try {
+        sessionStorage.setItem('has_session', '1');
+    } catch {}
+    return res.data;
 }
 
 /** 로그아웃(클라이언트 측) */
@@ -39,7 +29,9 @@ export async function logout() {
     } catch (error) {
         console.warn("로그아웃 요청 중 오류", error);
     } finally {
-        tokenStorage.clear();
+        // 세션 힌트 제거
+        try { sessionStorage.removeItem('has_session'); } catch {}
+        try { localStorage.removeItem('user_preview'); } catch {}
     }
 }
 

@@ -56,19 +56,25 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "내 정보", description = "JWT로 인증된 사용자의 정보를 반환합니다.")
-    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "내 정보", description = "인증된 경우 사용자 정보를 반환하고, 비인증은 빈 본문(200 또는 204)으로 응답합니다.")
     @GetMapping("/me")
-    public ResponseEntity<UserInfoResponse> me(Authentication authentication) {
-        CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
-        UserInfoResponse response = userService.getMyInfo(principal.getUsername());
+    public ResponseEntity<?> me(Authentication authentication) {
+        String username = AuthUtil.getCurrentUsername(authentication);
+        if (username == null || username.isBlank()) {
+            // 비로그인 상태: 204 No Content 로 응답 (FE는 null/빈값으로 처리)
+            return ResponseEntity.noContent().build();
+        }
+        UserInfoResponse response = userService.getMyInfo(username);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/me/delete")
     public ResponseEntity<Void> disableAccount(Authentication auth) {
-        CustomUserPrincipal principal = (CustomUserPrincipal) auth.getPrincipal();
-        userService.disableMyAccount(principal.getUsername());
+        String username = AuthUtil.getCurrentUsername(auth);
+        if (username == null || username.isBlank()) {
+            throw new org.springframework.security.access.AccessDeniedException("인증 정보가 없습니다.");
+        }
+        userService.disableMyAccount(username);
         return ResponseEntity.noContent().build();
     }
 }

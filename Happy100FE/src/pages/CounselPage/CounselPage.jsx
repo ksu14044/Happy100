@@ -15,9 +15,13 @@ import {
     SubmitButton,
     StatusMessage,
     Description,
+    PolicyBox,
+    Collapsible,
+    CollapsibleSummary,
 } from "./style";
 import { submitCounselApplication } from "../../apis/counselApi";
 import { useSearchParams } from "react-router-dom";
+import { CONTACT_INFO } from "../../data/brandContent.js";
 
 const TABS = [
     { code: "branch", label: "지사 신청" },
@@ -183,6 +187,23 @@ export default function CounselPage() {
                     />
                     <label htmlFor="privacyAgreement">개인정보 취급방침에 동의합니다.</label>
                 </CheckboxRow>
+
+                <Collapsible>
+                    <CollapsibleSummary>개인정보 수집·이용 안내</CollapsibleSummary>
+                    <PolicyBox role="region" aria-label="개인정보 수집·이용 안내">
+                        <strong>개인정보 수집·이용 안내</strong>
+                        <ul>
+                            <li>수집 항목: 성명, 연락처(휴대전화), 이메일, 문의 제목·내용, 첨부파일(선택), 신청 유형(지사/자격증반)</li>
+                            <li>수집·이용 목적: 상담 신청 확인 및 회신, 서비스 안내, 민원 처리 및 분쟁 대응</li>
+                            <li>보유·이용 기간: 서버 DB에 저장하지 않으며, 접수·회신 등 처리 완료 즉시 서버 내 정보는 파기합니다. 관계 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관 후 파기합니다.</li>
+                            <li>저장 방식: 서버 DB 미저장. 접수된 내용은 내부 메일/업무도구로 전달하여 처리합니다.</li>
+                            <li>동의 거부 권리 및 불이익: 동의를 거부할 권리가 있으나, 미동의 시 상담 접수 및 응대가 제한될 수 있습니다.</li>
+                            <li>제3자 제공/처리위탁: 제3자에게 제공하지 않으며, 위탁이 필요한 경우 사전에 고지하고 동의를 받습니다.</li>
+                            <li>자동 수집 정보: 보안 목적의 시스템 접근 로그 등은 법령에 따라 일정 기간 보관될 수 있습니다.</li>
+                            <li>개인정보 처리 책임자/문의: 운영기관 {CONTACT_INFO.operator}, 문의 {CONTACT_INFO.phone} / {CONTACT_INFO.email}</li>
+                        </ul>
+                    </PolicyBox>
+                </Collapsible>
 
                 {status.message && (
                     <StatusMessage data-variant={status.type}>{status.message}</StatusMessage>

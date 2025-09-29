@@ -6,4 +6,23 @@ import { fileURLToPath } from 'node:url'
 export default defineConfig({
   plugins: [react()],
   envDir: fileURLToPath(new URL('.', import.meta.url)),
+  server: {
+    proxy: {
+      // API 요청을 백엔드로 프록시 → 쿠키 SameSite=Lax로도 동작
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      // OAuth 시작 URL만 프록시 (콜백 '/oauth2/callback'은 SPA 라우팅으로 FE가 처리해야 함)
+      '/oauth2/authorization': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      // 업로드 정적 파일 프록시 (썸네일/첨부 이미지)
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 })

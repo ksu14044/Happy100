@@ -21,7 +21,7 @@ import {
     DangerBtn,
 } from "../WritePage/style"; // 작성 페이지 스타일 재사용
 import { TitleText, MetaBar, ContentWrap, BackBar, SecondaryBtn } from "./style";
-import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
+import { useGetUserInfoQuery } from "../../queries/userQuery";
 
 function humanFileSize(bytes) {
     if (typeof bytes !== "number" || Number.isNaN(bytes)) return "";
@@ -64,10 +64,8 @@ export default function PostDetail() {
     const deletePost = useDeletePostMutation();
     const isDeleting = deletePost.isPending;
 
-    const token = localStorage.getItem("auth_token");
-    const payload = token ? decodeJwtPayload(token) : null;
-    // 요구사항: payload에는 role:"ROLE_ADMIN"으로 들어있음
-    const isAdmin = payload?.role === "ROLE_ADMIN";
+    const { data: user } = useGetUserInfoQuery();
+    const isAdmin = user?.role === "ROLE_ADMIN";
 
     // contentJson 파싱 (ckeditor5 저장 구조 { html, ... } 또는 순수 HTML 문자열 모두 대응)
     const html = useMemo(() => {

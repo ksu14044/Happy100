@@ -1,6 +1,7 @@
 package com.Happy100BE.Happy100.security.filter;
 
 import com.Happy100BE.Happy100.security.jwt.JwtService;
+import com.Happy100BE.Happy100.security.jwt.TokenCookieUtil;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
@@ -30,27 +31,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenCookieUtil tokenCookieUtil;
 
     @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest request,
                                     @Nonnull HttpServletResponse response,
                                     @Nonnull FilterChain chain) throws ServletException, IOException {
 
-        // 이미 인증된 요청은 패스
+        // 기존 인증 존재 여부 확인(세션 기반 OAuth2 등)
         Authentication existing = SecurityContextHolder.getContext().getAuthentication();
-        if (existing != null && existing.isAuthenticated()
-                && !(existing instanceof AnonymousAuthenticationToken)) {
-            chain.doFilter(request, response);
-            return;
-        }
 
+        String token = null;
+
+        // 1) 우선 Authorization: Bearer 헤더 시도 (기존 호환)
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            token = authHeader.substring(BEARER_PREFIX.length());
+        }
+
+        // 2) 없으면 HttpOnly 쿠키에서 조회 (권장 방식)
+        if (token == null) {
+            token = tokenCookieUtil.resolveTokenFromRequest(request);
+        }
+
+        if (token == null) {
+            // 토큰이 전혀 없으면 기존 인증 상태 유지
             chain.doFilter(request, response);
             return;
         }
-
-        final String token = authHeader.substring(BEARER_PREFIX.length());
 
         String username;
         try {

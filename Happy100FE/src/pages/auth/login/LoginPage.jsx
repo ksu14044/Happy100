@@ -31,6 +31,7 @@ import {
     ModalPrimaryButton,
 } from "./style";
 import { Link, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
     loginApi,
     findUsernameByEmail,
@@ -42,10 +43,13 @@ import googleLogo from "../../../assets/images/google-logo.png";
 import naverLogo from "../../../assets/images/naver-logo.svg";
 import kakaoLogo from "../../../assets/images/kakao-logo.svg";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+const API_BASE_URL = import.meta.env.DEV
+    ? "" // dev: Vite proxy 사용 → 동일 오리진 경로로 이동
+    : (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [form, setForm] = useState({ username: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState("");
@@ -76,8 +80,15 @@ export default function LoginPage() {
         setErr("");
         setLoading(true);
         try {
-            await loginApi(form);      // 토큰 저장까지 수행됨
-            navigate("/");                  // 성공 후 이동
+            const data = await loginApi(form);      // 서버가 쿠키로 세션 설정
+            try {
+                if (data) {
+                    const preview = { name: data?.name || data?.username || '회원', role: 'ROLE_USER' };
+                    localStorage.setItem('user_preview', JSON.stringify(preview));
+                }
+            } catch {}
+            await queryClient.invalidateQueries({ queryKey: ['user','me'] });
+            navigate("/");            // 성공 후 이동
         } catch (e) {
             setErr(e?.response?.data?.message || e.message || "로그인 실패");
             console.error(e);
@@ -239,12 +250,11 @@ export default function LoginPage() {
     };
 
     const handleOAuthLogin = (provider) => {
-        if (!API_BASE_URL) {
-            setErr("API 서버 주소가 설정되지 않았습니다. .env 값을 확인하세요.");
-            return;
-        }
         const providerPath = provider.toLowerCase();
-        window.location.href = `${API_BASE_URL}/oauth2/authorization/${providerPath}`;
+        // dev: Vite proxy('/oauth2')를 통해 동일 오리진 상대 경로 사용
+        // prod: VITE_API_BASE_URL 기반 절대 경로 사용
+        const base = API_BASE_URL || "";
+        window.location.href = `${base}/oauth2/authorization/${providerPath}`;
     };
 
     return (

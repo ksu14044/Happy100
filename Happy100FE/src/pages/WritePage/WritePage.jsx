@@ -29,7 +29,7 @@ import {
     useUpdatePostMutation,
 } from "../../mutations/postMutation";
 import { toAttachmentRequests } from "../../apis/postApi";
-import { tokenStorage } from "../../libs/authStorage";
+// 쿠키 기반 인증으로 전환: 토큰 저장 불필요
 import { useGetPostByIdQuery } from "../../queries/postQuery";
 
 // 섹션 → 보드 타입 매핑 (백엔드 ENUM과 맞추세요)
@@ -46,7 +46,9 @@ const REDIRECT_PATH = {
     shop: "/shop/list",
 };
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = import.meta.env.DEV
+    ? ""
+    : (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/files` : "/api/files";
 
 function resolveFileUrl(urlOrPath) {
@@ -56,23 +58,14 @@ function resolveFileUrl(urlOrPath) {
     return `${base}${urlOrPath.startsWith("/") ? "" : "/"}${urlOrPath}`;
 }
 
-function buildAuthHeaders() {
-    const headers = {};
-    const stored = typeof tokenStorage !== "undefined" ? tokenStorage.load?.() : null;
-    const token = stored?.accessToken || localStorage.getItem("accessToken");
-    if (token) {
-        const scheme = stored?.tokenType || "Bearer";
-        headers["Authorization"] = `${scheme} ${token}`;
-    }
-    return headers;
-}
+// 쿠키 전송이 필요한 fetch 옵션만 설정
 
 async function uploadAttachment(file) {
     const form = new FormData();
     form.append("file", file);
     const res = await fetch(FILE_UPLOAD_ENDPOINT, {
         method: "POST",
-        headers: buildAuthHeaders(),
+        credentials: 'include',
         body: form,
     });
     if (!res.ok) throw new Error((await res.text()) || "첨부파일 업로드에 실패했습니다.");
@@ -122,12 +115,10 @@ class MyUploadAdapter {
         const form = new FormData();
         form.append("file", file);
 
-        const headers = buildAuthHeaders();
-
         const res = await fetch(FILE_UPLOAD_ENDPOINT, {
             method: "POST",
             body: form,
-            headers,
+            credentials: 'include',
         });
         if (!res.ok) {
             const msg = await res.text();

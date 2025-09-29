@@ -36,6 +36,11 @@ export const Bar = styled.div`
   gap: 24px;
   min-height: 76px;
 
+  ${mediaQuery.desktop} {
+    gap: 16px;
+    min-height: 70px;
+  }
+
   ${mediaQuery.mobile} {
     gap: 16px;
     min-height: 64px;
@@ -61,6 +66,12 @@ export const LogoImg = styled.img`
   object-fit: cover;
   background: #fff;
   border: 1px solid rgba(148, 163, 184, 0.35);
+
+  ${mediaQuery.desktop} {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+  }
 
   ${mediaQuery.mobile} {
     width: 46px;
@@ -89,13 +100,18 @@ export const Tagline = styled('span', forwardShow)`
   font-size: 12px;
   color: var(--color-muted);
   font-weight: 500;
+
+  ${mediaQuery.desktop} {
+    display: none;
+  }
 `;
 
 export const DesktopNav = styled.nav`
   display: none;
   flex: 1 1 auto;
 
-  ${mediaQueryUp.tablet} {
+  /* 1025px 이상에서만 데스크톱 내비 노출 */
+  @media (min-width: 1025px) {
     display: flex;
     justify-content: center;
   }
@@ -105,6 +121,10 @@ export const NavList = styled.ul`
   display: flex;
   align-items: center;
   gap: clamp(18px, 4vw, 34px);
+
+  ${mediaQuery.desktop} {
+    gap: clamp(12px, 2.8vw, 22px);
+  }
 `;
 
 export const NavItem = styled.li`
@@ -151,6 +171,11 @@ export const NavLink = styled('a', forwardActive)`
   &:hover::after {
     width: 70%;
     opacity: 1;
+  }
+
+  ${mediaQuery.desktop} {
+    padding: 12px 0;
+    font-size: 15px;
   }
 `;
 
@@ -208,7 +233,8 @@ export const RightArea = styled.div`
   align-items: center;
   gap: 12px;
 
-  ${mediaQueryUp.tablet} {
+  /* 1025px 이상에서만 우측 액션 노출 */
+  @media (min-width: 1025px) {
     display: inline-flex;
   }
 `;
@@ -221,6 +247,10 @@ export const UserName = styled.span`
   font-size: 14px;
   font-weight: 600;
   color: var(--color-muted);
+
+  ${mediaQuery.desktop} {
+    display: none;
+  }
 `;
 
 export const LogoutBtn = styled.button`
@@ -236,6 +266,11 @@ export const LogoutBtn = styled.button`
   &:hover {
     background: rgba(37, 99, 235, 0.08);
     border-color: rgba(37, 99, 235, 0.38);
+  }
+
+  ${mediaQuery.desktop} {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 `;
 
@@ -268,6 +303,11 @@ export const AuthLink = styled.a`
       filter: brightness(0.98);
     }
   }
+
+  ${mediaQuery.desktop} {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 `;
 
 export const CtaLink = styled.a`
@@ -287,6 +327,11 @@ export const CtaLink = styled.a`
     transform: translateY(-1px);
     box-shadow: 0 18px 32px rgba(37, 99, 235, 0.28);
   }
+
+  ${mediaQuery.desktop} {
+    padding: 9px 16px;
+    font-size: 14px;
+  }
 `;
 
 export const MobileBtn = styled.button`
@@ -299,7 +344,8 @@ export const MobileBtn = styled.button`
   background: rgba(255, 255, 255, 0.9);
   color: var(--color-primary);
 
-  ${mediaQueryUp.tablet} {
+  /* 1025px 이상에서는 모바일 버튼 숨김 */
+  @media (min-width: 1025px) {
     display: none;
   }
 `;
@@ -315,7 +361,11 @@ export const MobilePanel = styled.div`
   border: 1px solid rgba(148, 163, 184, 0.25);
   background: #fff;
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  max-height: calc(100vh - 100px);
   animation: ${mobileSlide} 0.22s ease;
 
   nav {
@@ -323,7 +373,8 @@ export const MobilePanel = styled.div`
     flex-direction: column;
   }
 
-  ${mediaQueryUp.tablet} {
+  /* 1025px 이상에서는 모바일 패널 숨김 (태블릿~모바일에서만 표시) */
+  @media (min-width: 1025px) {
     display: none;
   }
 `;

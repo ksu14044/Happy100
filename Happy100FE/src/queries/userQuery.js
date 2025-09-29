@@ -1,11 +1,41 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUserInfoApi, updateNameApi, updateEmailApi, updatePasswordApi, deleteAccountApi } from '../apis/userApi';
+import { getUserInfoApi, getUserInfoApiForced, updateNameApi, updateEmailApi, updatePasswordApi, deleteAccountApi } from '../apis/userApi';
 
 // 사용자 정보 조회 쿼리
 export const useGetUserInfoQuery = () => {
+  const enabled = typeof window !== 'undefined' && sessionStorage.getItem('has_session') === '1';
+  const initial = (() => {
+    if (typeof window === 'undefined') return undefined;
+    try {
+      const raw = localStorage.getItem('user_preview');
+      return raw ? JSON.parse(raw) : undefined;
+    } catch { return undefined; }
+  })();
   return useQuery({
     queryKey: ['user', 'me'],
-    queryFn: () => getUserInfoApi(),
+    queryFn: () => getUserInfoApi(), // 401도 null로 반환되므로 에러 아님
+    enabled,
+    staleTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+    initialData: initial,
+    onSuccess: (data) => {
+      try {
+        if (data) localStorage.setItem('user_preview', JSON.stringify({ name: data.name || data.username || '회원', role: data.role || 'ROLE_USER' }));
+        else localStorage.removeItem('user_preview');
+      } catch {}
+    },
+  });
+};
+
+// 보호 페이지 등에서 강제로 사용자 정보를 확인할 때 사용
+export const useGetUserInfoQueryForce = () => {
+  return useQuery({
+    queryKey: ['user', 'me', 'force'],
+    queryFn: () => getUserInfoApiForced(),
+    staleTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };
 

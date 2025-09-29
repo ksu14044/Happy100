@@ -26,7 +26,9 @@ import defaultProduct from "../../assets/images/default-product.svg";
 
 const BOARD_TYPE = "SHOP";
 const PAGE_SIZE = 9;
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_BASE_URL = import.meta.env.DEV
+  ? ""
+  : (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const SEVEN_DAYS_MS =  24 * 60 * 60 * 1000;
 
 const SEARCH_OPTIONS = [
@@ -45,14 +47,17 @@ function toAbsoluteUrl(input) {
     if (/^data:/i.test(input)) return input;
     if (/^https?:\/\//i.test(input)) return input;
 
-    const normalizedPath = input.startsWith("/uploads/")
-        ? input
-        : `/uploads/${input.replace(/^\/+/g, "")}`;
+    // 경로 정규화
+    let p = String(input).replace(/\\/g, '/').trim();
+    if (!p.startsWith('/')) p = `/${p}`;
 
-    if (API_BASE_URL) {
-        return `${API_BASE_URL}${normalizedPath}`;
+    // 이미지가 /api 다운로드 엔드포인트를 가리키면 브라우저에서 표시가 깨질 수 있음.
+    // 업로드 스토리지 경로를 우선 사용하도록 시도: '/uploads' 프리픽스를 보정.
+    if (!p.startsWith('/api/') && !p.startsWith('/uploads/')) {
+        p = `/uploads${p}`;
     }
-    return normalizedPath;
+
+    return API_BASE_URL ? `${API_BASE_URL}${p}` : p;
 }
 
 function tryParseJson(value) {
@@ -120,6 +125,14 @@ function pickThumbnail(post) {
     const attachments = Array.isArray(post?.attachments) ? [...post.attachments] : [];
     attachments.sort((a, b) => (a?.sortOrder ?? 0) - (b?.sortOrder ?? 0));
 
+    // 1) 본문 내 임베디드 이미지 우선
+    const html = extractHtml(post?.contentJson);
+    const embeddedImage = extractFirstImageFromHtml(html);
+    if (embeddedImage) {
+        return toAbsoluteUrl(embeddedImage);
+    }
+
+    // 2) 첨부 이미지로 대체
     const imageAttachment = attachments.find((att) => {
         if (!att) return false;
         const mime = (att.mimeType || "").toLowerCase();
@@ -131,12 +144,6 @@ function pickThumbnail(post) {
 
     if (imageAttachment) {
         return toAbsoluteUrl(imageAttachment.filePath);
-    }
-
-    const html = extractHtml(post?.contentJson);
-    const embeddedImage = extractFirstImageFromHtml(html);
-    if (embeddedImage) {
-        return toAbsoluteUrl(embeddedImage);
     }
 
     return defaultProduct;
@@ -317,7 +324,17 @@ export default function ShopListPage() {
                                 onClick={() => handleNavigate(post.postId)}
                             >
                                 <Thumbnail>
-                                    <img src={thumbnail} alt={post.title || "상품 이미지"} loading="lazy" />
+                                    <img
+                                        src={thumbnail}
+                                        alt={post.title || "상품 이미지"}
+                                        loading="lazy"
+                                        onError={(e) => {
+                                            if (e.currentTarget.dataset.fallback !== '1') {
+                                                e.currentTarget.dataset.fallback = '1';
+                                                e.currentTarget.src = defaultProduct;
+                                            }
+                                        }}
+                                    />
                                 </Thumbnail>
                                 <Info>
                                     <Title>

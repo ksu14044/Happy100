@@ -129,6 +129,67 @@ export const CheckboxRow = styled.div`
   }
 `;
 
+export const PolicyBox = styled.div`
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #334155;
+  font-size: ${responsiveFont('12px', '13px')};
+  line-height: 1.7;
+
+  strong {
+    color: #0f172a;
+  }
+
+  ul {
+    margin: 8px 0 0 16px;
+    padding: 0;
+  }
+
+  li {
+    list-style: disc;
+    margin: 4px 0;
+  }
+`;
+
+export const Collapsible = styled.details`
+  margin-top: 6px;
+`;
+
+export const CollapsibleSummary = styled.summary`
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #0f172a;
+  font-weight: 700;
+  font-size: ${responsiveFont('13px', '14px')};
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::after {
+    content: '▾';
+    font-size: 14px;
+    color: #334155;
+    transform: rotate(0deg);
+    transition: transform 0.18s ease;
+  }
+
+  /* rotate icon when open */
+  details[open] &::after {
+    transform: rotate(-180deg);
+  }
+`;
+
 export const SubmitButton = styled.button`
   align-self: flex-end;
   padding: 14px 32px;

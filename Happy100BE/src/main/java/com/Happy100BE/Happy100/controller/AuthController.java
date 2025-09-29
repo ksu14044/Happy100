@@ -12,6 +12,8 @@ import com.Happy100BE.Happy100.dto.response.PasswordResetVerifyResponse;
 import com.Happy100BE.Happy100.dto.response.SimpleOkResponse;
 import com.Happy100BE.Happy100.dto.response.UserResponseDto;
 import com.Happy100BE.Happy100.security.jwt.JwtService;
+import com.Happy100BE.Happy100.security.jwt.JwtProperties;
+import com.Happy100BE.Happy100.security.jwt.TokenCookieUtil;
 import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 import com.Happy100BE.Happy100.service.PasswordFindService;
 import com.Happy100BE.Happy100.service.UserService;
@@ -39,6 +41,8 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final JwtProperties jwtProperties;
+    private final TokenCookieUtil tokenCookieUtil;
     private final PasswordFindService passwordFindService;
 
     @Operation(summary = "회원가입")
@@ -72,7 +76,7 @@ public class AuthController {
         );
     }
 
-    @Operation(summary = "로그인", description = "로그인 성공 시 액세스 토큰을 발급합니다.")
+    @Operation(summary = "로그인", description = "로그인 성공 시 액세스 토큰을 HttpOnly 쿠키로 설정합니다.")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
@@ -85,11 +89,19 @@ public class AuthController {
             // JwtService 시그니처: generateToken(String username, String role)
             String accessToken = jwtService.generateToken(principal.getUsername(), principal.getAuthorities()
                     .iterator().next().getAuthority());
-            
+
+            long expiresIn = jwtProperties.accessTokenValiditySeconds();
+
+            // 액세스 토큰을 HttpOnly 쿠키로 설정
+            var cookie = tokenCookieUtil.buildAccessTokenCookie(accessToken, expiresIn);
+
             String name = userService.getMyInfo(principal.getUsername()).getName();
 
-            // 만료시간은 application-secret.yml의 access-token-validity-seconds(=3600)와 일치하도록 반환
-            return ResponseEntity.ok(new LoginResponse(accessToken, "Bearer", 3600, name));
+            // 호환성을 위해 기존 응답 포맷은 유지하되
+            // 프론트에서는 더 이상 localStorage를 사용하지 않고 쿠키 기반 인증을 사용하도록 전환한다.
+            return ResponseEntity.ok()
+                    .header("Set-Cookie", cookie.toString())
+                    .body(new LoginResponse(accessToken, "Bearer", expiresIn, name));
         } catch (DisabledException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ErrorResponse.of(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."));

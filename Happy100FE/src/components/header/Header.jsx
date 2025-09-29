@@ -6,10 +6,9 @@ import {
     MobileBtn, MobilePanel, MobileItem, SrOnly, LogoSvg,
     RightArea, AuthLink, UserArea, UserName, LogoutBtn, CtaLink,
 } from "./style";
-// [ADDED] 토큰 저장소에서 로그인 상태 읽기/지우기
-import { tokenStorage } from "../../libs/authStorage";
-import { decodeJwtPayload } from "../../libs/decoddecodeJwtPayload";
 import { logout as requestLogout } from "../../apis/authApi";
+import { useGetUserInfoQuery } from "../../queries/userQuery";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Header({
     navItems,
@@ -70,49 +69,22 @@ export default function Header({
         [navItems]
     );
 
-    const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
     const [openIdx, setOpenIdx] = useState(null); // 드롭다운 열린 인덱스
     const navRef = useRef(null);
 
-    // [CHANGED] 초기 로그인 상태를 load()로 반영
-    const [auth, setAuth] = useState(() => tokenStorage.load());
-    // [ADDED] 다른 탭 변경/로그인 완료 후 헤더 갱신
-    useEffect(() => {
-        const onStorage = (e) => {
-            if (e.key === "auth_token") setAuth(tokenStorage.load());
-        };
-        window.addEventListener("storage", onStorage);
-        return () => window.removeEventListener("storage", onStorage);
-    }, []);
-    useEffect(() => {
-        const unsub = tokenStorage.subscribe(setAuth);
-        // cross-tab 반영: storage 이벤트도 유지
-        const onStorage = (e) => {
-            if (e.key === "auth_token") setAuth(tokenStorage.load());
-        };
-        window.addEventListener("storage", onStorage);
-        return () => {
-            unsub();
-            window.removeEventListener("storage", onStorage);
-        };
-    }, []);
-
-    // JWT 토큰에서 사용자 정보 추출
+    // 쿠키 기반 인증: 현재 사용자 정보 조회
+    const { data: user, refetch } = useGetUserInfoQuery();
     const userInfo = useMemo(() => {
-        if (auth?.accessToken) {
-            const decoded = decodeJwtPayload(auth.accessToken);
-            console.log('Decoded token:', decoded);
-            return {
-                name: decoded?.name || auth?.user || "회원",
-                role: decoded?.role || "ROLE_USER"
-            };
+        if (user && typeof user === 'object') {
+            return { name: user.name || user.username || '회원', role: user.role || 'ROLE_USER' };
         }
-        return { name: "회원", role: "ROLE_USER" };
-    }, [auth?.accessToken, auth?.user]);
+        return null;
+    }, [user]);
     
     // 표시용 이름과 관리자 권한 계산
-    const displayName = userInfo.name;
-    const isAdmin = userInfo.role === "ROLE_ADMIN";
+    const displayName = userInfo?.name ?? "회원";
+    const isAdmin = userInfo?.role === "ROLE_ADMIN";
 
 
 
@@ -131,14 +103,28 @@ export default function Header({
     );
 
     // [ADDED] 로그아웃
+    const queryClient = useQueryClient();
     const onLogout = useCallback(async () => {
         await requestLogout();
+        // 즉시 UI 반영: 캐시를 비우고 무효화
+        queryClient.setQueryData(['user','me'], null);
+        await queryClient.invalidateQueries({ queryKey: ['user','me'] });
         if (onNavigate) onNavigate("/");
-    }, [onNavigate]);
+    }, [onNavigate, queryClient]);
 
     const [logoFailed, setLogoFailed] = useState(false);
-    const resolvedLogoSrc = logoSrc ?? import.meta.env.VITE_BRAND_LOGO_URL ?? "/assets/happy100-logo.jpg";
-    const showImageLogo = resolvedLogoSrc && !logoFailed;
+  const resolvedLogoSrc = logoSrc ?? import.meta.env.VITE_BRAND_LOGO_URL ?? "/assets/happy100-logo.jpg";
+  const showImageLogo = resolvedLogoSrc && !logoFailed;
+
+  // Lock body scroll while mobile menu is open so only the menu panel scrolls
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
 
     return (
         <HeaderWrap sticky={sticky} className={className}>
@@ -224,7 +210,7 @@ export default function Header({
                     </DesktopNav>
 
                     {/* 데스크톱 우측 */}
-                    {auth?.accessToken ? (
+                    {userInfo ? (
                         <UserArea>
                             <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
                                 상담 신청
@@ -275,7 +261,7 @@ export default function Header({
                     <MobilePanel id="mobile-menu">
                         <nav>
                             {/* [ADDED] 모바일 상단에 로그인 상태에 따른 액션 */}
-                            {auth?.accessToken ? (
+                            {userInfo ? (
                                 <React.Fragment>
                                     <MobileItem as="div" style={{ fontWeight: 700, cursor: "default" }}>
                                         {displayName}님

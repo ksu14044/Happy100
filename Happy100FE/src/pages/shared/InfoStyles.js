@@ -150,7 +150,9 @@ export const TimelineBadge = styled.span`
 `;
 
 export const TableWrap = styled.div`
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   border-radius: 24px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: 0 22px 44px rgba(15, 23, 42, 0.08);
@@ -158,6 +160,7 @@ export const TableWrap = styled.div`
 
 export const InfoTable = styled.table`
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
   background: #fff;
   font-size: 15px;
@@ -171,6 +174,15 @@ export const InfoTable = styled.table`
     padding: clamp(18px, 3vw, 24px);
     text-align: left;
     border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  td {
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    color: #334155;
   }
 
   tbody tr:last-of-type td {
@@ -179,5 +191,54 @@ export const InfoTable = styled.table`
 
   ${mediaQuery.mobile} {
     font-size: 14px;
+    th, td {
+      padding: 14px;
+    }
+  }
+
+  &[data-variant='cards'] {
+    ${mediaQuery.mobile} {
+      min-width: 0;
+      width: 100%;
+
+      thead {
+        display: none;
+      }
+
+      tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      tr {
+        display: block;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        background: #fff;
+        overflow: hidden;
+      }
+
+      td, th {
+        display: grid;
+        grid-template-columns: 104px 1fr;
+        gap: 8px;
+        align-items: start;
+        border: none;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      tr > :last-child {
+        border-bottom: none;
+      }
+
+      td::before, th::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #0f172a;
+        white-space: nowrap;
+      }
+    }
   }
 `;

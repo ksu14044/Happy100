@@ -11,6 +11,7 @@ import WritePage from './pages/WritePage/WritePage.jsx';
 import PostDetail from './pages/PostDetail/PostDetail.jsx';
 import LoginPage from './pages/auth/login/LoginPage.jsx';
 import OAuthCallbackPage from './pages/auth/oauth/OAuthCallbackPage.jsx';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage.jsx';
 import CounselPage from './pages/CounselPage/CounselPage.jsx';
 import ShopListPage from './pages/ShopListPage/ShopListPage.jsx';
 import OverviewMapPage from './pages/OverviewMapPage/OverviewMapPage.jsx';
@@ -74,11 +75,13 @@ export default function App() {
           <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><UsersManagementPage /></AdminRoute>} />
           <Route path="/admin/posts" element={<AdminRoute><PostsManagementPage /></AdminRoute>} />
-          {/* 게시판 라우트 */}
-          <Route path="/:section/write" element={<WritePage />} />
-          <Route path="/:section/edit/:postId" element={<WritePage />} />
+          {/* 게시판 라우트 (관리자 전용) */}
+          <Route path="/:section/write" element={<AdminRoute><WritePage /></AdminRoute>} />
+          <Route path="/:section/edit/:postId" element={<AdminRoute><WritePage /></AdminRoute>} />
           <Route path="/:section/:key/:postId" element={<PostDetail />} />
           <Route path="/:section/:key" element={<BoardListPage />} />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Main>
       <Footer />

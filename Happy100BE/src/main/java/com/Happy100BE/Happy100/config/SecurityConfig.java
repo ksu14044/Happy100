@@ -44,6 +44,7 @@ public class SecurityConfig {
         private final AuthenticationSuccessHandler oAuth2SuccessHandler;
         private final AuthenticationFailureHandler oAuth2FailureHandler;
         private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
+        private final com.Happy100BE.Happy100.security.jwt.TokenCookieUtil tokenCookieUtil;
 
         @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
         private String corsAllowedOrigins;
@@ -75,6 +76,9 @@ public class SecurityConfig {
                                                                 "/uploads/**")
                                                 .permitAll()
 
+                                                // 인증 여부 확인용 me 엔드포인트는 항상 통과(컨트롤러에서 비인증 시 빈 응답)
+                                                .requestMatchers(HttpMethod.GET, "/api/users/me").permitAll()
+
                                                 // 관리자
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
@@ -92,7 +96,12 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutUrl("/api/auth/logout")
                                                 .deleteCookies("access_token", "refresh_token")
-                                                .logoutSuccessHandler((req, res, auth) -> res.setStatus(204)))
+                                                .logoutSuccessHandler((req, res, auth) -> {
+                                                        // 도메인/경로 특성에 맞춘 삭제 쿠키도 함께 내려 신뢰도 향상
+                                                        var del = tokenCookieUtil.buildDeleteCookie();
+                                                        res.addHeader("Set-Cookie", del.toString());
+                                                        res.setStatus(204);
+                                                }))
 
                                 .authenticationProvider(authenticationProvider())
 

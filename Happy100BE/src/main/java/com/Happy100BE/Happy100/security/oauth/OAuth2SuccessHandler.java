@@ -2,6 +2,7 @@ package com.Happy100BE.Happy100.security.oauth;
 
 import com.Happy100BE.Happy100.security.jwt.JwtProperties;
 import com.Happy100BE.Happy100.security.jwt.JwtService;
+import com.Happy100BE.Happy100.security.jwt.TokenCookieUtil;
 import com.Happy100BE.Happy100.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserService userService;
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
+    private final TokenCookieUtil tokenCookieUtil;
 
     @Value("${react.server.protocol:http}")
     private String reactProtocol;
@@ -99,11 +101,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtService.generateToken(username, role);
         long expiresIn = jwtProperties.accessTokenValiditySeconds();
 
+        // 액세스 토큰을 HttpOnly 쿠키로 설정하고 토큰은 쿼리에 노출하지 않는다.
+        var cookie = tokenCookieUtil.buildAccessTokenCookie(accessToken, expiresIn);
+        response.addHeader("Set-Cookie", cookie.toString());
+
         String redirectUri = UriComponentsBuilder.fromHttpUrl(buildFrontendBaseUrl())
                 .path(normalizePath(reactCallbackPath))
-                .queryParam("accessToken", accessToken)
-                .queryParam("tokenType", "Bearer")
-                .queryParam("expiresIn", expiresIn)
                 .queryParam("username", username)
                 .build()
                 .encode(StandardCharsets.UTF_8)

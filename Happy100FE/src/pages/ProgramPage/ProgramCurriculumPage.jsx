@@ -41,7 +41,7 @@ export default function ProgramCurriculumPage() {
           <Lead>{CURRICULUM_GUIDE.description}</Lead>
         </SectionHeader>
         <TableWrap>
-          <InfoTable>
+          <InfoTable data-variant="cards">
             <thead>
               <tr>
                 <th scope="col">과정명</th>
@@ -53,10 +53,10 @@ export default function ProgramCurriculumPage() {
             <tbody>
               {CURRICULUM_GUIDE.programs.map((program) => (
                 <tr key={program.name}>
-                  <td>{program.name}</td>
-                  <td>{program.summary}</td>
-                  <td>{program.duration}</td>
-                  <td>{program.target}</td>
+                  <td data-label="과정명">{program.name}</td>
+                  <td data-label="주요 내용">{program.summary}</td>
+                  <td data-label="교육 시간">{program.duration}</td>
+                  <td data-label="대상">{program.target}</td>
                 </tr>
               ))}
             </tbody>
