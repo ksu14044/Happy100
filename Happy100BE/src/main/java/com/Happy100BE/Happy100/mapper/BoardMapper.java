@@ -19,7 +19,8 @@ public interface BoardMapper {
             @Param("limit") int limit,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword,
-            @Param("sort") String sort);
+            @Param("sort") String sort,
+            @Param("useFulltext") boolean useFulltext);
     int updatePost(BoardPost post);
     int softDeletePost(@Param("postId") Long postId);
     int increaseViewCount(@Param("postId") Long postId);
@@ -29,9 +30,12 @@ public interface BoardMapper {
     List<BoardAttachment> selectAttachments(@Param("postId") Long postId);
     BoardAttachment selectAttachmentById(@Param("attachmentId") Long attachmentId);
     int deleteAttachmentsByPost(@Param("postId") Long postId);
+    // 다건 첨부 일괄 조회
+    java.util.List<com.Happy100BE.Happy100.entity.BoardAttachment> selectAttachmentsByPostIds(@Param("postIds") java.util.List<Long> postIds);
     int existsEnabledBoardType(@org.apache.ibatis.annotations.Param("typeKey") String typeKey);
     int countPostsByBoardType(@Param("boardType") String boardType);
     int countPostList(@Param("boardType") String boardType,
                       @Param("searchType") String searchType,
-                      @Param("keyword") String keyword);
+                      @Param("keyword") String keyword,
+                      @Param("useFulltext") boolean useFulltext);
 }

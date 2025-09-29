@@ -19,8 +19,6 @@ public class OAuth2EnvProbe {
         // 실제 프로세스 환경변수에서 바로 읽어 확인합니다.
         String clientId = env.getProperty("OAUTH_GOOGLE_CLIENT_ID", "");
         String clientSecret = env.getProperty("OAUTH_GOOGLE_CLIENT_SECRET", "");
-        System.out.println(clientId);
-        System.out.println(clientSecret);
         int idLen = clientId != null ? clientId.length() : 0;
         int secLen = clientSecret != null ? clientSecret.length() : 0;
 

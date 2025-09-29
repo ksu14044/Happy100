@@ -114,12 +114,22 @@
     <if test="keyword != null and keyword != ''">
       WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(#{keyword}), '%')
     </if>
+    <!-- 안전한 정렬: 허용된 컬럼/방향만 매핑 -->
     <choose>
-      <when test="orderBy != null and orderBy != ''">
-        ORDER BY ${orderBy}
+      <when test="orderBy == 'created_at DESC'">
+        ORDER BY u.created_at DESC
+      </when>
+      <when test="orderBy == 'created_at ASC'">
+        ORDER BY u.created_at ASC
+      </when>
+      <when test="orderBy == 'username DESC'">
+        ORDER BY u.username DESC
+      </when>
+      <when test="orderBy == 'username ASC'">
+        ORDER BY u.username ASC
       </when>
       <otherwise>
-        ORDER BY created_at DESC
+        ORDER BY u.created_at DESC
       </otherwise>
     </choose>
     LIMIT #{limit} OFFSET #{offset}

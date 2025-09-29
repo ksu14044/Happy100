@@ -43,17 +43,36 @@
       </if>
       <if test="keyword != null and keyword != ''">
         <choose>
-          <when test="searchType == 'TITLE'">
-            AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+          <!-- FULLTEXT 사용 시 -->
+          <when test="useFulltext">
+            <choose>
+              <when test="searchType == 'TITLE'">
+                AND MATCH(title) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </when>
+              <when test="searchType == 'CONTENT'">
+                AND MATCH(content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </when>
+              <otherwise>
+                AND MATCH(title, content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </otherwise>
+            </choose>
           </when>
-          <when test="searchType == 'CONTENT'">
-            AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
-          </when>
+          <!-- 기본 LIKE 검색 -->
           <otherwise>
-            AND (
-              LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
-              OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
-            )
+            <choose>
+              <when test="searchType == 'TITLE'">
+                AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+              </when>
+              <when test="searchType == 'CONTENT'">
+                AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+              </when>
+              <otherwise>
+                AND (
+                  LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+                  OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+                )
+              </otherwise>
+            </choose>
           </otherwise>
         </choose>
       </if>
@@ -122,6 +141,19 @@
     ORDER BY sort_order ASC, attachment_id ASC
   </select>
 
+  <!-- 여러 게시글의 첨부파일을 한 번에 조회하여 N+1 문제 완화 -->
+  <select id="selectAttachmentsByPostIds" resultMap="BoardAttachmentMap">
+    SELECT
+      attachment_id, post_id, attachment_type, file_name, file_path,
+      file_size, mime_type, sort_order, created_at
+    FROM board_attachment
+    WHERE post_id IN
+    <foreach collection="postIds" item="pid" open="(" separator="," close=")">
+      #{pid}
+    </foreach>
+    ORDER BY post_id ASC, sort_order ASC, attachment_id ASC
+  </select>
+
   <select id="selectAttachmentById" resultMap="BoardAttachmentMap">
     SELECT
       attachment_id, post_id, attachment_type, file_name, file_path,
@@ -149,17 +181,34 @@
       </if>
       <if test="keyword != null and keyword != ''">
         <choose>
-          <when test="searchType == 'TITLE'">
-            AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
-          </when>
-          <when test="searchType == 'CONTENT'">
-            AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+          <when test="useFulltext">
+            <choose>
+              <when test="searchType == 'TITLE'">
+                AND MATCH(title) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </when>
+              <when test="searchType == 'CONTENT'">
+                AND MATCH(content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </when>
+              <otherwise>
+                AND MATCH(title, content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+              </otherwise>
+            </choose>
           </when>
           <otherwise>
-            AND (
-              LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
-              OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
-            )
+            <choose>
+              <when test="searchType == 'TITLE'">
+                AND LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+              </when>
+              <when test="searchType == 'CONTENT'">
+                AND LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+              </when>
+              <otherwise>
+                AND (
+                  LOWER(title) LIKE CONCAT('%', #{keyword}, '%')
+                  OR LOWER(COALESCE(content_json, '')) LIKE CONCAT('%', #{keyword}, '%')
+                )
+              </otherwise>
+            </choose>
           </otherwise>
         </choose>
       </if>

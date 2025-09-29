@@ -123,8 +123,6 @@ public class AuthController {
 
     @PostMapping("/request")
     public ResponseEntity<SimpleOkResponse> requestCode(@RequestBody @Valid PasswordFindRequest req) {
-        System.out.println(req.getUsername());
-        System.out.println(req.getEmail());
         passwordFindService.requestVerificationCode(req);
         return ResponseEntity.ok(new SimpleOkResponse("OK"));
     }

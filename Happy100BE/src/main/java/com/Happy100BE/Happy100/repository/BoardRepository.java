@@ -4,6 +4,7 @@ import com.Happy100BE.Happy100.entity.BoardPost;
 import com.Happy100BE.Happy100.entity.BoardAttachment;
 import com.Happy100BE.Happy100.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,6 +14,9 @@ import java.util.List;
 public class BoardRepository {
 
     private final BoardMapper boardMapper;
+
+    @Value("${app.search.use-fulltext:true}")
+    private boolean useFulltext;
 
     public Long insertPost(BoardPost post, List<BoardAttachment> attachments) {
         boardMapper.insertPost(post);
@@ -33,11 +37,16 @@ public class BoardRepository {
                                         String searchType,
                                         String keyword,
                                         String sort) {
-        return boardMapper.selectPostList(boardType, offset, limit, searchType, keyword, sort);
+        return boardMapper.selectPostList(boardType, offset, limit, searchType, keyword, sort, useFulltext);
     }
 
     public List<BoardAttachment> findAttachments(Long postId) {
         return boardMapper.selectAttachments(postId);
+    }
+
+    public java.util.List<BoardAttachment> findAttachmentsByPostIds(java.util.List<Long> postIds) {
+        if (postIds == null || postIds.isEmpty()) return java.util.List.of();
+        return boardMapper.selectAttachmentsByPostIds(postIds);
     }
 
     public BoardAttachment findAttachment(Long attachmentId) {
@@ -72,6 +81,6 @@ public class BoardRepository {
     }
 
     public int countPostList(String boardType, String searchType, String keyword) {
-        return boardMapper.countPostList(boardType, searchType, keyword);
+        return boardMapper.countPostList(boardType, searchType, keyword, useFulltext);
     }
 }

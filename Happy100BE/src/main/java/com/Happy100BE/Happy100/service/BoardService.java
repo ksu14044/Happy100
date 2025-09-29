@@ -50,7 +50,6 @@ public class BoardService {
         post.setTitle(req.getTitle());
         post.setContentJson(req.getContentJson());
         post.setAuthorId(principal.getUserId()); // INT
-        System.out.println(post.getAuthorId());
         List<BoardAttachment> attachments = toAttachmentEntities(null, req.getAttachments());
         return boardRepository.insertPost(post, attachments);
     }
@@ -84,10 +83,21 @@ public class BoardService {
                 ctx.keyword,
                 ctx.sort
         );
+        // 첨부 N+1 방지: 한 번에 조회 후 매핑
+        List<Long> ids = new ArrayList<>();
+        for (BoardPost p : posts) {
+            if (p.getDeletedYn() != null && p.getDeletedYn() == 1) continue;
+            ids.add(p.getPostId());
+        }
+        List<BoardAttachment> allAtts = boardRepository.findAttachmentsByPostIds(ids);
+        java.util.Map<Long, List<BoardAttachment>> grouped = new java.util.HashMap<>();
+        for (BoardAttachment a : allAtts) {
+            grouped.computeIfAbsent(a.getPostId(), k -> new ArrayList<>()).add(a);
+        }
         List<PostResponse> result = new ArrayList<>();
         for (BoardPost p : posts) {
             if (p.getDeletedYn() != null && p.getDeletedYn() == 1) continue;
-            List<BoardAttachment> atts = boardRepository.findAttachments(p.getPostId());
+            List<BoardAttachment> atts = grouped.getOrDefault(p.getPostId(), java.util.List.of());
             result.add(toPostResponse(p, atts));
         }
         return result;
