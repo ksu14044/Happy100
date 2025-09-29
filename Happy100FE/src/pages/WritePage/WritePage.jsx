@@ -2,8 +2,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+// 에디터 래퍼는 가벼워서 정적 import, 본체 빌드만 동적 로딩
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import {
     PageWrap,
     Container,
@@ -170,6 +170,18 @@ export default function WritePage() {
     const { mutate: createPost, isPending: isCreating } = useCreatePostMutation();
     const { mutate: updatePost, isPending: isUpdating } = useUpdatePostMutation();
     const { mutate: deletePost, isPending: isDeleting } = useDeletePostMutation();
+
+    // ClassicEditor 동적 로드 (React.lazy 사용할 수 없음)
+    const [classicEditor, setClassicEditor] = useState(null);
+    useEffect(() => {
+        let mounted = true;
+        import('@ckeditor/ckeditor5-build-classic').then((m) => {
+            if (mounted) setClassicEditor(() => (m.default || m));
+        }).catch((e) => {
+            console.error('CKEditor Classic build load failed', e);
+        });
+        return () => { mounted = false; };
+    }, []);
 
     useEffect(() => {
         if (!isEditMode || !existingPost || initializedRef.current) return;
@@ -464,19 +476,23 @@ export default function WritePage() {
                 <Field>
                     <Label>내용</Label>
                     <EditorWrap>
-                        <CKEditor
-                            editor={ClassicEditor}
-                            data={editorHtml}
-                            config={editorConfig}
-                            onReady={(ed) => {
-                                // 업로드 어댑터 주입
-                                ed.plugins.get("FileRepository").createUploadAdapter = (loader) =>
-                                    new MyUploadAdapter(loader);
-                            }}
-                            onChange={(_, editor) => {
-                                setEditorHtml(editor.getData());
-                            }}
-                        />
+                        {classicEditor ? (
+                            <CKEditor
+                                editor={classicEditor}
+                                data={editorHtml}
+                                config={editorConfig}
+                                onReady={(ed) => {
+                                    // 업로드 어댑터 주입
+                                    ed.plugins.get("FileRepository").createUploadAdapter = (loader) =>
+                                        new MyUploadAdapter(loader);
+                                }}
+                                onChange={(_, editor) => {
+                                    setEditorHtml(editor.getData());
+                                }}
+                            />
+                        ) : (
+                            <div style={{padding: 12}}>에디터를 불러오는 중…</div>
+                        )}
                     </EditorWrap>
                     <Help>
                         이미지: 툴바의 “이미지 업로드”로 올릴 수 있습니다. 동영상: “미디어 삽입” 버튼을 눌러

@@ -77,7 +77,13 @@ export default function Header({
     const { data: user, refetch } = useGetUserInfoQuery();
     const userInfo = useMemo(() => {
         if (user && typeof user === 'object') {
-            return { name: user.name || user.username || '회원', role: user.role || 'ROLE_USER' };
+            // role 우선순위: role -> roleName -> authorities 배열
+            let role = user.role || user.roleName || null;
+            if (!role && Array.isArray(user.authorities)) {
+                const found = user.authorities.find((r) => typeof r === 'string' && r.includes('ROLE_'));
+                role = found || null;
+            }
+            return { name: user.name || user.username || '회원', role: role || 'ROLE_USER' };
         }
         return null;
     }, [user]);

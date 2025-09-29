@@ -3,7 +3,7 @@ import { getUserInfoApi, getUserInfoApiForced, updateNameApi, updateEmailApi, up
 
 // 사용자 정보 조회 쿼리
 export const useGetUserInfoQuery = () => {
-  const enabled = typeof window !== 'undefined' && sessionStorage.getItem('has_session') === '1';
+  // 항상 세션을 확인하되, 401은 null 처리로 에러 전파하지 않음
   const initial = (() => {
     if (typeof window === 'undefined') return undefined;
     try {
@@ -14,14 +14,22 @@ export const useGetUserInfoQuery = () => {
   return useQuery({
     queryKey: ['user', 'me'],
     queryFn: () => getUserInfoApi(), // 401도 null로 반환되므로 에러 아님
-    enabled,
+    enabled: true,
     staleTime: 0,
     retry: false,
     refetchOnWindowFocus: false,
     initialData: initial,
     onSuccess: (data) => {
       try {
-        if (data) localStorage.setItem('user_preview', JSON.stringify({ name: data.name || data.username || '회원', role: data.role || 'ROLE_USER' }));
+        if (data) {
+          let role = data.role || data.roleName || null;
+          if (!role && Array.isArray(data.authorities)) {
+            const found = data.authorities.find((r) => typeof r === 'string' && r.includes('ROLE_'));
+            role = found || null;
+          }
+          const preview = { name: data.name || data.username || '회원', role: role || 'ROLE_USER' };
+          localStorage.setItem('user_preview', JSON.stringify(preview));
+        }
         else localStorage.removeItem('user_preview');
       } catch {}
     },

@@ -6,6 +6,19 @@ import { fileURLToPath } from 'node:url'
 export default defineConfig({
   plugins: [react()],
   envDir: fileURLToPath(new URL('.', import.meta.url)),
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          query: ['@tanstack/react-query'],
+          axios: ['axios'],
+          editor: ['@ckeditor/ckeditor5-build-classic', '@ckeditor/ckeditor5-react'],
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       // API 요청을 백엔드로 프록시 → 쿠키 SameSite=Lax로도 동작

@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { Global } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -7,14 +7,16 @@ import Header from './components/header/Header.jsx';
 import Footer from './components/footer/Footer.jsx';
 import BoardListPage from './pages/BoardListPage/BoardListPage.jsx';
 import SignUpPage from './pages/auth/signup/SignUpPage.jsx';
-import WritePage from './pages/WritePage/WritePage.jsx';
-import PostDetail from './pages/PostDetail/PostDetail.jsx';
 import LoginPage from './pages/auth/login/LoginPage.jsx';
-import OAuthCallbackPage from './pages/auth/oauth/OAuthCallbackPage.jsx';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage.jsx';
 import CounselPage from './pages/CounselPage/CounselPage.jsx';
 import ShopListPage from './pages/ShopListPage/ShopListPage.jsx';
-import OverviewMapPage from './pages/OverviewMapPage/OverviewMapPage.jsx';
+//
+// 무거운 페이지는 동적 로딩으로 초기 번들 축소
+const OAuthCallbackPage = React.lazy(() => import('./pages/auth/oauth/OAuthCallbackPage.jsx'));
+const PostDetail = React.lazy(() => import('./pages/PostDetail/PostDetail.jsx'));
+const WritePage = React.lazy(() => import('./pages/WritePage/WritePage.jsx'));
+const OverviewMapPage = React.lazy(() => import('./pages/OverviewMapPage/OverviewMapPage.jsx'));
 import { globalStyles } from './styles/globalStyles.js';
 import HomePage from './pages/HomePage/HomePage.jsx';
 import OverviewPage from './pages/OverviewPage/OverviewPage.jsx';
@@ -29,7 +31,6 @@ import ProgramFlowPage from './pages/ProgramPage/ProgramFlowPage.jsx';
 import ProgramCurriculumPage from './pages/ProgramPage/ProgramCurriculumPage.jsx';
 import FranchisePage from './pages/FranchisePage/FranchisePage.jsx';
 import MyPage from './pages/MyPage/MyPage.jsx';
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 
 const Main = styled.main`
   flex: 1 1 auto;
@@ -55,6 +56,7 @@ export default function App() {
         showTagline
       />
       <Main>
+        <Suspense fallback={<div style={{minHeight: '40vh', display:'flex',alignItems:'center',justifyContent:'center'}}>불러오는 중…</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/overview" element={<OverviewPage />} />
@@ -83,6 +85,7 @@ export default function App() {
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </Suspense>
       </Main>
       <Footer />
     </>

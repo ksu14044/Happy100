@@ -26,9 +26,14 @@ export default function OAuthCallbackPage() {
                 try {
                     const d = me?.data;
                     if (d) {
+                        let role = d.role || d.roleName || null;
+                        if (!role && Array.isArray(d.authorities)) {
+                            const found = d.authorities.find((r) => typeof r === 'string' && r.includes('ROLE_'));
+                            role = found || null;
+                        }
                         localStorage.setItem('user_preview', JSON.stringify({
                             name: d.name || d.username || '회원',
-                            role: d.role || 'ROLE_USER',
+                            role: role || 'ROLE_USER',
                         }));
                     }
                 } catch {}

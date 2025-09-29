@@ -32,6 +32,7 @@ import {
 } from "./style";
 import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { api } from "../../../configs/axiosConfig";
 import {
     loginApi,
     findUsernameByEmail,
@@ -80,12 +81,18 @@ export default function LoginPage() {
         setErr("");
         setLoading(true);
         try {
-            const data = await loginApi(form);      // 서버가 쿠키로 세션 설정
+            await loginApi(form);      // 서버가 쿠키로 세션 설정
+            // 세션이 생겼으니 실제 사용자 정보로 preview 갱신
             try {
-                if (data) {
-                    const preview = { name: data?.name || data?.username || '회원', role: 'ROLE_USER' };
-                    localStorage.setItem('user_preview', JSON.stringify(preview));
+                const me = await api.get('/api/users/me', { validateStatus: (s) => s === 200 });
+                const d = me?.data || {};
+                let role = d.role || d.roleName || null;
+                if (!role && Array.isArray(d.authorities)) {
+                    const found = d.authorities.find((r) => typeof r === 'string' && r.includes('ROLE_'));
+                    role = found || null;
                 }
+                const preview = { name: d.name || d.username || '회원', role: role || 'ROLE_USER' };
+                localStorage.setItem('user_preview', JSON.stringify(preview));
             } catch {}
             await queryClient.invalidateQueries({ queryKey: ['user','me'] });
             navigate("/");            // 성공 후 이동

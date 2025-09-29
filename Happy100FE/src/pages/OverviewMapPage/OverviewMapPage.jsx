@@ -35,22 +35,24 @@ export default function OverviewMapPage() {
             window.kakao.maps.load(() => initMap());
         };
 
+        // 스크립트가 있는데 kakao.maps가 없는 비정상 상태(HMR/캐시)면 제거 후 재주입
         if (existingScript) {
             if (window.kakao && window.kakao.maps) {
                 handleScriptLoad();
-            } else {
-                existingScript.addEventListener("load", handleScriptLoad, { once: true });
-                existingScript.addEventListener("error", () => {
-                    setStatus({ loading: false, error: "카카오 지도 SDK 스크립트를 불러오지 못했습니다." });
-                }, { once: true });
+                return;
             }
-            return;
+            try {
+                existingScript.parentNode?.removeChild(existingScript);
+            } catch {}
+            // stale 글로벌 제거 시도
+            try { delete window.kakao; } catch { window.kakao = undefined; }
         }
 
         const script = document.createElement("script");
         script.id = KAKAO_SCRIPT_ID;
         script.async = true;
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services`;
+        const cacheBust = import.meta.env.DEV ? `&_=${Date.now()}` : "";
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services${cacheBust}`;
         script.addEventListener("load", handleScriptLoad, { once: true });
         script.addEventListener("error", () => {
             setStatus({ loading: false, error: "카카오 지도 SDK 스크립트를 불러오지 못했습니다." });

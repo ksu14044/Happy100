@@ -24,7 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.md
+# 문서 파일은 추적 대상으로 유지
 
 # Playwright
 e2e/
