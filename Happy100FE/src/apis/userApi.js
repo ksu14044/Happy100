@@ -3,11 +3,11 @@ import { api } from '../configs/axiosConfig';
 // 사용자 정보 조회
 export const getUserInfoApi = async () => {
   const response = await api.get('/api/users/me', {
-    // 401(비로그인)도 예외로 처리하지 않고 정상 흐름으로 받음
-    validateStatus: (status) => status === 200 || status === 401,
+    // 401, 204(비로그인)도 예외로 처리하지 않고 정상 흐름으로 받음
+    validateStatus: (status) => status === 200 || status === 401 || status === 204,
   });
   if (response.status === 200) return response.data;
-  return null; // 401 등은 비로그인 처리
+  return null; // 401 또는 204는 비로그인 처리
 };
 
 // 강제 조회: 보호 페이지 등에서는 실제 세션 여부 확인이 필요할 수 있음

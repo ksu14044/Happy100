@@ -3,7 +3,7 @@ import { getUserInfoApi, getUserInfoApiForced, updateNameApi, updateEmailApi, up
 
 // 사용자 정보 조회 쿼리
 export const useGetUserInfoQuery = () => {
-  // 항상 세션을 확인하되, 401은 null 처리로 에러 전파하지 않음
+  // 항상 세션을 확인하되, 401/204는 null 처리로 에러 전파하지 않음
   const initial = (() => {
     if (typeof window === 'undefined') return undefined;
     try {
@@ -13,7 +13,7 @@ export const useGetUserInfoQuery = () => {
   })();
   return useQuery({
     queryKey: ['user', 'me'],
-    queryFn: () => getUserInfoApi(), // 401도 null로 반환되므로 에러 아님
+    queryFn: () => getUserInfoApi(), // 401/204도 null로 반환되므로 에러 아님
     enabled: true,
     staleTime: 0,
     retry: false,
