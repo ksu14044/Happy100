@@ -11,9 +11,10 @@ export const getPostApi = async ({
 }) => {
   if (!boardType) throw new Error("boardType is required");
 
+  const safePage = Number.isFinite(Number(page)) ? Math.trunc(Number(page)) : 1;
   const params = {
     boardType,
-    page,
+    page: Math.max(0, safePage - 1), // 백엔드 페이지는 0부터 시작하므로 1 기반 상태값을 보정
     size,
   };
 

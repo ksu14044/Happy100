@@ -15,14 +15,10 @@ import {
     ErrorState,
     LoadingState,
     NewBadge,
-    FilterBar,
-    SearchSelect,
-    SearchInput,
-    SearchButton,
-    SortSelect,
 } from "./style";
 import { Pagination } from "../../components/Pagination";
 import defaultProduct from "../../assets/images/default-product.svg";
+import { SearchSortControls } from "../../components/search-sort-controls";
 
 const BOARD_TYPE = "SHOP";
 const PAGE_SIZE = 9;
@@ -248,6 +244,21 @@ export default function ShopListPage() {
         return items;
     }, [page, totalPages, isMobile]);
 
+    const handleSearchSubmit = (trimmed) => {
+        if (!trimmed) {
+            setAppliedSearch({ searchType: undefined, keyword: "" });
+            setSearchType("TITLE");
+        } else {
+            setAppliedSearch({ searchType, keyword: trimmed });
+        }
+        setPage(1);
+    };
+
+    const handleSortChange = (value) => {
+        setSort(value);
+        setPage(1);
+    };
+
     const handleNavigate = (postId) => {
         navigate(`/shop/list/${postId}`);
     };
@@ -260,46 +271,17 @@ export default function ShopListPage() {
                 writeSection="shop"
             />
 
-            <FilterBar
-                onSubmit={(event) => {
-                    event.preventDefault();
-                    const trimmed = keywordInput.trim();
-                    if (!trimmed) {
-                        setAppliedSearch({ searchType: undefined, keyword: "" });
-                        setSearchType("TITLE");
-                    } else {
-                        setAppliedSearch({ searchType, keyword: trimmed });
-                    }
-                    setPage(1);
-                }}
-            >
-                <SortSelect
-                    value={sort}
-                    onChange={(event) => {
-                        setSort(event.target.value);
-                        setPage(1);
-                    }}
-                >
-                    {SORT_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </SortSelect>
-                <SearchSelect value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-                    {SEARCH_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </SearchSelect>
-                <SearchInput
-                    value={keywordInput}
-                    onChange={(e) => setKeywordInput(e.target.value)}
-                    placeholder="검색어를 입력하세요"
-                />
-                <SearchButton type="submit">검색</SearchButton>
-            </FilterBar>
+            <SearchSortControls
+                sortOptions={SORT_OPTIONS}
+                searchOptions={SEARCH_OPTIONS}
+                sortValue={sort}
+                onSortChange={handleSortChange}
+                searchTypeValue={searchType}
+                onSearchTypeChange={setSearchType}
+                keywordValue={keywordInput}
+                onKeywordChange={setKeywordInput}
+                onSubmit={handleSearchSubmit}
+            />
 
             {isLoading && <LoadingState>상품을 불러오는 중입니다…</LoadingState>}
             {!isLoading && error && (

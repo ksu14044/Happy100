@@ -6,11 +6,6 @@ import {
     TableBlock,
     StatusMessage,
     ErrorMessage,
-    FilterBar,
-    SearchSelect,
-    SearchInput,
-    SearchButton,
-    SortSelect,
 } from "./style";
 import BoardTitle from "../../components/board-title/BoardTitle";
 import TableHeader from "../../components/board-table-header/TableHeader";
@@ -19,6 +14,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useGetPostListQuery } from "../../queries/postQuery";
 import { Pagination } from "../../components/Pagination";
+import { SearchSortControls } from "../../components/search-sort-controls";
 
 // section/key 조합별 설정(보드타입/타이틀/설명)
 const PAGE_CONFIG = {
@@ -124,9 +120,7 @@ export default function BoardListPage() {
         return <Navigate to="/404" replace />;
     }
 
-    const handleSearchSubmit = (event) => {
-        event.preventDefault();
-        const trimmed = keywordInput.trim();
+    const handleSearchSubmit = (trimmed) => {
         if (!trimmed) {
             setAppliedSearch({ searchType: undefined, keyword: "" });
             setSearchType("TITLE");
@@ -136,8 +130,8 @@ export default function BoardListPage() {
         setPage(1);
     };
 
-    const handleSortChange = (event) => {
-        setSort(event.target.value);
+    const handleSortChange = (value) => {
+        setSort(value);
         setPage(1);
     };
 
@@ -145,28 +139,17 @@ export default function BoardListPage() {
         <PageWrap>
             <BoardTitle title={config.title} description={config.description} />
 
-            <FilterBar onSubmit={handleSearchSubmit}>
-                <SortSelect value={sort} onChange={handleSortChange}>
-                    {SORT_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </SortSelect>
-                <SearchSelect value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-                    {SEARCH_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </SearchSelect>
-                <SearchInput
-                    value={keywordInput}
-                    onChange={(e) => setKeywordInput(e.target.value)}
-                    placeholder="검색어를 입력하세요"
-                />
-                <SearchButton type="submit">검색</SearchButton>
-            </FilterBar>
+            <SearchSortControls
+                sortOptions={SORT_OPTIONS}
+                searchOptions={SEARCH_OPTIONS}
+                sortValue={sort}
+                onSortChange={handleSortChange}
+                searchTypeValue={searchType}
+                onSearchTypeChange={setSearchType}
+                keywordValue={keywordInput}
+                onKeywordChange={setKeywordInput}
+                onSubmit={handleSearchSubmit}
+            />
 
             <TableBlock>
                 <TableHeader />
