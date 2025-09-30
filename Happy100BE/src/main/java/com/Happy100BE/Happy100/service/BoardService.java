@@ -74,7 +74,7 @@ public class BoardService {
         int offset = Math.max(0, (page - 1)) * size;
 
         SearchContext ctx = buildSearchContext(searchType, keyword, sort);
-
+        
         List<BoardPost> posts = boardRepository.findPostList(
                 boardType,
                 offset,
@@ -83,6 +83,11 @@ public class BoardService {
                 ctx.keyword,
                 ctx.sort
         );
+        
+
+        for(BoardPost p : posts) {
+            System.out.println(p);
+        }
         // 첨부 N+1 방지: 한 번에 조회 후 매핑
         List<Long> ids = new ArrayList<>();
         for (BoardPost p : posts) {
@@ -100,6 +105,7 @@ public class BoardService {
             List<BoardAttachment> atts = grouped.getOrDefault(p.getPostId(), java.util.List.of());
             result.add(toPostResponse(p, atts));
         }
+        System.out.println(result);
         return result;
     }
 

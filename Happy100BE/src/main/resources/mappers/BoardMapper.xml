@@ -45,15 +45,16 @@
         <choose>
           <!-- FULLTEXT 사용 시 -->
           <when test="useFulltext">
+            <bind name="fulltextKeyword" value="@com.Happy100BE.Happy100.mapper.FulltextKeywordHelper@toBooleanModeKeyword(keyword)"/>
             <choose>
               <when test="searchType == 'TITLE'">
-                AND MATCH(title) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(title) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </when>
               <when test="searchType == 'CONTENT'">
-                AND MATCH(content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(content_json) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </when>
               <otherwise>
-                AND MATCH(title, content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(title, content_json) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </otherwise>
             </choose>
           </when>
@@ -182,15 +183,16 @@
       <if test="keyword != null and keyword != ''">
         <choose>
           <when test="useFulltext">
+            <bind name="fulltextKeyword" value="@com.Happy100BE.Happy100.mapper.FulltextKeywordHelper@toBooleanModeKeyword(keyword)"/>
             <choose>
               <when test="searchType == 'TITLE'">
-                AND MATCH(title) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(title) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </when>
               <when test="searchType == 'CONTENT'">
-                AND MATCH(content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(content_json) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </when>
               <otherwise>
-                AND MATCH(title, content_json) AGAINST (#{keyword} IN BOOLEAN MODE)
+                AND MATCH(title, content_json) AGAINST (#{fulltextKeyword} IN BOOLEAN MODE)
               </otherwise>
             </choose>
           </when>
