@@ -16,6 +16,9 @@ export const useGetPostListQuery = ({
             getPostApi({ boardType, page, size, searchType, keyword, sort, signal }),
         enabled: !!boardType && enabled,
         staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+        keepPreviousData: true,
+        placeholderData: (previousData) => previousData,
     });
 
 export const useGetPostByIdQuery = ({ postId, increaseView = true, enabled = true }) =>
@@ -24,5 +27,6 @@ export const useGetPostByIdQuery = ({ postId, increaseView = true, enabled = tru
         queryFn: ({ signal }) => getPostByIdApi({ postId, increaseView, signal }),
         enabled: !!postId && enabled,
         staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
         retry: 0,
     });
