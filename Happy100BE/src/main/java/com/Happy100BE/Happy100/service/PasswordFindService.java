@@ -1,5 +1,6 @@
 package com.Happy100BE.Happy100.service;
 
+import com.Happy100BE.Happy100.cache.UserDetailsCache;
 import com.Happy100BE.Happy100.entity.ResetToken;
 import com.Happy100BE.Happy100.entity.VerificationCode;
 import com.Happy100BE.Happy100.dto.request.PasswordFindConfirmRequest;
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Duration; import java.time.Instant;
+import java.time.Duration;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class PasswordFindService {
     private final RecoveryRepository recoveryRepository;
     private final PasswordEncoder passwordEncoder;
     private final com.Happy100BE.Happy100.config.MailSenderAdapter mailSenderAdapter;
+    private final UserDetailsCache userDetailsCache;
 
     private static final Duration CODE_TTL = Duration.ofMinutes(10);
     private static final int CODE_MAX_ATTEMPTS = 5;
@@ -98,5 +101,6 @@ public class PasswordFindService {
         String encoded = passwordEncoder.encode(req.getNewPassword());
         int rows = userRepository.updatePasswordByUsernameAndEmail(token.getUsername(), token.getEmail(), encoded);
         if (rows == 0) throw new IllegalArgumentException("대상 계정을 찾을 수 없습니다.");
+        userDetailsCache.evict(token.getUsername());
     }
 }

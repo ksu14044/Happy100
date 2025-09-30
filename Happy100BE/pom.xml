@@ -43,6 +43,16 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Caching -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- .env 로딩은 application.yml의 spring.config.import로 처리하므로
              중복 로딩을 방지하기 위해 spring-dotenv 의존성을 제거합니다. -->
 

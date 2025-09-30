@@ -1,23 +1,18 @@
 package com.Happy100BE.Happy100.service;
 
+import com.Happy100BE.Happy100.cache.UserDetailsCache;
 import com.Happy100BE.Happy100.dto.request.SignUpRequestDto;
 import com.Happy100BE.Happy100.dto.response.UserInfoResponse;
 import com.Happy100BE.Happy100.dto.response.UserResponseDto;
 import com.Happy100BE.Happy100.entity.User;
 import com.Happy100BE.Happy100.mapper.UserMapper;
 import com.Happy100BE.Happy100.repository.UserRepository;
-import com.Happy100BE.Happy100.security.principal.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 
-import java.lang.StackWalker.Option;
 import java.util.Optional;
 
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserDetailsCache userDetailsCache;
 
 
     @Transactional
@@ -56,6 +52,8 @@ public class UserService {
         } catch (DuplicateKeyException e) {
             throw new IllegalArgumentException("이미 등록된 사용자입니다.");
         }
+
+        userDetailsCache.evict(user.getUsername());
 
         return UserResponseDto.builder()
                 .userId(user.getUserId())
@@ -101,6 +99,7 @@ public class UserService {
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
+        userDetailsCache.evict(username);
     }
 
     @Transactional
@@ -115,6 +114,7 @@ public class UserService {
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
+        userDetailsCache.evict(username);
     }
 
     @Transactional
@@ -129,6 +129,7 @@ public class UserService {
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 비활성화된 계정입니다.");
         }
+        userDetailsCache.evict(username);
     }
 
     public void disableMyAccount(String myUsername) {
@@ -139,6 +140,7 @@ public class UserService {
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 이미 비활성화되었습니다.");
         }
+        userDetailsCache.evict(myUsername);
     }
 
     @Transactional
@@ -150,6 +152,7 @@ public class UserService {
         if (rows == 0) {
             throw new IllegalArgumentException("대상 사용자를 찾을 수 없거나 이미 비활성화되었습니다.");
         }
+        userDetailsCache.evict(targetUsername);
     }
 
     public Optional<String> findUsername(String email) {
@@ -199,6 +202,7 @@ public class UserService {
                 .build();
         int rows = userRepository.save(user);
         if (rows == 0) throw new IllegalStateException("소셜 사용자 생성에 실패했습니다.");
+        userDetailsCache.evict(user.getUsername());
         return username;
     }
 
@@ -224,6 +228,7 @@ public class UserService {
                     .map(existingUsername -> {
                         if (StringUtils.hasText(name)) {
                             userRepository.updateNameByUsername(existingUsername, name);
+                            userDetailsCache.evict(existingUsername);
                         }
                         return existingUsername;
                     })
@@ -246,6 +251,7 @@ public class UserService {
                 .build();
         int rows = userRepository.save(user);
         if (rows == 0) throw new IllegalStateException("소셜 사용자 생성에 실패했습니다.");
+        userDetailsCache.evict(user.getUsername());
         return user.getUsername();
     }
 }

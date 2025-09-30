@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.Happy100BE.Happy100.cache.UserDetailsCache;
 import com.Happy100BE.Happy100.dto.response.AdminPostResponse;
 import com.Happy100BE.Happy100.dto.response.PageResponse;
 import com.Happy100BE.Happy100.dto.response.UserResponse;
@@ -27,6 +28,7 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+    private final UserDetailsCache userDetailsCache;
 
     public PageResponse<UserResponse> getUsers(int page, int size, String keyword) {
         int safePage = Math.max(page, 1);
@@ -49,10 +51,15 @@ public class AdminService {
         if (userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자 ID가 필요합니다.");
         }
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "대상 사용자를 찾을 수 없습니다.");
+        }
         int updated = userRepository.disableAccountByUserId(userId);
         if (updated == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "대상 사용자를 찾을 수 없습니다.");
         }
+        userDetailsCache.evict(user.getUsername());
     }
 
     public PageResponse<AdminPostResponse> getPosts(int page, int size, String searchType, String keyword) {
