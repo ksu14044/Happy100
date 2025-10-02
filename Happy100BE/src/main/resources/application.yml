@@ -3,11 +3,17 @@ spring:
     active: local
     group:
       local: local_server, common, secret
+      prod: prod_server, common, secret
   config:
     import: >-
       optional:file:.env[.properties],
       optional:file:.env.local[.properties],
+      optional:classpath:.env[.properties],
+      optional:classpath:.env.local[.properties],
       optional:file:Happy100BE/.env[.properties],
+      optional:file:.env.production[.properties],
+      optional:file:Happy100BE/.env.production[.properties],
+      optional:classpath:.env.production[.properties],
       optional:file:Happy100BE/.env.local[.properties]
 
 ---
@@ -77,6 +83,37 @@ react:
     port: ${REACT_SERVER_PORT:5173}
     callback-path: ${REACT_SERVER_CALLBACK_PATH:/oauth2/callback}
     failure-path: ${REACT_SERVER_FAILURE_PATH:/oauth2/callback}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod_server
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      read-only: false
+server:
+  forward-headers-strategy: framework
+  port: ${SERVER_PORT:8080}
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://행복백세.com,http://xn--3h3b1nt9hlw0a.com,https://행복백세.com,https://xn--3h3b1nt9hlw0a.com}
+react:
+  server:
+    protocol: ${REACT_SERVER_PROTOCOL:http}
+    host: ${REACT_SERVER_HOST:xn--3h3b1nt9hlw0a.com}
+    port: ${REACT_SERVER_PORT:80}
+    callback-path: ${REACT_SERVER_CALLBACK_PATH:/oauth2/callback}
+    failure-path: ${REACT_SERVER_FAILURE_PATH:/oauth2/callback}
+jwt:
+  cookie:
+    secure: ${JWT_COOKIE_SECURE:false}
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}
+    domain: ${JWT_COOKIE_DOMAIN:xn--3h3b1nt9hlw0a.com}
 
 ---
 spring:

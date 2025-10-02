@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api/counsel")
+@RequestMapping("/counsel")
 public class CounselApplicationController {
 
     private final CounselApplicationService counselApplicationService;

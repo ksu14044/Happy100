@@ -17,7 +17,7 @@ import com.Happy100BE.Happy100.service.AdminService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 @Validated
 public class AdminController {

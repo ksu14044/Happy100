@@ -3,6 +3,7 @@ package com.Happy100BE.Happy100.repository;
 import com.Happy100BE.Happy100.entity.BoardPost;
 import com.Happy100BE.Happy100.entity.BoardAttachment;
 import com.Happy100BE.Happy100.mapper.BoardMapper;
+import com.Happy100BE.Happy100.mapper.FulltextKeywordHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -37,7 +38,8 @@ public class BoardRepository {
                                         String searchType,
                                         String keyword,
                                         String sort) {
-        return boardMapper.selectPostList(boardType, offset, limit, searchType, keyword, sort, useFulltext);
+        boolean applyFulltext = shouldUseFulltext(keyword);
+        return boardMapper.selectPostList(boardType, offset, limit, searchType, keyword, sort, applyFulltext);
     }
 
     public List<BoardAttachment> findAttachments(Long postId) {
@@ -81,6 +83,14 @@ public class BoardRepository {
     }
 
     public int countPostList(String boardType, String searchType, String keyword) {
-        return boardMapper.countPostList(boardType, searchType, keyword, useFulltext);
+        boolean applyFulltext = shouldUseFulltext(keyword);
+        return boardMapper.countPostList(boardType, searchType, keyword, applyFulltext);
+    }
+
+    private boolean shouldUseFulltext(String keyword) {
+        if (!useFulltext) {
+            return false;
+        }
+        return FulltextKeywordHelper.canUseFulltext(keyword);
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/boards")
+@RequestMapping("/boards")
 public class BoardController {
 
     private final BoardService boardService;
@@ -84,16 +84,17 @@ public class BoardController {
         int totalPostListCount = boardService.countPosts(boardType, searchType, keyword);
         int totalPages = (int) Math.ceil(totalPostListCount / (double) safeSize);
         if (totalPages == 0) totalPages = 1;
+        int effectivePage = Math.min(safePage, totalPages);
 
         PostListResponse res = PostListResponse.builder()
-                .page(safePage)
+                .page(effectivePage)
                 .limitCount(safeSize)
                 .totalPages(totalPages)
                 .totalElements(totalPostListCount)
-                .isFirstPage(safePage == 1)
-                .isLastPage(safePage >= totalPages)
-                .nextPage(safePage < totalPages ? safePage + 1 : 0)
-                .postList(boardService.list(boardType, safePage, safeSize, searchType, keyword, sort))
+                .isFirstPage(effectivePage == 1)
+                .isLastPage(effectivePage >= totalPages)
+                .nextPage(effectivePage < totalPages ? effectivePage + 1 : 0)
+                .postList(boardService.list(boardType, effectivePage, safeSize, searchType, keyword, sort))
                 .build();
         return ResponseEntity.ok().body(res);
     }

@@ -27,4 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(location);
     }
+
+    // Root index.html은 Spring Boot 기본 정적 자원 매핑을 활용하고,
+    // '.' 문자가 없는 경로만 SPA 라우팅으로 처리하여 무한 포워딩을 방지한다.
 }

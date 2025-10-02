@@ -6,7 +6,12 @@ target/
 !**/src/test/**/target/
 .env
 .env.*
+!.env.*.example
 uploads/
+# 프론트 번들 정적 자산은 매 빌드마다 생성되므로 제외
+src/main/resources/static/
+# Windows 다운로드 보안 식별자 파일
+*.Zone.Identifier
 ### STS ###
 .apt_generated
 .classpath

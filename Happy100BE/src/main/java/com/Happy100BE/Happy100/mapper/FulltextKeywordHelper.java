@@ -4,6 +4,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * MySQL BOOLEAN MODE용 검색어 가공 유틸리티.
@@ -14,6 +15,18 @@ public final class FulltextKeywordHelper {
 
     private static final String BOOLEAN_PREFIX_CHARS = "+-<>()~";
     private static final String BOOLEAN_SUFFIX_CHARS = ")]>.,;?!";
+    private static final Set<Character.UnicodeScript> CJK_SCRIPTS = Set.of(
+            Character.UnicodeScript.HANGUL,
+            Character.UnicodeScript.HAN
+    );
+
+    private static final Set<Character.UnicodeBlock> CJK_BLOCKS = Set.of(
+            Character.UnicodeBlock.HANGUL_SYLLABLES,
+            Character.UnicodeBlock.HANGUL_JAMO,
+            Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO,
+            Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS,
+            Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+    );
 
     private FulltextKeywordHelper() {
     }
@@ -38,6 +51,31 @@ public final class FulltextKeywordHelper {
             return trimmed;
         }
         return String.join(" ", processed);
+    }
+
+    public static boolean canUseFulltext(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return false;
+        }
+
+        String trimmed = keyword.trim();
+        String stripped = trimmed.replaceAll("\\s+", "");
+        if (stripped.length() < 3) {
+            return false;
+        }
+
+        return trimmed.codePoints()
+                .noneMatch(FulltextKeywordHelper::isCjkCodePoint);
+    }
+
+    private static boolean isCjkCodePoint(int codePoint) {
+        Character.UnicodeScript script = Character.UnicodeScript.of(codePoint);
+        if (CJK_SCRIPTS.contains(script)) {
+            return true;
+        }
+
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(codePoint);
+        return block != null && CJK_BLOCKS.contains(block);
     }
 
     private static String applyPrefixWildcard(String token) {

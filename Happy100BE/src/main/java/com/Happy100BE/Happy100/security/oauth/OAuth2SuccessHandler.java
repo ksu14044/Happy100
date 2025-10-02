@@ -7,6 +7,7 @@ import com.Happy100BE.Happy100.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -17,11 +18,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.IDN;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserService userService;
@@ -112,18 +116,21 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .encode(StandardCharsets.UTF_8)
                 .toUriString();
 
+        log.info("OAuth2 success: provider={}, user={}, redirectUri={}", provider, username, redirectUri);
         response.sendRedirect(redirectUri);
     }
 
     private String buildFrontendBaseUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append(reactProtocol).append("://").append(reactHost);
+        sb.append(reactProtocol).append("://").append(normalizeHost(reactHost));
         boolean isDefaultPort = ("http".equalsIgnoreCase(reactProtocol) && reactPort == 80)
                 || ("https".equalsIgnoreCase(reactProtocol) && reactPort == 443);
         if (!isDefaultPort && reactPort > 0) {
             sb.append(":").append(reactPort);
         }
-        return sb.toString();
+        String base = sb.toString();
+        log.debug("OAuth2 success redirect baseUrl={}", base);
+        return base;
     }
 
     private String normalizePath(String path) {
@@ -131,5 +138,66 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             return "/oauth2/callback";
         }
         return path.startsWith("/") ? path : "/" + path;
+    }
+
+    private String normalizeHost(String host) {
+        if (host == null || host.isBlank()) {
+            return "localhost";
+        }
+
+        String trimmed = host.trim();
+        trimmed = recoverEncoding(trimmed);
+
+        // Allow values like "https://domain" or "domain:8080" by parsing with protocol fallback.
+        try {
+            String probe = trimmed.contains("://") ? trimmed : reactProtocol + "://" + trimmed;
+            URI uri = URI.create(probe);
+            String parsedHost = uri.getHost();
+            if (parsedHost != null && !parsedHost.isBlank()) {
+                String ascii = IDN.toASCII(parsedHost);
+                log.debug("OAuth2 success normalizeHost parsedHost={} ascii={}", parsedHost, ascii);
+                return ascii;
+            }
+        } catch (Exception ignored) {
+            // Fallback to manual cleanup below
+        }
+
+        int slashIdx = trimmed.indexOf('/');
+        if (slashIdx >= 0) {
+            trimmed = trimmed.substring(0, slashIdx);
+        }
+
+        int colonIdx = trimmed.indexOf(':');
+        if (colonIdx >= 0) {
+            trimmed = trimmed.substring(0, colonIdx);
+        }
+
+        try {
+            String ascii = IDN.toASCII(trimmed);
+            log.debug("OAuth2 success normalizeHost fallback trimmed={} ascii={}", trimmed, ascii);
+            return ascii;
+        } catch (IllegalArgumentException e) {
+            log.warn("OAuth2 success normalizeHost failed for host='{}': {}", host, e.getMessage());
+            return trimmed;
+        }
+    }
+
+    private String recoverEncoding(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        boolean hasLatinMojibake = value.chars().anyMatch(ch -> ch >= 0x80 && ch <= 0xFF);
+        if (!hasLatinMojibake) {
+            return value;
+        }
+        try {
+            String recovered = new String(value.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            log.debug("OAuth2 success recoverEncoding '{}' -> '{}'", value, recovered);
+            return recovered;
+        } catch (Exception ex) {
+            log.warn("OAuth2 success recoverEncoding failed for '{}': {}", value, ex.getMessage());
+            return value;
+        }
     }
 }

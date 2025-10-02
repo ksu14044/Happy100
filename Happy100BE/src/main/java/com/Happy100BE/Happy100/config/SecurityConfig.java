@@ -2,17 +2,15 @@ package com.Happy100BE.Happy100.config;
 
 import com.Happy100BE.Happy100.security.filter.JwtAuthenticationFilter;
 import com.Happy100BE.Happy100.service.CustomUserDetailsService;
-import lombok.RequiredArgsConstructor;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus; // ✅ 추가
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -26,9 +24,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint; // ✅ 추가
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // ✅ 추가
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -59,28 +57,59 @@ public class SecurityConfig {
                                 .httpBasic(b -> b.disable())
 
                                 .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 // 공개 문서
                                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
                                                                 "/swagger-ui.html")
                                                 .permitAll()
                                                 // 인증/회원가입, 소셜 로그인 진입점 및 콜백 허용
-                                                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/counsel/**").permitAll()
+                                                .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/counsel/**").permitAll()
+
+                                                // 정적 SPA 리소스 허용
+                                                .requestMatchers(
+                                                                "/",
+                                                                "/index.html",
+                                                                "/vite.svg",
+                                                                "/assets/**",
+                                                                "/favicon.ico",
+                                                                "/manifest.json",
+                                                                "/robots.txt")
+                                                .permitAll()
 
                                                 // ✅ 읽기 전용 공개 API (필요 시 조정)
                                                 .requestMatchers(HttpMethod.GET,
+                                                                "/api/notices",
                                                                 "/api/notices/**",
+                                                                "/api/recruits",
                                                                 "/api/recruits/**",
+                                                                "/api/products",
                                                                 "/api/products/**",
+                                                                "/api/posts",
                                                                 "/api/posts/**",
+                                                                "/api/boards",
                                                                 "/api/boards/**",
+                                                                "/api/uploads/**",
+                                                                "/notices",
+                                                                "/notices/**",
+                                                                "/recruits",
+                                                                "/recruits/**",
+                                                                "/products",
+                                                                "/products/**",
+                                                                "/posts",
+                                                                "/posts/**",
+                                                                "/boards",
+                                                                "/boards/**",
                                                                 "/uploads/**")
                                                 .permitAll()
 
                                                 // 인증 여부 확인용 me 엔드포인트는 항상 통과(컨트롤러에서 비인증 시 빈 응답)
-                                                .requestMatchers(HttpMethod.GET, "/api/users/me").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/users/me", "/api/users/me").permitAll()
+
+                                                // 프록시 전환기 위해 API 전체 허가 (추후 필요 시 축소)
+                                                .requestMatchers("/api/**").permitAll()
 
                                                 // 관리자
-                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
 
                                                 // 그 외 보호
                                                 .anyRequest().authenticated())
@@ -94,7 +123,7 @@ public class SecurityConfig {
 
                                 // 로그아웃
                                 .logout(logout -> logout
-                                                .logoutUrl("/api/auth/logout")
+                                                .logoutUrl("/auth/logout")
                                                 .deleteCookies("access_token", "refresh_token")
                                                 .logoutSuccessHandler((req, res, auth) -> {
                                                         // 도메인/경로 특성에 맞춘 삭제 쿠키도 함께 내려 신뢰도 향상
@@ -105,11 +134,11 @@ public class SecurityConfig {
 
                                 .authenticationProvider(authenticationProvider())
 
-                                // ✅ 핵심: /api/** 에서는 302 리다이렉트 대신 401을 응답 (CORS 회피)
+                                // ✅ 핵심: API 요청에는 302 리다이렉트 대신 401을 응답 (CORS 회피)
                                 .exceptionHandling(ex -> ex
                                                 .defaultAuthenticationEntryPointFor(
                                                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                                                new AntPathRequestMatcher("/api/**")))
+                                                                new AntPathRequestMatcher("/**")))
 
                                 // JWT 필터
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
