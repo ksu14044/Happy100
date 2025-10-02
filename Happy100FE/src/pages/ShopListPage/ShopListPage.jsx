@@ -224,14 +224,15 @@ export default function ShopListPage() {
     const postList = data?.postList ?? [];
     const totalPages = data?.totalPages ?? 1;
     const totalElements = data?.totalElements ?? 0;
+    const currentPage = data?.page ?? page;
 
     const paginationItems = useMemo(() => {
         if (totalPages <= 1) return [1];
-        if (isMobile) return [page];
+        if (isMobile) return [currentPage];
         const items = [];
         const delta = 2;
-        const start = Math.max(1, page - delta);
-        const end = Math.min(totalPages, page + delta);
+        const start = Math.max(1, currentPage - delta);
+        const end = Math.min(totalPages, currentPage + delta);
         if (start > 1) {
             items.push(1);
             if (start > 2) items.push("…");
@@ -242,7 +243,7 @@ export default function ShopListPage() {
             items.push(totalPages);
         }
         return items;
-    }, [page, totalPages, isMobile]);
+    }, [currentPage, totalPages, isMobile]);
 
     const handleSearchSubmit = (trimmed) => {
         if (!trimmed) {
@@ -340,7 +341,7 @@ export default function ShopListPage() {
             {totalElements > 0 && (
                 <Pagination
                     total={totalElements}
-                    page={page}
+                    page={currentPage}
                     totalPages={totalPages}
                     pageItems={paginationItems}
                     onChange={setPage}

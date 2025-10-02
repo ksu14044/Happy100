@@ -43,9 +43,16 @@ export default function OverviewMapPage() {
             }
             try {
                 existingScript.parentNode?.removeChild(existingScript);
-            } catch {}
+            } catch (error) {
+                console.warn('기존 카카오 지도 스크립트를 제거하지 못했습니다.', error);
+            }
             // stale 글로벌 제거 시도
-            try { delete window.kakao; } catch { window.kakao = undefined; }
+            try {
+                delete window.kakao;
+            } catch (error) {
+                console.warn('카카오 전역 객체 초기화에 실패했습니다. 수동으로 초기화합니다.', error);
+                window.kakao = undefined;
+            }
         }
 
         const script = document.createElement("script");

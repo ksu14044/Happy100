@@ -36,12 +36,19 @@ export default function OAuthCallbackPage() {
                             role: role || 'ROLE_USER',
                         }));
                     }
-                } catch {}
-                try { sessionStorage.setItem('has_session', '1'); } catch {}
+                } catch (error) {
+                    console.warn('OAuth 로그인 후 사용자 프리뷰 저장에 실패했습니다.', error);
+                }
+                try {
+                    sessionStorage.setItem('has_session', '1');
+                } catch (error) {
+                    console.warn('OAuth 로그인 세션 플래그 저장에 실패했습니다.', error);
+                }
                 await queryClient.invalidateQueries({ queryKey: ['user','me'] });
                 setStatus({ type: "success", message: "로그인에 성공했습니다. 잠시 후 이동합니다." });
                 setTimeout(() => navigate(redirect, { replace: true }), 600);
-            } catch (e) {
+            } catch (error) {
+                console.error('OAuth 세션 검증 과정에서 오류가 발생했습니다.', error);
                 setStatus({ type: "error", message: "로그인 세션을 확인하지 못했습니다. 다시 시도해 주세요." });
             }
         })();

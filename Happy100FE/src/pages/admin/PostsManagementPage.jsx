@@ -97,7 +97,7 @@ const PostsManagementPage = () => {
     },
   });
   // 페이지네이션 관련 계산값
-  const baseList = posts?.content ?? [];
+  const baseList = useMemo(() => posts?.content ?? [], [posts]);
   const filteredList = useMemo(() => {
     if (!isSearching) return baseList;
     const lowered = effectiveTitle.toLowerCase();

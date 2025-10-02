@@ -9,7 +9,10 @@ export const useGetUserInfoQuery = () => {
     try {
       const raw = localStorage.getItem('user_preview');
       return raw ? JSON.parse(raw) : undefined;
-    } catch { return undefined; }
+    } catch (error) {
+      console.warn('로컬에 저장된 사용자 프리뷰를 불러오는 데 실패했습니다.', error);
+      return undefined;
+    }
   })();
   return useQuery({
     queryKey: ['user', 'me'],
@@ -29,9 +32,12 @@ export const useGetUserInfoQuery = () => {
           }
           const preview = { name: data.name || data.username || '회원', role: role || 'ROLE_USER' };
           localStorage.setItem('user_preview', JSON.stringify(preview));
+        } else {
+          localStorage.removeItem('user_preview');
         }
-        else localStorage.removeItem('user_preview');
-      } catch {}
+      } catch (error) {
+        console.warn('사용자 프리뷰 저장에 실패했습니다.', error);
+      }
     },
   });
 };

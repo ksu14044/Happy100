@@ -39,7 +39,7 @@ export default function PasswordEditForm({ onCancel }) {
     setIsSubmitting(true);
     
     try {
-      const result = await mutateAsync(newPassword);
+      await mutateAsync(newPassword);
       console.log('[PasswordEditForm] 비밀번호 변경 성공');
       onCancel();
     } catch (err) {

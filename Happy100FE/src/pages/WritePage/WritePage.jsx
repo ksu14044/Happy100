@@ -49,7 +49,7 @@ const REDIRECT_PATH = {
 const API_BASE_URL = import.meta.env.DEV
     ? ""
     : (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
-const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/files` : "/api/files";
+const FILE_UPLOAD_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/files` : "/api/files";
 
 function resolveFileUrl(urlOrPath) {
     if (!urlOrPath) return "";

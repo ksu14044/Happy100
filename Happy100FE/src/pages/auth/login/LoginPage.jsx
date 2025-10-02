@@ -93,7 +93,9 @@ export default function LoginPage() {
                 }
                 const preview = { name: d.name || d.username || '회원', role: role || 'ROLE_USER' };
                 localStorage.setItem('user_preview', JSON.stringify(preview));
-            } catch {}
+            } catch (error) {
+                console.warn('로그인 직후 사용자 정보를 캐싱하는 과정에서 오류가 발생했습니다.', error);
+            }
             await queryClient.invalidateQueries({ queryKey: ['user','me'] });
             navigate("/");            // 성공 후 이동
         } catch (e) {

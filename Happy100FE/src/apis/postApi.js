@@ -14,7 +14,7 @@ export const getPostApi = async ({
   const safePage = Number.isFinite(Number(page)) ? Math.trunc(Number(page)) : 1;
   const params = {
     boardType,
-    page: Math.max(0, safePage - 1), // 백엔드 페이지는 0부터 시작하므로 1 기반 상태값을 보정
+    page: Math.max(1, safePage), // 백엔드와 동일하게 1 기반으로 전달
     size,
   };
 

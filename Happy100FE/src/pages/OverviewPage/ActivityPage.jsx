@@ -18,20 +18,20 @@ import {
 import { KEY_PHILOSOPHY } from '../../data/brandContent.js';
 
 const DETAIL_LIST = {
-  '시니어 교육': [
-    '배움·활동 병행 커리큘럼으로 학습 동기를 유지합니다.',
-    '두뇌·감각 자극, 건강 증진을 위한 콘텐츠를 구성합니다.',
-    '실습 중심 교육으로 현장에서 바로 활용 가능한 역량을 길러 줍니다.',
+  '맞춤형 통합 인지수업': [
+    '주간보호센터·노인정 등 현장에서 참여자 맞춤 난이도로 수업을 설계합니다.',
+    '시니어요리, 공예, 숟가락 난타 등 체험형 콘텐츠를 조합해 몰입도를 높입니다.',
+    '생활 속에서 이어 갈 수 있도록 활동지와 복습 키트를 함께 제공합니다.',
   ],
-  '세대 융합 프로그램': [
-    '아동·청소년·가족이 함께 참여하는 공감형 프로젝트를 운영합니다.',
-    '세대 간 소통을 촉진하는 협업형 활동과 멘토링을 기획합니다.',
-    '돌봄 부담을 나누는 가족 참여형 프로그램을 지원합니다.',
+  '지역 공모사업 연계': [
+    '지자체·교육기관과 협력해 지역 특화 과제를 발굴하고 제안합니다.',
+    '공모 선정 이후에는 예산 집행, 인력 매칭, 성과 보고까지 전 과정을 지원합니다.',
+    '업사이클링 재료 키트, 체험 부스 운영 등 지역 참여형 프로그램을 확장합니다.',
   ],
-  '문화·예술 융합': [
-    '지역 축제·행사와 연계한 참여형 문화 프로그램을 진행합니다.',
-    '시니어의 재능을 살린 공연·전시·체험 활동을 지원합니다.',
-    '지역 예술인·기관과 협력해 지속 가능한 문화 생태계를 만듭니다.',
+  '전문 인력 양성과 자격증': [
+    '민간자격 과정을 통해 현장 경험 기반의 강사를 양성합니다.',
+    '온라인·오프라인 병행 교육으로 지역 편차 없이 학습 기회를 제공합니다.',
+    '수료 이후에는 강사 활동, 지사 설립, 프로젝트 참여 등 후속 경로를 연계합니다.',
   ],
 };
 
@@ -47,10 +47,10 @@ export default function ActivityPage() {
       <Section>
         <AccentTag>핵심 활동</AccentTag>
         <SectionHeader>
-          <PageTitle>행복백세 핵심 활동 영역</PageTitle>
+          <PageTitle>서원교육 협동조합 핵심 활동 영역</PageTitle>
           <Lead>
-            행복교육운동과 함께하는 행복백세는 시니어 교육, 세대 융합, 문화·예술 융합이라는 세 가지 축을 기반으로
-            통합적인 배움과 활동의 장을 마련합니다.
+            서원교육 협동조합은 통합 인지수업, 공모사업 연계, 전문 인력 양성이라는 세 축을 중심으로 지역과 현장을
+            아우르는 교육 생태계를 구축합니다.
           </Lead>
         </SectionHeader>
       </Section>
@@ -61,17 +61,23 @@ export default function ActivityPage() {
           <Lead>한 영역에서 쌓은 경험이 다른 영역의 참여를 촉진하는 선순환 구조를 지향합니다.</Lead>
         </SectionHeader>
         <TwoColumn>
-          {KEY_PHILOSOPHY.items.map((item) => (
+          {KEY_PHILOSOPHY.items.map((item) => {
+            const details = DETAIL_LIST[item.title] ?? [];
+            return (
             <InfoCard key={item.title}>
               <CardTitle>{item.title}</CardTitle>
               <CardText>{item.subtitle}</CardText>
-              <BulletList>
-                {DETAIL_LIST[item.title].map((detail) => (
-                  <BulletItem key={detail}>{detail}</BulletItem>
-                ))}
-              </BulletList>
+              <CardText>{item.body}</CardText>
+              {details.length > 0 ? (
+                <BulletList>
+                  {details.map((detail) => (
+                    <BulletItem key={detail}>{detail}</BulletItem>
+                  ))}
+                </BulletList>
+              ) : null}
             </InfoCard>
-          ))}
+          );
+          })}
         </TwoColumn>
       </Section>
 

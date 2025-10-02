@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { mediaQuery } from '../../styles/responsive';
 
 export const Container = styled.div`
   max-width: 1200px;

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { RowWrap, Container, RowGrid, Cell, NewBadge, TitleCell } from "./style";
 import { gridColumns } from "../board-table-header/style";
 
@@ -48,13 +49,13 @@ export default function TableRow({
 
     const Wrapper = href
         ? ({ children }) => (
-            <a
-                href={href}
+            <Link
+                to={href}
                 style={{ display: "block", color: "inherit", textDecoration: "none" }}
                 onClick={onClick}
             >
                 {children}
-            </a>
+            </Link>
         )
         : ({ children }) => (
             <div role="button" onClick={onClick} style={{ display: "block" }}>

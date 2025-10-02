@@ -14,7 +14,7 @@ export default function WritePostButton({ label = "글쓰기", section }) {
   if (!section) return null;
 
   return (
-    <WriteButton href={`/${section}/write`} aria-label="새 글쓰기">
+    <WriteButton to={`/${section}/write`} aria-label="새 글쓰기">
       {label}
     </WriteButton>
   );

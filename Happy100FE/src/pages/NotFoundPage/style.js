@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Link } from 'react-router-dom';
 import { responsiveFont } from '../../styles/responsive';
 
 export const Wrap = styled.section`
@@ -64,7 +65,7 @@ export const Actions = styled.div`
   flex-wrap: wrap;
 `;
 
-export const PrimaryBtn = styled.a`
+export const PrimaryBtn = styled(Link)`
   padding: 12px 20px;
   border-radius: 999px;
   color: #fff;
@@ -73,12 +74,16 @@ export const PrimaryBtn = styled.a`
   box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
 `;
 
-export const GhostBtn = styled.a`
+export const GhostBtn = styled.button`
   padding: 12px 18px;
   border-radius: 999px;
   color: #1f2937;
   font-weight: 700;
   background: rgba(248, 250, 252, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.4);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-clip: padding-box;
 `;
-

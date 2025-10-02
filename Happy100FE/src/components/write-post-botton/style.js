@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
+import { Link } from "react-router-dom";
 import { responsiveFont } from "../../styles/responsive";
 
-export const WriteButton = styled.a`
+export const WriteButton = styled(Link)`
   display: inline-flex;
   align-items: center;
   justify-content: center;

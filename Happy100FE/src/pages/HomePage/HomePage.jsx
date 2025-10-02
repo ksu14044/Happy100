@@ -5,10 +5,10 @@ import {
   BRAND_NAME,
   BRAND_SLOGAN,
   BRAND_KEYWORDS,
-  KEY_PHILOSOPHY,
-  PROGRAM_FLOW,
-  CURRICULUM_GUIDE,
-  EXPECTED_IMPACT,
+  COOP_OVERVIEW,
+  LICENSE_GUIDE,
+  PARTNERSHIP_ACTIVITIES,
+  SOCIAL_CHALLENGES,
   CONTACT_INFO,
 } from '../../data/brandContent.js';
 import { mediaQuery } from '../../styles/responsive.js';
@@ -171,10 +171,10 @@ const SectionDescription = styled.p`
 const CardGrid = styled.div`
   display: grid;
   gap: clamp(18px, 4vw, 28px);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 `;
 
-const ActivityCard = styled.div`
+const Card = styled.div`
   position: relative;
   padding: clamp(24px, 4vw, 32px);
   border-radius: 24px;
@@ -183,7 +183,7 @@ const ActivityCard = styled.div`
   border: 1px solid rgba(148, 163, 184, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
@@ -192,53 +192,48 @@ const ActivityCard = styled.div`
   }
 `;
 
-const ActivityTitle = styled.h3`
+const CardTitle = styled.h3`
   font-size: 20px;
   color: #1e293b;
 `;
 
-const ActivitySubtitle = styled.span`
-  font-weight: 600;
-  color: #2563eb;
+const CardSummary = styled.p`
+  margin: 0;
+  color: #475569;
+  line-height: 1.7;
 `;
 
-const FlowTrack = styled.div`
-  position: relative;
+const BulletList = styled.ul`
   display: grid;
-  gap: clamp(18px, 3vw, 26px);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  padding-left: 0;
 `;
 
-const FlowStep = styled.div`
-  position: relative;
-  padding: 26px;
-  border-radius: 24px;
-  background: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(37, 99, 235, 0.18);
+const BulletItem = styled.li`
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
+  gap: 10px;
+  color: #1f2937;
+  font-size: 15px;
+  line-height: 1.6;
 
-const FlowBadge = styled.span`
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.15);
+  &::before {
+    content: '•';
+    color: #2563eb;
+    font-size: 20px;
+    line-height: 1;
+  }
 `;
 
 const CurriculumGrid = styled.div`
   display: grid;
-  gap: 18px;
+  gap: clamp(18px, 3vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 `;
 
 const CurriculumCard = styled.div`
-  display: grid;
-  gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   padding: clamp(24px, 4vw, 32px);
   border-radius: 24px;
   background: #fff;
@@ -246,53 +241,90 @@ const CurriculumCard = styled.div`
   box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
 `;
 
-const CurriculumMeta = styled.div`
+const ChipList = styled.ul`
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 18px;
-  font-size: 14px;
-  color: #2563eb;
+  gap: 10px;
+  padding-left: 0;
+`;
+
+const Chip = styled.li`
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-size: 13px;
   font-weight: 600;
 `;
 
-const ImpactGrid = styled.div`
+const HighlightGrid = styled.div`
   display: grid;
-  gap: clamp(18px, 4vw, 28px);
+  gap: clamp(18px, 3vw, 24px);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 `;
 
-const ImpactCard = styled.div`
-  padding: clamp(24px, 4vw, 32px);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.88);
-  color: #e2e8f0;
+const HighlightCard = styled.div`
+  padding: clamp(24px, 4vw, 30px);
+  border-radius: 22px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  color: #1f2937;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.18);
+  gap: 12px;
+  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.08);
 `;
 
-const ImpactTitle = styled.h3`
-  font-size: 20px;
-  color: #93c5fd;
+const HighlightTitle = styled.h3`
+  font-size: 18px;
+  color: #1d4ed8;
 `;
 
-const ImpactList = styled.ul`
+const HighlightSummary = styled.p`
+  margin: 0;
+  color: #334155;
+  line-height: 1.7;
+`;
+
+const IssueGrid = styled.div`
+  display: grid;
+  gap: clamp(18px, 3vw, 26px);
+`;
+
+const IssueCard = styled.div`
+  padding: clamp(24px, 4vw, 32px);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 14px;
+`;
+
+const IssueTitle = styled.h3`
+  font-size: 18px;
+  color: #1e293b;
+`;
+
+const IssueList = styled.ul`
   display: grid;
   gap: 10px;
   padding-left: 0;
 `;
 
-const ImpactBullet = styled.li`
+const IssueItem = styled.li`
   display: flex;
-  align-items: center;
   gap: 10px;
+  color: #1f2937;
   font-size: 15px;
+  line-height: 1.6;
 
   &::before {
-    content: '•';
-    color: #38bdf8;
-    font-size: 22px;
+    content: '·';
+    color: #2563eb;
+    font-size: 24px;
     line-height: 1;
   }
 `;
@@ -319,6 +351,11 @@ const ContactInfo = styled.div`
 const ContactTitle = styled.h3`
   font-size: clamp(24px, 4vw, 30px);
   color: #fff;
+`;
+
+const ContactGrid = styled.div`
+  display: grid;
+  gap: 14px;
 `;
 
 const ContactRow = styled.div`
@@ -357,11 +394,6 @@ const KeywordTag = styled.span`
   font-size: 13px;
 `;
 
-const ContactGrid = styled.div`
-  display: grid;
-  gap: 14px;
-`;
-
 const ResponsiveSpacer = styled.div`
   display: none;
   height: 1px;
@@ -384,15 +416,15 @@ export default function HomePage() {
         <SectionInner>
           <HeroGrid>
             <HeroContent>
-              <HeroHighlight>행복교육운동</HeroHighlight>
+              <HeroHighlight>{BRAND_NAME}</HeroHighlight>
               <HeroTitle>
-                {BRAND_NAME}와 함께
-                <br />
                 {BRAND_SLOGAN}
+                <br />
+                현장과 지역사회를 잇다
               </HeroTitle>
               <HeroText>
-                시니어 교육과 활동, 세대 융합과 문화예술을 잇는 행복백세의 통합 프로그램을 통해
-                지속가능한 백세 시대를 설계해 보세요.
+                시니어와 장애우를 위한 통합 인지교육, 공모사업, 자격증 과정을 통해 지역사회와 함께 성장하는
+                서원교육 협동조합의 교육 여정을 만나보세요.
               </HeroText>
               <HeroActions>
                 <PrimaryButton type="button" onClick={() => onNavigate('/counsel')}>
@@ -408,9 +440,9 @@ export default function HomePage() {
               <HeroVisualInner>
                 <KeywordTag>{BRAND_KEYWORDS}</KeywordTag>
                 <HeroBadgeGrid>
-                  <HeroBadge>시니어 교육<br />맞춤 설계</HeroBadge>
-                  <HeroBadge>세대 융합<br />공동체</HeroBadge>
-                  <HeroBadge>문화·예술<br />현장 참여</HeroBadge>
+                  {COOP_OVERVIEW.map((item) => (
+                    <HeroBadge key={item.title}>{item.title}</HeroBadge>
+                  ))}
                 </HeroBadgeGrid>
               </HeroVisualInner>
             </HeroVisual>
@@ -420,50 +452,45 @@ export default function HomePage() {
 
       <Section>
         <SectionHeader>
-          <SectionTitle>{KEY_PHILOSOPHY.title}</SectionTitle>
-          <SectionDescription>{KEY_PHILOSOPHY.description}</SectionDescription>
+          <SectionTitle>서원교육 협동조합 개요</SectionTitle>
+          <SectionDescription>
+            시니어와 장애우의 일상에 필요한 인지활동과 체험 교육을 제공하며, 지역과 기관을 연결하는 교육 허브로
+            자리하고 있습니다.
+          </SectionDescription>
         </SectionHeader>
         <CardGrid>
-          {KEY_PHILOSOPHY.items.map((item) => (
-            <ActivityCard key={item.title}>
-              <ActivitySubtitle>{item.subtitle}</ActivitySubtitle>
-              <ActivityTitle>{item.title}</ActivityTitle>
-              <SectionDescription>{item.body}</SectionDescription>
-            </ActivityCard>
+          {COOP_OVERVIEW.map((item) => (
+            <Card key={item.title}>
+              <CardTitle>{item.title}</CardTitle>
+              <CardSummary>{item.summary}</CardSummary>
+              <BulletList>
+                {item.details.map((detail) => (
+                  <BulletItem key={detail}>{detail}</BulletItem>
+                ))}
+              </BulletList>
+            </Card>
           ))}
         </CardGrid>
       </Section>
 
       <Section>
         <SectionHeader>
-          <SectionTitle>{PROGRAM_FLOW.title}</SectionTitle>
-          <SectionDescription>{PROGRAM_FLOW.description}</SectionDescription>
-        </SectionHeader>
-        <FlowTrack>
-          {PROGRAM_FLOW.steps.map((step, index) => (
-            <FlowStep key={step.title}>
-              <FlowBadge>{String(index + 1).padStart(2, '0')}</FlowBadge>
-              <ActivityTitle>{step.title}</ActivityTitle>
-              <SectionDescription>{step.body}</SectionDescription>
-            </FlowStep>
-          ))}
-        </FlowTrack>
-      </Section>
-
-      <Section>
-        <SectionHeader>
-          <SectionTitle>{CURRICULUM_GUIDE.title}</SectionTitle>
-          <SectionDescription>{CURRICULUM_GUIDE.description}</SectionDescription>
+          <SectionTitle>자격증 안내</SectionTitle>
+          <SectionDescription>
+            현장의 필요에 맞춘 통합인지, 요리, 원예, 난타, 감성 코칭 등 전문 강사 과정을 통해 실무 역량을 갖춘 인재를
+            양성합니다.
+          </SectionDescription>
         </SectionHeader>
         <CurriculumGrid>
-          {CURRICULUM_GUIDE.programs.map((program) => (
-            <CurriculumCard key={program.name}>
-              <ActivityTitle>{program.name}</ActivityTitle>
-              <SectionDescription>{program.summary}</SectionDescription>
-              <CurriculumMeta>
-                <span>{program.duration}</span>
-                <span>{program.target}</span>
-              </CurriculumMeta>
+          {LICENSE_GUIDE.map((license) => (
+            <CurriculumCard key={license.name}>
+              <CardTitle>{license.name}</CardTitle>
+              <CardSummary>{license.summary}</CardSummary>
+              <ChipList>
+                {license.highlights.map((highlight) => (
+                  <Chip key={highlight}>{highlight}</Chip>
+                ))}
+              </ChipList>
             </CurriculumCard>
           ))}
         </CurriculumGrid>
@@ -471,35 +498,53 @@ export default function HomePage() {
 
       <Section>
         <SectionHeader>
-          <SectionTitle>기대 효과</SectionTitle>
+          <SectionTitle>지역사회와 사회적 협동조합 간 연계활동</SectionTitle>
           <SectionDescription>
-            개인과 가족, 지역사회, 나아가 사회 전체가 함께 성장하도록 설계된 행복백세의 가치입니다.
+            현장 중심 프로젝트와 문화 활동을 통해 협동조합, 기관, 단체가 함께 성장하는 협력 모델을 만듭니다.
           </SectionDescription>
         </SectionHeader>
-        <ImpactGrid>
-          {EXPECTED_IMPACT.map((impact) => (
-            <ImpactCard key={impact.category}>
-              <ImpactTitle>{impact.category}</ImpactTitle>
-              <ImpactList>
-                {impact.points.map((point) => (
-                  <ImpactBullet key={point}>{point}</ImpactBullet>
-                ))}
-              </ImpactList>
-            </ImpactCard>
+        <HighlightGrid>
+          {PARTNERSHIP_ACTIVITIES.map((activity) => (
+            <HighlightCard key={activity.title}>
+              <HighlightTitle>{activity.title}</HighlightTitle>
+              <HighlightSummary>{activity.description}</HighlightSummary>
+            </HighlightCard>
           ))}
-        </ImpactGrid>
+        </HighlightGrid>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>현대사회 문제와 대응</SectionTitle>
+          <SectionDescription>
+            급속한 고령화와 교육 수요 변화에 대응하기 위해 데이터를 기반으로 한 진단과 미래 전략을 제시합니다.
+          </SectionDescription>
+        </SectionHeader>
+        <IssueGrid>
+          {SOCIAL_CHALLENGES.map((issue) => (
+            <IssueCard key={issue.title}>
+              <IssueTitle>{issue.title}</IssueTitle>
+              <IssueList>
+                {issue.points.map((point) => (
+                  <IssueItem key={point}>{point}</IssueItem>
+                ))}
+              </IssueList>
+            </IssueCard>
+          ))}
+        </IssueGrid>
       </Section>
 
       <Section>
         <SectionHeader>
           <SectionTitle>상담 및 제휴 문의</SectionTitle>
           <SectionDescription>
-            프로그램 참여, 지사 설립, 제휴 문의 등 무엇이든 편하게 문의해 주세요. 담당자가 빠르게 도와드리겠습니다.
+            프로그램 도입, 강사 협력, 공모사업 제안 등 다양한 협력을 기다리고 있습니다. 필요하신 내용을 남겨주시면
+            담당자가 신속하게 안내드리겠습니다.
           </SectionDescription>
         </SectionHeader>
         <ContactBanner>
           <ContactInfo>
-            <ContactTitle>함께할 준비가 되셨나요?</ContactTitle>
+            <ContactTitle>지금 바로 함께 도전해요</ContactTitle>
             <ContactGrid>
               <ContactRow>
                 <strong>주관·운영</strong>

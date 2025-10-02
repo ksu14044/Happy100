@@ -14,11 +14,10 @@ export default function NotFoundPage() {
           아래 버튼으로 이동을 계속해 주세요.
         </Desc>
         <Actions>
-          <PrimaryBtn href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>홈으로 가기</PrimaryBtn>
-          <GhostBtn href="#" onClick={(e) => { e.preventDefault(); navigate(-1); }}>이전 페이지</GhostBtn>
+          <PrimaryBtn to="/">홈으로 가기</PrimaryBtn>
+          <GhostBtn type="button" onClick={() => navigate(-1)}>이전 페이지</GhostBtn>
         </Actions>
       </Card>
     </Wrap>
   );
 }
-

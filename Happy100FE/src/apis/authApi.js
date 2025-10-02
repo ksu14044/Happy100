@@ -18,7 +18,9 @@ export async function loginApi({ username, password }) {
     // 쿠키 기반 인증: 서버가 Set-Cookie로 토큰을 설정함
     try {
         sessionStorage.setItem('has_session', '1');
-    } catch {}
+    } catch (error) {
+        console.warn('세션 저장에 실패했습니다.', error);
+    }
     return res.data;
 }
 
@@ -30,8 +32,16 @@ export async function logout() {
         console.warn("로그아웃 요청 중 오류", error);
     } finally {
         // 세션 힌트 제거
-        try { sessionStorage.removeItem('has_session'); } catch {}
-        try { localStorage.removeItem('user_preview'); } catch {}
+        try {
+            sessionStorage.removeItem('has_session');
+        } catch (error) {
+            console.warn('세션 힌트 제거 중 오류가 발생했습니다.', error);
+        }
+        try {
+            localStorage.removeItem('user_preview');
+        } catch (error) {
+            console.warn('사용자 프리뷰 제거 중 오류가 발생했습니다.', error);
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
     HeaderWrap, Inner, Bar, LogoButton, Brand, Tagline, LogoImg,
     DesktopNav, NavList, NavItem, NavLink,
@@ -74,7 +75,7 @@ export default function Header({
     const navRef = useRef(null);
 
     // 쿠키 기반 인증: 현재 사용자 정보 조회
-    const { data: user, refetch } = useGetUserInfoQuery();
+    const { data: user } = useGetUserInfoQuery();
     const userInfo = useMemo(() => {
         if (user && typeof user === 'object') {
             // role 우선순위: role -> roleName -> authorities 배열
@@ -136,7 +137,7 @@ export default function Header({
         <HeaderWrap sticky={sticky} className={className}>
             <Inner>
                 <Bar>
-                    <LogoButton as="a" href="/" onClick={(e) => go(e, "/")} aria-label="행복백세 홈">
+                    <LogoButton as={Link} to="/" onClick={(e) => go(e, "/")} aria-label="행복백세 홈">
                         {showImageLogo ? (
                             <LogoImg
                                 src={resolvedLogoSrc}
@@ -182,7 +183,7 @@ export default function Header({
                                 return (
                                     <NavItem key={item.label} onMouseEnter={() => setOpenIdx(idx)}>
                                         <NavLink
-                                            href={item.href}
+                                            to={item.href}
                                             active={active}
                                             aria-haspopup={hasChildren || undefined}
                                             aria-expanded={hasChildren ? open : undefined}
@@ -201,7 +202,7 @@ export default function Header({
                                                 {item.children.map((child) => (
                                                     <DropdownLink
                                                         key={child.label}
-                                                        href={child.href}
+                                                        to={child.href}
                                                         onClick={(e) => go(e, child.href)}
                                                     >
                                                         {child.label}
@@ -218,11 +219,11 @@ export default function Header({
                     {/* 데스크톱 우측 */}
                     {userInfo ? (
                         <UserArea>
-                            <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
+                            <CtaLink to="/counsel" onClick={(e) => go(e, "/counsel")}>
                                 상담 신청
                             </CtaLink>
                             {isAdmin && (
-                                <AuthLink href="/admin" onClick={(e) => go(e, "/admin")}>
+                                <AuthLink to="/admin" onClick={(e) => go(e, "/admin")}>
                                     관리자
                                 </AuthLink>
                             )}
@@ -235,13 +236,13 @@ export default function Header({
                         </UserArea>
                     ) : (
                         <RightArea>
-                            <CtaLink href="/counsel" onClick={(e) => go(e, "/counsel")}>
+                            <CtaLink to="/counsel" onClick={(e) => go(e, "/counsel")}>
                                 상담 신청
                             </CtaLink>
-                            <AuthLink href="/login" onClick={(e) => go(e, "/login")}>
+                            <AuthLink to="/login" onClick={(e) => go(e, "/login")}>
                                 로그인
                             </AuthLink>
-                            <AuthLink href="/signup" data-variant="primary" onClick={(e) => go(e, "/signup")}>
+                            <AuthLink to="/signup" data-variant="primary" onClick={(e) => go(e, "/signup")}>
                                 회원가입
                             </AuthLink>
                         </RightArea>
@@ -273,7 +274,7 @@ export default function Header({
                                         {displayName}님
                                     </MobileItem>
                                     {isAdmin && (
-                                        <MobileItem href="/admin" onClick={(e) => go(e, "/admin")}>
+                                        <MobileItem to="/admin" onClick={(e) => go(e, "/admin")}>
                                             관리자 페이지
                                         </MobileItem>
                                     )}
@@ -283,17 +284,17 @@ export default function Header({
                                 </React.Fragment>
                             ) : (
                                 <React.Fragment>
-                                    <MobileItem href="/login" onClick={(e) => go(e, "/login")}>
+                                    <MobileItem to="/login" onClick={(e) => go(e, "/login")}>
                                         로그인
                                     </MobileItem>
-                                    <MobileItem href="/signup" onClick={(e) => go(e, "/signup")}>
+                                    <MobileItem to="/signup" onClick={(e) => go(e, "/signup")}>
                                         회원가입
                                     </MobileItem>
                                 </React.Fragment>
                             )}
 
                             <MobileItem
-                                href="/counsel"
+                                to="/counsel"
                                 onClick={(e) => go(e, "/counsel")}
                                 style={{ fontWeight: 700, color: "var(--color-primary)", background: "rgba(37,99,235,0.1)" }}
                             >
@@ -302,13 +303,13 @@ export default function Header({
 
                             {items.map((item) => (
                                 <React.Fragment key={item.label}>
-                                    <MobileItem href={item.href} onClick={(e) => go(e, item.href)}>
+                                    <MobileItem to={item.href} onClick={(e) => go(e, item.href)}>
                                         {item.label}
                                     </MobileItem>
                                     {item.children?.map((child) => (
                                         <MobileItem
                                             key={child.label}
-                                            href={child.href}
+                                            to={child.href}
                                             onClick={(e) => go(e, child.href)}
                                             style={{ paddingLeft: 28, fontSize: 14 }}
                                         >

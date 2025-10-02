@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
-import { mediaQuery, mediaQueryUp } from '../../styles/responsive';
+import { Link } from 'react-router-dom';
+import { mediaQuery } from '../../styles/responsive';
 
 const containerWidth = '1180px';
 
@@ -139,7 +140,7 @@ export const NavItem = styled.li`
   }
 `;
 
-export const NavLink = styled('a', forwardActive)`
+export const NavLink = styled(Link, forwardActive)`
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -213,7 +214,7 @@ export const Dropdown = styled('ul', forwardOpen)`
   }
 `;
 
-export const DropdownLink = styled.a`
+export const DropdownLink = styled(Link)`
   display: block;
   padding: 12px;
   border-radius: 12px;
@@ -274,7 +275,7 @@ export const LogoutBtn = styled.button`
   }
 `;
 
-export const AuthLink = styled.a`
+export const AuthLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -310,7 +311,7 @@ export const AuthLink = styled.a`
   }
 `;
 
-export const CtaLink = styled.a`
+export const CtaLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -379,7 +380,7 @@ export const MobilePanel = styled.div`
   }
 `;
 
-export const MobileItem = styled.a`
+export const MobileItem = styled(Link)`
   display: block;
   padding: 16px 20px;
   font-size: 16px;

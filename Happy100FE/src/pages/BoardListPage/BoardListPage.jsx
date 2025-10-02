@@ -87,13 +87,16 @@ export default function BoardListPage() {
         postList = [],
         totalPages = 1,
         totalElements = 0,
+        page: responsePage,
     } = data ?? {};
+
+    const currentPage = responsePage ?? page;
 
     // 페이지 버튼(모바일 단순화)
     const pageItems = useMemo(() => {
-        if (isMobile) return [page];
+        if (isMobile) return [currentPage];
         const total = Math.max(1, totalPages);
-        const cur = Math.min(Math.max(1, page), total);
+        const cur = Math.min(Math.max(1, currentPage), total);
         const delta = 2;
         const start = Math.max(1, cur - delta);
         const end = Math.min(total, cur + delta);
@@ -108,7 +111,7 @@ export default function BoardListPage() {
             items.push(total);
         }
         return items;
-    }, [page, totalPages, isMobile]);
+    }, [currentPage, totalPages, isMobile]);
 
     const fmtDate = (d) => {
         if (!d) return "";
@@ -187,7 +190,7 @@ export default function BoardListPage() {
             {totalElements > 0 && (
                 <Pagination
                     total={totalElements}
-                    page={page}
+                    page={currentPage}
                     totalPages={totalPages}
                     pageItems={pageItems}
                     onChange={setPage}
