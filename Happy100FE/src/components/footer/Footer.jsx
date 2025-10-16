@@ -33,7 +33,7 @@ export default function Footer({
         youtube: '#',
         naver: '#',
         blog: '#',
-        band: 'https://naver.com',
+        band: 'https://band.us/band/97173841',
     },
     className,
 }) {
