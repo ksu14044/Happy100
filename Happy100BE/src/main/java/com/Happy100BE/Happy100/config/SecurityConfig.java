@@ -2,6 +2,7 @@ package com.Happy100BE.Happy100.config;
 
 import com.Happy100BE.Happy100.security.filter.JwtAuthenticationFilter;
 import com.Happy100BE.Happy100.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,6 +50,15 @@ public class SecurityConfig {
         @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
         private String corsAllowedOrigins;
 
+        @Value("${app.security.hsts.enabled:false}")
+        private boolean hstsEnabled;
+
+        @Value("${app.security.hsts.max-age:0}")
+        private long hstsMaxAgeSeconds;
+
+        @Value("${app.security.force-https.enabled:false}")
+        private boolean forceHttps;
+
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
@@ -55,6 +67,30 @@ public class SecurityConfig {
                                 .cors(Customizer.withDefaults())
                                 .formLogin(f -> f.disable())
                                 .httpBasic(b -> b.disable())
+
+                                // 보안 헤더 기본값 및 HSTS(프로덕션에서만 활성 권장)
+                                .headers(headers -> {
+                                        headers.contentTypeOptions(Customizer.withDefaults());
+                                        headers.frameOptions(frame -> frame.sameOrigin());
+                                        headers.referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+                                        if (hstsEnabled) {
+                                                headers.httpStrictTransportSecurity(h -> h
+                                                                .includeSubDomains(true)
+                                                                .preload(false)
+                                                                .maxAgeInSeconds(Math.max(0, hstsMaxAgeSeconds))
+                                                );
+                                        } else {
+                                                headers.httpStrictTransportSecurity(h -> h.disable());
+                                        }
+                                })
+
+                                // HTTP -> HTTPS 강제 리다이렉트 (프록시의 X-Forwarded-Proto 인지 전제)
+                                .requiresChannel(channel -> {
+                                        if (forceHttps) {
+                                                channel.requestMatchers((RequestMatcher) this::shouldForceSecure)
+                                                                .requiresSecure();
+                                        }
+                                })
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -184,5 +220,21 @@ public class SecurityConfig {
                                 .map(String::trim)
                                 .filter(StringUtils::hasText)
                                 .toList();
+        }
+
+        private boolean shouldForceSecure(HttpServletRequest request) {
+                if (request == null) {
+                        return false;
+                }
+                if (request.isSecure()) {
+                        return false;
+                }
+
+                String forwardedProto = request.getHeader("X-Forwarded-Proto");
+                if (!StringUtils.hasText(forwardedProto)) {
+                        // 프록시가 원본 스킴을 전달하지 못하면 강제 리다이렉트를 생략해 무한 루프를 방지한다.
+                        return false;
+                }
+                return !"https".equalsIgnoreCase(forwardedProto);
         }
 }

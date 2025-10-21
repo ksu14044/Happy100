@@ -40,6 +40,13 @@ app:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
   search:
     use-fulltext: ${APP_SEARCH_USE_FULLTEXT:true}
+  security:
+    # 기본 프로필(공통)에서도 환경변수로 HTTPS 강제/해제를 제어할 수 있도록 기본 키 노출
+    hsts:
+      enabled: ${APP_SECURITY_HSTS_ENABLED:false}
+      max-age: ${APP_SECURITY_HSTS_MAX_AGE:0}
+    force-https:
+      enabled: ${APP_SECURITY_FORCE_HTTPS_ENABLED:false}
 
 jwt:
   cookie:
@@ -53,6 +60,8 @@ jwt:
 
 server:
   port: 8080
+  # 프록시/로드밸런서의 X-Forwarded-* 헤더를 신뢰해 HTTPS 리다이렉트/링크 생성 시 원본 스킴을 반영
+  forward-headers-strategy: framework
 
 logging:
   level:
@@ -102,17 +111,27 @@ server:
   port: ${SERVER_PORT:8080}
 app:
   cors:
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://행복백세.com,http://xn--3h3b1nt9hlw0a.com,https://행복백세.com,https://xn--3h3b1nt9hlw0a.com}
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:https://행복백세.com,https://xn--3h3b1nt9hlw0a.com}
+  security:
+    hsts:
+      # 브라우저가 HTTP를 자동으로 HTTPS로 올리는 HSTS를 임시 비활성화(문제 진단 목적)
+      enabled: ${APP_SECURITY_HSTS_ENABLED:false}
+      max-age: ${APP_SECURITY_HSTS_MAX_AGE:0}
+    force-https:
+      # 프록시(OpenResty)에서 X-Forwarded-Proto 헤더를 전달하지 못하는 환경에서는
+      # Spring Security의 HTTPS 강제가 무한 리다이렉트를 유발할 수 있음.
+      # 운영 호스팅에서 프록시 설정 제어가 불가하므로 기본값을 비활성화합니다.
+      enabled: ${APP_SECURITY_FORCE_HTTPS_ENABLED:false}
 react:
   server:
-    protocol: ${REACT_SERVER_PROTOCOL:http}
+    protocol: ${REACT_SERVER_PROTOCOL:https}
     host: ${REACT_SERVER_HOST:xn--3h3b1nt9hlw0a.com}
-    port: ${REACT_SERVER_PORT:80}
+    port: ${REACT_SERVER_PORT:443}
     callback-path: ${REACT_SERVER_CALLBACK_PATH:/oauth2/callback}
     failure-path: ${REACT_SERVER_FAILURE_PATH:/oauth2/callback}
 jwt:
   cookie:
-    secure: ${JWT_COOKIE_SECURE:false}
+    secure: ${JWT_COOKIE_SECURE:true}
     same-site: ${JWT_COOKIE_SAME_SITE:Lax}
     domain: ${JWT_COOKIE_DOMAIN:xn--3h3b1nt9hlw0a.com}
 
