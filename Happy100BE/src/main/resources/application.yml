@@ -93,6 +93,11 @@ react:
     port: ${REACT_SERVER_PORT:5173}
     callback-path: ${REACT_SERVER_CALLBACK_PATH:/oauth2/callback}
     failure-path: ${REACT_SERVER_FAILURE_PATH:/oauth2/callback}
+app:
+  security:
+    force-https:
+      # 로컬 서버 프로필이라도 카페24 톰캣 환경에서는 HTTPS 강제가 필요하므로 기본값을 true로 둔다.
+      enabled: ${APP_SECURITY_FORCE_HTTPS_ENABLED:true}
 
 ---
 spring:
@@ -115,13 +120,12 @@ app:
   security:
     hsts:
       # 브라우저가 HTTP를 자동으로 HTTPS로 올리는 HSTS를 임시 비활성화(문제 진단 목적)
-      enabled: ${APP_SECURITY_HSTS_ENABLED:false}
+      enabled: ${APP_SECURITY_HSTS_ENABLED:true}
       max-age: ${APP_SECURITY_HSTS_MAX_AGE:0}
     force-https:
-      # 프록시(OpenResty)에서 X-Forwarded-Proto 헤더를 전달하지 못하는 환경에서는
-      # Spring Security의 HTTPS 강제가 무한 리다이렉트를 유발할 수 있음.
-      # 운영 호스팅에서 프록시 설정 제어가 불가하므로 기본값을 비활성화합니다.
-      enabled: ${APP_SECURITY_FORCE_HTTPS_ENABLED:false}
+      # 프록시(OpenResty)에서 X-Forwarded-Proto 헤더를 정상 전달한다는 전제에서만 적용.
+      # 운영 서비스는 HTTPS만 허용해야 하므로 기본값을 true로 유지합니다.
+      enabled: ${APP_SECURITY_FORCE_HTTPS_ENABLED:true}
 react:
   server:
     protocol: ${REACT_SERVER_PROTOCOL:https}

@@ -1,8 +1,8 @@
 package com.Happy100BE.Happy100.config;
 
+import com.Happy100BE.Happy100.security.filter.ForceHttpsRedirectFilter;
 import com.Happy100BE.Happy100.security.filter.JwtAuthenticationFilter;
 import com.Happy100BE.Happy100.service.CustomUserDetailsService;
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +23,12 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -46,6 +46,7 @@ public class SecurityConfig {
         private final AuthenticationFailureHandler oAuth2FailureHandler;
         private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
         private final com.Happy100BE.Happy100.security.jwt.TokenCookieUtil tokenCookieUtil;
+        private final ForceHttpsRedirectFilter forceHttpsRedirectFilter;
 
         @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
         private String corsAllowedOrigins;
@@ -55,9 +56,6 @@ public class SecurityConfig {
 
         @Value("${app.security.hsts.max-age:0}")
         private long hstsMaxAgeSeconds;
-
-        @Value("${app.security.force-https.enabled:false}")
-        private boolean forceHttps;
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -83,15 +81,6 @@ public class SecurityConfig {
                                                 headers.httpStrictTransportSecurity(h -> h.disable());
                                         }
                                 })
-
-                                // HTTP -> HTTPS 강제 리다이렉트 (프록시의 X-Forwarded-Proto 인지 전제)
-                                .requiresChannel(channel -> {
-                                        if (forceHttps) {
-                                                channel.requestMatchers((RequestMatcher) this::shouldForceSecure)
-                                                                .requiresSecure();
-                                        }
-                                })
-
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 // 공개 문서
@@ -108,8 +97,14 @@ public class SecurityConfig {
                                                                 "/vite.svg",
                                                                 "/assets/**",
                                                                 "/favicon.ico",
+                                                                "/favicon-16.png",
+                                                                "/favicon-32.png",
+                                                                "/apple-touch-icon.png",
+                                                                "/site.webmanifest",
                                                                 "/manifest.json",
-                                                                "/robots.txt")
+                                                                "/robots.txt",
+                                                                "/naver2603cf3c756331c8f6900b52cf60a486.html",
+                                                                "/sitemap.xml")
                                                 .permitAll()
 
                                                 // ✅ 읽기 전용 공개 API (필요 시 조정)
@@ -176,6 +171,9 @@ public class SecurityConfig {
                                                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                                                                 new AntPathRequestMatcher("/**")))
 
+                                // HTTP -> HTTPS 301 강제 리다이렉트를 ChannelProcessing 이전에서 처리
+                                .addFilterBefore(forceHttpsRedirectFilter, ChannelProcessingFilter.class)
+
                                 // JWT 필터
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -222,19 +220,4 @@ public class SecurityConfig {
                                 .toList();
         }
 
-        private boolean shouldForceSecure(HttpServletRequest request) {
-                if (request == null) {
-                        return false;
-                }
-                if (request.isSecure()) {
-                        return false;
-                }
-
-                String forwardedProto = request.getHeader("X-Forwarded-Proto");
-                if (!StringUtils.hasText(forwardedProto)) {
-                        // 프록시가 원본 스킴을 전달하지 못하면 강제 리다이렉트를 생략해 무한 루프를 방지한다.
-                        return false;
-                }
-                return !"https".equalsIgnoreCase(forwardedProto);
-        }
 }
